@@ -3,6 +3,12 @@ import { Request, Response, NextFunction } from 'express';
 export const getRestaurant = async (req: Request, res: Response) => {
 }
 
+export const getRestaurants = async (req: Request, res: Response) => {
+}
+
+export const getCloserRestaurants = async (req: Request, res: Response) => {
+}
+
 export const createRestaurant = async (req: Request, res: Response) => {
 
 }

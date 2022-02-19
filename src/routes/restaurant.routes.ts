@@ -12,6 +12,18 @@ router.get(
     restaurantController.getRestaurant
 )
 
+router.get(
+    '/',
+    [tokenIsValid],
+    restaurantController.getRestaurants
+)
+
+router.get(
+    '/closer-restaurarts',
+    [tokenIsValid],
+    restaurantController.getCloserRestaurants
+)
+
 router.post(
     '/',
     [
