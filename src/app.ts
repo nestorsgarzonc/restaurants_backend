@@ -3,15 +3,15 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from 'cors';
 import morgan from 'morgan';
-import { config as dotConfig } from "dotenv";
 import waiterRoutes from "./routes/waiter.routes";
 import tableRoutes from "./routes/table.routes";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 import orderRoutes from "./routes/order.routes";
 import restaurantRoutes from "./routes/restaurant.routes";
+import db from './core/db';
 
-dotConfig();
+db();
 
 const app = express();
 const server = createServer(app);
