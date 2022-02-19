@@ -15,6 +15,7 @@ interface User {
     address: String;
     deviceToken?: String;
     tokenType?: String;
+    coordinates?: Number[];
 }
 
 const scheme = new Schema<User>({
@@ -75,6 +76,10 @@ const scheme = new Schema<User>({
     },
     tokenType: {
         type: String,
+        required: false
+    },
+    coordinates: {
+        type: [Number],
         required: false
     }
 });
