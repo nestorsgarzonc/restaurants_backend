@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import * as authController from '../controllers/auth.controller';
+import { tokenIsValid } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.post(
 
 router.get(
     '/logout',
+    [tokenIsValid],
     authController.logout,
 )
 
@@ -37,6 +39,7 @@ router.put(
 
 router.get(
     '/refresh-token',
+    [tokenIsValid],
     authController.refreshToken,
 )
 
