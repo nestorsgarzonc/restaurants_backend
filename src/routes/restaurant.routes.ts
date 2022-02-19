@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { body } from 'express-validator';
 import * as restaurantController from '../controllers/restaurant.controller';
 import { tokenIsValid } from '../middlewares/auth.middleware';
+import { errorHandler } from '../middlewares/errors.middleware';
 
 const router = Router()
 
@@ -18,6 +19,7 @@ router.post(
         body('phone').isLength({ min: 3 }).withMessage('Phone must be at least 3 characters long'),
         body('email').isEmail().withMessage('Invalid email'),
         tokenIsValid,
+        errorHandler,
     ],
     restaurantController.createRestaurant
 )
@@ -29,6 +31,7 @@ router.put(
         body('phone').isLength({ min: 3 }).withMessage('Phone must be at least 3 characters long'),
         body('email').isEmail().withMessage('Invalid email'),
         tokenIsValid,
+        errorHandler,
     ],
     restaurantController.updateRestaurant
 )

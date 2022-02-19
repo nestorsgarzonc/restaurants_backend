@@ -27,7 +27,7 @@ app.use(cors({
     "methods": "*",
 }))
 
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
     res.send('Is working!');
 });
 

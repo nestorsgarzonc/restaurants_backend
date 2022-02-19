@@ -63,6 +63,7 @@ const scheme = new Schema<User>({
     ordersStory: [{
         type: Schema.Types.ObjectId,
         ref: 'Order',
+        default: [],
     }],
     address: {
         type: String,
@@ -75,6 +76,14 @@ const scheme = new Schema<User>({
     tokenType: {
         type: String,
         required: false
+    }
+});
+
+scheme.post('save', function (error, _, next) {
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+        next(new Error('El usuario ya existe.'));
+    } else {
+        next();
     }
 });
 

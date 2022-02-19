@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { body } from 'express-validator';
 import * as orderController from '../controllers/order.controller';
 import { tokenIsValid } from '../middlewares/auth.middleware';
+import { errorHandler } from '../middlewares/errors.middleware';
 
 const router = Router()
 
@@ -27,6 +28,7 @@ router.post(
         body('status').isString(),
         body('totalPrice').isNumeric(),
         tokenIsValid,
+        errorHandler,
     ],
     orderController.createOrder
 )
