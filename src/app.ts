@@ -3,6 +3,15 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from 'cors';
 import morgan from 'morgan';
+import { config as dotConfig } from "dotenv";
+import waiterRoutes from "./routes/waiter.routes";
+import tableRoutes from "./routes/table.routes";
+import userRoutes from "./routes/user.routes";
+import authRoutes from "./routes/auth.routes";
+import orderRoutes from "./routes/order.routes";
+import restaurantRoutes from "./routes/restaurant.routes";
+
+dotConfig();
 
 const app = express();
 const server = createServer(app);
@@ -19,10 +28,15 @@ app.use(cors({
 }))
 
 app.get('/', (req, res) => {
-    res.json({
-        'Amor': 'Te amo! ♥♥♥'
-    })
-})
+    res.send('Is working!');
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/waiter', waiterRoutes);
+app.use('/api/table', tableRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/order', orderRoutes);
+app.use('/api/restaurant', restaurantRoutes);
 
 io.on('connection', async (socket) => {
     console.log('a user connected');
