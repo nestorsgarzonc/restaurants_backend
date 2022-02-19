@@ -1,13 +1,14 @@
 import { Schema, model, Types } from 'mongoose';
 
 interface Order {
-    orders: Types.ObjectId[];
+    usersOrder: Types.ObjectId[];
     status: String;
     totalPrice: Number;
+    restaurantId: String;
 }
 
-const scheme= new Schema<Order>({
-    orders: [{
+const scheme = new Schema<Order>({
+    usersOrder: [{
         type: Schema.Types.ObjectId,
         ref: 'UserOrder',
         required: true
@@ -20,6 +21,10 @@ const scheme= new Schema<Order>({
         type: Number,
         required: true,
         default: 0
+    },
+    restaurantId: {
+        type: String,
+        required: true
     }
 });
 
