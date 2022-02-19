@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { hashSync, compareSync } from 'bcrypt';
-import * as jwt from "jsonwebtoken";
+import { getToken } from '../core/jwt';
 import User from '../models/user/user';
 
 export const login = async (req: Request, res: Response) => {
@@ -11,11 +11,7 @@ export const login = async (req: Request, res: Response) => {
     if (!compareSync(req.body.password, user.password.toString())) {
         return res.status(404).json({ msg: 'Usuario o contraseña incorrecta' });
     }
-    const token = jwt.sign(
-        { userId: user.id },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.TOKEN_DURATION }
-    );
+    const token = getToken(user.id);
     return res.json({ token });
 }
 
@@ -44,10 +40,6 @@ export const refreshToken = async (req: Request, res: Response) => {
     if (!user) {
         return res.status(404).json({ msg: 'User not found' });
     }
-    const token = jwt.sign(
-        { userId: user.id },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.TOKEN_DURATION }
-    );
+    const token = getToken(user.id);
     return res.json({ token });
 }
