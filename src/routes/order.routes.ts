@@ -14,7 +14,7 @@ router.get(
 
 //Pass restaurant id as query param
 router.get(
-    '/:id/restaurant',
+    '/:restaurantId/restaurant',
     [tokenIsValid],
     orderController.getRestaurantOrders
 )

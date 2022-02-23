@@ -4,7 +4,7 @@ import UserOrder from '../models/restaurant/userOrder';
 
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
-        const orderId = req.query.id;
+        const orderId = req.params.id;
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ msg: 'Order not found' });
@@ -17,7 +17,7 @@ export const getOrderDetail = async (req: Request, res: Response) => {
 
 
 export const getRestaurantOrders = async (req: Request, res: Response) => {
-    const restaurantId = req.query.restaurantId;
+    const restaurantId = req.params.restaurantId;
     try {
         const orders = await Order.find({ restaurantId })
             .sort({ createdAt: -1 });
@@ -42,7 +42,7 @@ export const createTableOrder = async (req: Request, res: Response) => {
 
 export const updateTableOrder = async (req: Request, res: Response) => {
     try {
-        const orderId = req.query.id;
+        const orderId = req.params.id;
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ msg: 'Order not found' });
@@ -69,7 +69,7 @@ export const createUserOrder = async (req: Request, res: Response) => {
 
 export const updateUserOrder = async (req: Request, res: Response) => {
     try {
-        const userOrder = UserOrder.findById(req.query.id);
+        const userOrder = UserOrder.findById(req.params.id);
         if (!userOrder) {
             return res.status(404).json({ msg: 'User order not found' });
         }
