@@ -12,7 +12,6 @@ router.get(
     orderController.getOrderDetail
 )
 
-
 //Pass restaurant id as query param
 router.get(
     '/:id/restaurant',
@@ -21,16 +20,63 @@ router.get(
 )
 
 router.post(
-    '/',
+    '/table-order',
     [
-        body('userId').isMongoId(),
+        body('usersOrder').isMongoId(),
         body('restaurantId').isMongoId(),
         body('status').isString(),
-        body('totalPrice').isNumeric(),
+        body('totalPrice').isNumeric().isFloat({ min: 0 }),
         tokenIsValid,
         errorHandler,
     ],
-    orderController.createOrder
+    orderController.createTableOrder
+)
+
+router.put(
+    '/table-order/:id',
+    [
+        body('usersOrder').isMongoId().optional({ nullable: true }),
+        body('restaurantId').isMongoId().optional({ nullable: true }),
+        body('status').isString().optional({ nullable: true }),
+        body('totalPrice').isNumeric().isFloat({ min: 0 }).optional({ nullable: true }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    orderController.updateTableOrder
+)
+
+router.post(
+    '/user-order',
+    [
+        body('userId').isMongoId(),
+        body('restaurantId').isMongoId(),
+        body('tableId').isMongoId(),
+        body('waiterId').isMongoId(),
+        body('itemsIds').isArray(),
+        body('status').isString(),
+        body('price').isNumeric().isFloat({ min: 0 }),
+        body('tip').isNumeric().isFloat({ min: 0, max: 1 }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    orderController.createUserOrder
+)
+
+router.post(
+    '/user-order/:id',
+    [
+        body('userId').isMongoId().optional({ nullable: true }),
+        body('restaurantId').isMongoId().optional({ nullable: true }),
+        body('tableId').isMongoId().optional({ nullable: true }),
+        body('waiterId').isMongoId().optional({ nullable: true }),
+        body('itemsIds').isArray().optional({ nullable: true }),
+        body('status').isString().optional({ nullable: true }),
+        body('price').isNumeric().isFloat({ min: 0 }).optional({ nullable: true }),
+        body('tip').isNumeric().isFloat({ min: 0, max: 1 }).optional({ nullable: true }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    orderController.updateUserOrder
 )
 
 export default router

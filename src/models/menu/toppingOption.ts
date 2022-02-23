@@ -4,6 +4,8 @@ interface ToppingOption {
     name: String;
     price: Number;
     imgUrl?: String;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const scheme = new Schema<ToppingOption>({
@@ -19,6 +21,6 @@ const scheme = new Schema<ToppingOption>({
         type: String,
         required: false
     }
-});
+}, { timestamps: true });
 
 export default model<ToppingOption>('ToppingOption', scheme);

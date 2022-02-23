@@ -3,6 +3,8 @@ import { Schema, model, Types } from 'mongoose';
 interface Waiter {
     user: Types.ObjectId;
     restaurant: Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const schema = new Schema<Waiter>({
@@ -16,6 +18,6 @@ const schema = new Schema<Waiter>({
         ref: 'Restaurant',
         required: true
     }
-});
+}, { timestamps: true });
 
 export default model<Waiter>('Waiter', schema);

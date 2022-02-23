@@ -6,6 +6,8 @@ interface Toppings {
     options: Types.ObjectId[];
     minOptions?: Number;
     maxOptions?: Number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const scheme = new Schema<Toppings>({
@@ -30,6 +32,6 @@ const scheme = new Schema<Toppings>({
         type: Number,
         required: false
     }
-});
+}, { timestamps: true });
 
 export default model<Toppings>('Toppings', scheme);

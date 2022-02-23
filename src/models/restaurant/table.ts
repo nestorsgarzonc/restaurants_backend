@@ -4,6 +4,8 @@ interface Table {
     name: string;
     capacity: number;
     restaurant: Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const schema = new Schema<Table>({
@@ -20,6 +22,6 @@ const schema = new Schema<Table>({
         ref: 'Restaurant',
         required: true
     }
-});
+}, { timestamps: true });
 
 export default model<Table>('Table', schema);

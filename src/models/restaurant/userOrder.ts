@@ -1,38 +1,40 @@
 import { Schema, model, Types } from 'mongoose';
 
 interface UserOrder {
-    user: Types.ObjectId;
-    restaurant: Types.ObjectId;
-    table: Types.ObjectId;
-    waiter: Types.ObjectId;
-    items: Types.ObjectId[];
-    status: string;
+    userId: Types.ObjectId;
+    restaurantId: Types.ObjectId;
+    tableId: Types.ObjectId;
+    waiterId: Types.ObjectId;
+    itemsIds: Types.ObjectId[];
+    status: String;
     price: Number;
     tip: Number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const scheme = new Schema<UserOrder>({
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    restaurant: {
+    restaurantId: {
         type: Schema.Types.ObjectId,
         ref: 'Restaurant',
         required: true
     },
-    table: {
+    tableId: {
         type: Schema.Types.ObjectId,
         ref: 'Table',
         required: true
     },
-    waiter: {
+    waiterId: {
         type: Schema.Types.ObjectId,
         ref: 'Waiter',
         required: true
     },
-    items: [{
+    itemsIds: [{
         type: Schema.Types.ObjectId,
         ref: 'MenuItem',
         required: true
@@ -51,6 +53,6 @@ const scheme = new Schema<UserOrder>({
         required: true,
         default: 0
     }
-});
+}, { timestamps: true });
 
 export default model<UserOrder>('UserOrder', scheme);

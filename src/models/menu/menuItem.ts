@@ -7,6 +7,8 @@ interface MenuItem {
     toppings: Types.ObjectId[];
     isAvaliable: Boolean;
     discount?: Number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const scheme = new Schema<MenuItem>({
@@ -35,6 +37,6 @@ const scheme = new Schema<MenuItem>({
         type: Number,
         required: false
     }
-});
+}, { timestamps: true });
 
 export default model<MenuItem>('MenuItem', scheme);

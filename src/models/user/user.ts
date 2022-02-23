@@ -16,6 +16,8 @@ interface User {
     deviceToken?: String;
     tokenType?: String;
     coordinates?: Number[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const scheme = new Schema<User>({
@@ -82,7 +84,7 @@ const scheme = new Schema<User>({
         type: [Number],
         required: false
     }
-});
+}, { timestamps: true });
 
 scheme.post('save', function (error, _, next) {
     if (error.name === 'MongoServerError' && error.code === 11000) {

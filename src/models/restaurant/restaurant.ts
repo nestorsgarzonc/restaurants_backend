@@ -14,6 +14,8 @@ interface Restaurant {
     owner: Types.ObjectId,
     tables: Types.ObjectId[];
     waiters: Types.ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const schema = new Schema<Restaurant>({
@@ -67,7 +69,7 @@ const schema = new Schema<Restaurant>({
         ref: 'Waiter',
         required: true
     }]
-})
+}, { timestamps: true })
 
 schema.plugin(uniqueValidator, { message: '{PATH} debe ser unico' });
 
