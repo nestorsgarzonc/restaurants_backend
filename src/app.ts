@@ -9,6 +9,7 @@ import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 import orderRoutes from "./routes/order.routes";
 import restaurantRoutes from "./routes/restaurant.routes";
+import menuRoutes from "./routes/menu.routes";
 import db from './core/db';
 
 db();
@@ -37,6 +38,7 @@ app.use('/api/table', tableRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/order', orderRoutes);
 app.use('/api/restaurant', restaurantRoutes);
+app.use('/api/menu', menuRoutes)
 
 io.on('connection', async (socket) => {
     console.log('a user connected');
