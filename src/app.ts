@@ -28,7 +28,7 @@ app.use(cors({
 }))
 
 app.get('/', (_, res) => {
-    res.send('Is working!');
+    res.send(Date.now());
 });
 
 app.use('/api/auth', authRoutes);
