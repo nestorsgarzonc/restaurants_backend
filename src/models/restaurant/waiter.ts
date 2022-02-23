@@ -3,6 +3,7 @@ import { Schema, model, Types } from 'mongoose';
 interface Waiter {
     user: Types.ObjectId;
     restaurant: Types.ObjectId;
+    status: String;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -12,6 +13,11 @@ const schema = new Schema<Waiter>({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['available', 'unavailable'],
+        default: 'available'
     },
     restaurant: {
         type: Schema.Types.ObjectId,

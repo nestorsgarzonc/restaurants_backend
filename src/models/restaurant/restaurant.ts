@@ -2,20 +2,20 @@ import { Schema, model, Types } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
 interface Restaurant {
-    name: string;
-    phone?: string;
-    email?: string;
-    address?: string;
-    description: string;
-    imageUrl?: string;
-    primaryColor?: string;
-    secondaryColor?: string;
-    menu: Types.ObjectId,
-    owner: Types.ObjectId,
-    tables: Types.ObjectId[];
-    waiters: Types.ObjectId[];
+    address: String;
     createdAt: Date;
+    description: String;
+    email: String;
+    imageUrl?: String;
+    menu: Types.ObjectId[],
+    name: String;
+    owner: Types.ObjectId,
+    phone: Number;
+    primaryColor?: String;
+    secondaryColor?: String;
+    tables: Types.ObjectId[];
     updatedAt: Date;
+    waiters: Types.ObjectId[];
 }
 
 const schema = new Schema<Restaurant>({
@@ -24,16 +24,16 @@ const schema = new Schema<Restaurant>({
         required: true
     },
     phone: {
-        type: String,
-        required: false
+        type: Number,
+        required: true,
     },
     email: {
         type: String,
-        required: false
+        required: true,
     },
     address: {
         type: String,
-        required: false
+        required: true,
     },
     description: {
         type: String,
@@ -49,11 +49,11 @@ const schema = new Schema<Restaurant>({
         type: String,
         required: false
     },
-    menu: {
+    menu: [{
         type: Schema.Types.ObjectId,
-        ref: 'Menu',
+        ref: 'MenuItem',
         required: true
-    },
+    }],
     owner: {
         type: Schema.Types.ObjectId,
         ref: 'User',
