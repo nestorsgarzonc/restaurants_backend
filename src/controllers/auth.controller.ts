@@ -11,8 +11,12 @@ export const login = async (req: Request, res: Response) => {
     if (!compareSync(req.body.password, user.password.toString())) {
         return res.status(404).json({ msg: 'Usuario o contraseña incorrecta' });
     }
+
     const token = getToken(user.id);
-    return res.json({ token });
+    return res.json({
+        token,
+        id: user.id
+    });
 }
 
 export const register = async (req: Request, res: Response) => {

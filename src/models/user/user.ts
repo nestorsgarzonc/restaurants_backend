@@ -12,7 +12,7 @@ interface User {
     isWaiter: Boolean;
     isCustomer: Boolean;
     ordersStory: Types.ObjectId[];
-    address: String;
+    address?: String;
     deviceToken?: String;
     tokenType?: String;
     coordinates?: Number[];
@@ -70,7 +70,7 @@ const scheme = new Schema<User>({
     }],
     address: {
         type: String,
-        required: true
+        required: false
     },
     deviceToken: {
         type: String,

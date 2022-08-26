@@ -62,7 +62,7 @@ router.post(
     orderController.createUserOrder
 )
 
-router.post(
+router.put(
     '/user-order/:id',
     [
         body('userId').isMongoId().optional({ nullable: true }),

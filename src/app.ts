@@ -23,14 +23,18 @@ app.disable('x-powered-by')
 
 app.use(morgan('dev'))
 app.use(express.json())
+
 app.use(cors({
     "origin": "*",
     "methods": "*",
 }))
 
 app.get('/', (_, res) => {
-    res.send(Date.now());
+    res.json({
+        date: Date.now().toString()
+    })
 });
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/waiter', waiterRoutes);
@@ -46,6 +50,7 @@ io.on('connection', async (socket) => {
 
     socket.on('msg', (data) => {
         console.log(data);
+        socket.emit('msg', data);
     })
 
     socket.on('disconnect', () => {
@@ -54,8 +59,11 @@ io.on('connection', async (socket) => {
 
 
     socket.on('join_to_restaurant_table', (data) => {
+        
         let parsedData = JSON.parse(data);
         socket.join(parsedData.table_id);
+
+        
         console.log(parsedData.table_id);
         //TODO: SEND ORDER STATUS TO ALL USERS IN THE TABLE
         io.to(parsedData.table_id).emit('new_user_joined', { ...parsedData, 'connected': true });
