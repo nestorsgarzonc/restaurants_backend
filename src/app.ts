@@ -11,7 +11,9 @@ import orderRoutes from "./routes/order.routes";
 import restaurantRoutes from "./routes/restaurant.routes";
 import menuRoutes from "./routes/menu.routes";
 import db from './core/db';
+import { configEnv } from "./core/config_env";
 
+configEnv();
 db();
 
 const app = express();
@@ -59,11 +61,11 @@ io.on('connection', async (socket) => {
 
 
     socket.on('join_to_restaurant_table', (data) => {
-        
+
         let parsedData = JSON.parse(data);
         socket.join(parsedData.table_id);
 
-        
+
         console.log(parsedData.table_id);
         //TODO: SEND ORDER STATUS TO ALL USERS IN THE TABLE
         io.to(parsedData.table_id).emit('new_user_joined', { ...parsedData, 'connected': true });
