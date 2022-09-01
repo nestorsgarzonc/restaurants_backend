@@ -17,4 +17,4 @@ router.put(
     userController.updateUser
 )
 
-export default router
+export default router;
