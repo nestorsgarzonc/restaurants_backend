@@ -51,7 +51,7 @@ const schema = new Schema<Restaurant>({
     },
     menu: [{
         type: Schema.Types.ObjectId,
-        ref: 'MenuItem',
+        ref: 'Categories',
         required: true
     }],
     owner: {

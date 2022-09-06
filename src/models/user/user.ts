@@ -7,10 +7,7 @@ interface User {
     password: String;
     phone: Number;
     isActive: Boolean;
-    isAdmin: Boolean;
-    isOwner: Boolean;
-    isWaiter: Boolean;
-    isCustomer: Boolean;
+    roles: String;
     ordersStory: Types.ObjectId[];
     address?: String;
     deviceToken?: String;
@@ -41,28 +38,16 @@ const scheme = new Schema<User>({
     },
     phone: {
         type: Number,
-        required: true,
+        required: false,
         unique: true,
     },
     isActive: {
         type: Boolean,
         default: true
     },
-    isAdmin: {
-        type: Boolean,
-        default: false
-    },
-    isOwner: {
-        type: Boolean,
-        default: false
-    },
-    isWaiter: {
-        type: Boolean,
-        default: false
-    },
-    isCustomer: {
-        type: Boolean,
-        default: true,
+    roles: {
+        type: String,
+        default: [],
     },
     ordersStory: [{
         type: Schema.Types.ObjectId,
@@ -87,7 +72,8 @@ const scheme = new Schema<User>({
     },
     sessionValid:{
         type: Boolean,
-        required: false
+        required: false,
+        default: false
     }
 }, { timestamps: true });
 
