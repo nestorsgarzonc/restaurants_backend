@@ -157,7 +157,7 @@ export const createWaiter = async (req: Request, res: Response) => {
             restaurant: restaurant._id,
             user: user._id,
         });
-        user.isWaiter = true;
+        user.rol ="waiter";
         await user.save();
         await waiter.save();
         restaurant.waiters.push(waiter._id);
@@ -274,7 +274,7 @@ export const createOwner = async (req: Request, res: Response) => {
         }
         restaurant.owner = user._id;
         await restaurant.save();
-        user.isOwner = true;
+        user.rol = "owner";
         await user.save();
         return res.json({ msg: 'Owner created successfully', user });
     } catch (error) {
