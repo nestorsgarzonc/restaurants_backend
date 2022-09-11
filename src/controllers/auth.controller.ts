@@ -4,7 +4,7 @@ import { getToken } from '../core/jwt';
 import User from '../models/user/user';
 
 export const login = async (req: Request, res: Response) => {
-    try{
+    try {
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return res.status(404).json({ msg: 'Oops, usuario incorrecto' });
@@ -14,15 +14,16 @@ export const login = async (req: Request, res: Response) => {
         }
         user.sessionValid = true;
         user.save();
+        const userProteted = user.toObject();
+        delete userProteted.password;
         const token = getToken(user.id);
         return res.json({
             token,
-            id: user.id
+            ...userProteted,
         });
-    }catch(error){
+    } catch (error) {
         return res.status(400).json({ msg: error.message });
     }
-    
 }
 
 export const register = async (req: Request, res: Response) => {
@@ -38,15 +39,15 @@ export const register = async (req: Request, res: Response) => {
 }
 
 export const logout = async (req: Request, res: Response) => {
-    try{
+    try {
         const user = await User.findById(res.locals.token.userId);
         user.sessionValid = false;
         user.save();
         return res.json({ msg: "PENDING: Logout successfully." });
-    }catch(error){
+    } catch (error) {
         return res.status(400).json({ msg: error.message });
     }
-    
+
 }
 
 export const resetPassword = async (req: Request, res: Response) => {
