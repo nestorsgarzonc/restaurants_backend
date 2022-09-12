@@ -63,7 +63,7 @@ router.put(
     restaurantController.updateRestaurant
 )
 
-router.get(
+/*router.get(
     '/:restaurantId/tables',
     [tokenIsValid],
     restaurantController.getTables
@@ -100,11 +100,11 @@ router.get(
     restaurantController.getWaiters
 )
 
-router.post(
-    '/waiter/:userId',
-    [tokenIsValid],
-    restaurantController.createWaiter
-)
+//router.post(
+//    '/waiter/:userId',
+//    [tokenIsValid],
+//    restaurantController.createWaiter
+//)
 
 router.put(
     '/:id/waiter',
@@ -148,4 +148,4 @@ router.get(
     restaurantController.getOwner
 )
 
-export default router
+export default router*/

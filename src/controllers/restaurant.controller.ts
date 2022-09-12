@@ -76,7 +76,9 @@ export const updateRestaurant = async (req: Request, res: Response) => {
     }
 }
 
-export const getTables = async (req: Request, res: Response) => {
+//TODO: Table's methods into restaurant controller
+
+/*export const getTables = async (req: Request, res: Response) => {
     try {
         const restaurant = await Restaurant.findById(req.params.restaurantId);
         if (!restaurant) {
@@ -128,41 +130,17 @@ export const deleteTable = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
-}
+}*/
 
-export const getWaiters = async (req: Request, res: Response) => {
+//TODO: Waiter's methods into restaurant controller
+
+/*export const getWaiters = async (req: Request, res: Response) => {
     try {
         const restaurant = await Restaurant.findById(req.params.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ msg: 'Restaurant not found' });
         }
         return res.json(restaurant.waiters);
-    } catch (error) {
-        return res.status(400).json({ msg: error });
-    }
-}
-
-export const createWaiter = async (req: Request, res: Response) => {
-    try {
-        const user = await User.findById(req.body.userId);
-        if (!user) {
-            return res.status(404).json({ msg: 'User not found' });
-        }
-        const restaurant = await Restaurant.findById(req.params.restaurantId);
-        if (!restaurant) {
-            return res.status(404).json({ msg: 'Restaurant not found' });
-        }
-        const waiter = new Waiter({
-            ...req.body,
-            restaurant: restaurant._id,
-            user: user._id,
-        });
-        user.rol ="waiter";
-        await user.save();
-        await waiter.save();
-        restaurant.waiters.push(waiter._id);
-        await restaurant.save();
-        return res.json({ msg: 'Waiter created successfully', waiter });
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
@@ -192,9 +170,11 @@ export const deleteWaiter = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
-}
+}*/
 
-export const getMenu = async (req: Request, res: Response) => {
+//TODO: Menu's methods into restaurant controller
+
+/*export const getMenu = async (req: Request, res: Response) => {
     try {
         const restaurant = await (await Restaurant.findById(req.params.restaurantId))
             .populate('MenuItem');
@@ -247,9 +227,10 @@ export const deleteMenu = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
-}
+}*/
 
 export const getOwner = async (req: Request, res: Response) => {
+    //TODO: Where do we use this method??
     try {
         const restaurant = await Restaurant.findById(req.params.restaurantId)
             .populate('Owner');
@@ -263,6 +244,7 @@ export const getOwner = async (req: Request, res: Response) => {
 }
 
 export const createOwner = async (req: Request, res: Response) => {
+    //TODO: Where do we use this method??
     try {
         const user = await User.findById(req.body.userId);
         if (!user) {
