@@ -13,9 +13,11 @@ router.get(
 )
 
 router.post(
-    '/:id',
+    '/',
     [
         body('restaurantId').isMongoId(),
+        body('waiterEmail').isEmail().normalizeEmail().withMessage('The waiters email is invalid'),
+        body('adminId').trim(),
         tokenIsValid,
         errorHandler,
     ],
