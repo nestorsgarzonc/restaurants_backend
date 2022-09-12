@@ -147,5 +147,5 @@ router.get(
     [tokenIsValid],
     restaurantController.getOwner
 )
-
-export default router*/
+*/
+export default router
