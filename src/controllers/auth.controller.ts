@@ -19,7 +19,7 @@ export const login = async (req: Request, res: Response) => {
         const token = getToken(user.id);
         return res.json({
             token,
-            ...userProteted,
+            user: userProteted,
         });
     } catch (error) {
         return res.status(400).json({ msg: error.message });
