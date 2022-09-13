@@ -55,7 +55,7 @@ router.delete(
 
 
 router.post(
-    //This is where I create a category
+    
     '/category/:categoryId',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
