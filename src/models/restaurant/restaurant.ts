@@ -52,7 +52,8 @@ const schema = new Schema<Restaurant>({
     menu: [{
         type: Schema.Types.ObjectId,
         ref: 'Categories',
-        required: true
+        default:[],
+        required: false
     }],
     owner: {
         type: Schema.Types.ObjectId,
@@ -62,12 +63,14 @@ const schema = new Schema<Restaurant>({
     tables: [{
         type: Schema.Types.ObjectId,
         ref: 'Table',
-        required: true
+        required: false,
+        default:[]
     }],
     waiters: [{
         type: Schema.Types.ObjectId,
         ref: 'Waiter',
-        required: true
+        required: false,
+        default:[]
     }]
 }, { timestamps: true })
 

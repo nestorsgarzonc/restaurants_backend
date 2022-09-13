@@ -15,7 +15,7 @@ const scheme = new Schema<ToppingOption>({
     },
     price: {
         type: Number,
-        required: true
+        default: 0
     },
     imgUrl: {
         type: String,

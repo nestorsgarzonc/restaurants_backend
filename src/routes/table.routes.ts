@@ -1,9 +1,23 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import * as userController from '../controllers/user.controller';
+import * as tableController from '../controllers/table.controller';
 import { tokenIsValid } from '../middlewares/auth.middleware';
+import { errorHandler } from '../middlewares/errors.middleware';
 
 const router = Router();
+
+router.post(
+    '/',
+    [
+        body('name').trim().isLength({ min: 1 }).withMessage('Name must be at least 1 characters long'),
+        body('capacity').isNumeric().withMessage('Capacity must be a number'),
+        body('restaurantId').isMongoId().withMessage('Invalid restaurant id'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    tableController.createTable
+)
 
 //TODO: MAKE WITH SOCKETS
 router.get(
