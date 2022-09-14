@@ -72,4 +72,4 @@ io.on('connection', async (socket) => {
     })
 });
 
-server.listen(3000, () => console.log('Listening at port 3000'));
+server.listen(process.env.PORT, () => console.log('Listening at port', process.env.PORT));
