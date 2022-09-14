@@ -49,6 +49,16 @@ router.put(
     authController.resetPassword,
 )
 
+router.put(
+    '/new-password',
+    [
+        body('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters long'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    authController.createNewPassword,
+)
+
 router.get(
     '/refresh-token',
     [tokenIsValid],

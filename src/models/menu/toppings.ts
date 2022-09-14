@@ -22,7 +22,7 @@ const scheme = new Schema<Toppings>({
     options: [{
         type: Schema.Types.ObjectId,
         ref: 'ToppingOption',
-        required: true
+        default: []
     }],
     minOptions: {
         type: Number,

@@ -27,7 +27,7 @@ const scheme = new Schema<MenuItem>({
     toppings: [{
         type: Schema.Types.ObjectId,
         ref: 'Toppings',
-        required: true
+        default: []
     }],
     isAvaliable: {
         type: Boolean,

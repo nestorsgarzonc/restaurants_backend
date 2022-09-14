@@ -31,14 +31,11 @@ router.post(
         body('description').trim().isLength({ min: 3 }).withMessage('Description must be at least 3 characters long'),
         body('email').isEmail().normalizeEmail().withMessage('Invalid email'),
         body('imageUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
-        body('menu').isArray().withMessage('Invalid menu'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('owner').isMongoId().withMessage('Invalid owner'),
         body('phone').isNumeric().withMessage('Phone must be at least 3 characters long'),
         body('primaryColor').isHexColor().withMessage('Invalid primary color').optional({ nullable: true }),
         body('secondaryColor').isHexColor().withMessage('Invalid secondary color').optional({ nullable: true }),
-        body('tables').isArray().withMessage('Invalid menu'),
-        body('waiters').isArray().withMessage('Invalid menu'),
         tokenIsValid,
         errorHandler,
     ],
@@ -66,7 +63,7 @@ router.put(
     restaurantController.updateRestaurant
 )
 
-router.get(
+/*router.get(
     '/:restaurantId/tables',
     [tokenIsValid],
     restaurantController.getTables
@@ -103,11 +100,11 @@ router.get(
     restaurantController.getWaiters
 )
 
-router.post(
-    '/waiter/:userId',
-    [tokenIsValid],
-    restaurantController.createWaiter
-)
+//router.post(
+//    '/waiter/:userId',
+//    [tokenIsValid],
+//    restaurantController.createWaiter
+//)
 
 router.put(
     '/:id/waiter',
@@ -150,5 +147,5 @@ router.get(
     [tokenIsValid],
     restaurantController.getOwner
 )
-
+*/
 export default router

@@ -21,7 +21,7 @@ const scheme = new Schema<Categories>({
     menuItems: [{
         type: Schema.Types.ObjectId,
         ref: 'MenuItem',
-        required: true
+        default: []
     }],
     isAvaliable: {
         type: Boolean,
