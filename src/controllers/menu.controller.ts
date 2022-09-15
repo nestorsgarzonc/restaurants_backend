@@ -4,6 +4,7 @@ import Restaurant from '../models/restaurant/restaurant';
 import Topping from '../models/menu/toppings';
 import Category from '../models/menu/category';
 import ToppingOption from '../models/menu/toppingOption';
+import Table from '../models/restaurant/table';
 
 export const getAllMenus = async (req: Request, res: Response) => {
     //TODO: where do we use this method
@@ -17,23 +18,25 @@ export const getAllMenus = async (req: Request, res: Response) => {
 
 export const getRestaurantMenu = async (req: Request, res: Response) => {
     //TODO: this is what I need to complete ajaja
-    const restaurant = await Restaurant.findById(req.params.restaurantId)
-    .populate({
-        path: 'menu',
-        populate: {
-            path: 'menuItems',
+    const table = await Table.findById(req.params.restaurantId);
+    if (!table) return res.status(404).json({ msg: 'Table not found' });
+    const restaurant = await Restaurant.findById(table.restaurantId)
+        .populate({
+            path: 'menu',
             populate: {
-                path: 'toppings',
+                path: 'menuItems',
                 populate: {
-                    path: 'options'
+                    path: 'toppings',
+                    populate: {
+                        path: 'options'
+                    }
                 }
             }
-        }
-    })
+        })
 
 
-    if(!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
-    try{
+    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
+    try {
         return res.json(restaurant);
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -42,10 +45,10 @@ export const getRestaurantMenu = async (req: Request, res: Response) => {
 
 export const createCategory = async (req: Request, res: Response) => {
     const restaurant = await Restaurant.findById(req.params.restaurantId);
-    if(!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
-    const category = new Category (req.body);
+    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
+    const category = new Category(req.body);
     restaurant.menu.push(category._id);
-    try{
+    try {
         await restaurant.save();
         await category.save();
         return res.json({ msg: 'Category created successfully', category });
@@ -145,9 +148,9 @@ export const deleteToppingFromMenu = async (req: Request, res: Response) => {
 
 export const addToppingOptionToTopping = async (req: Request, res: Response) => {
     const topping = await Topping.findById(req.params.toppingId);
-    if(!topping) return res.status(404).json({ msg: 'Topping not found' });
+    if (!topping) return res.status(404).json({ msg: 'Topping not found' });
     const toppingOption = new ToppingOption(req.body);
-    try{
+    try {
         await toppingOption.save();
         topping.options.push(toppingOption._id);
         await topping.save();

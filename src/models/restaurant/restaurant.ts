@@ -52,7 +52,7 @@ const schema = new Schema<Restaurant>({
     menu: [{
         type: Schema.Types.ObjectId,
         ref: 'Categories',
-        default:[],
+        default: [],
         required: false
     }],
     owner: {
@@ -64,16 +64,16 @@ const schema = new Schema<Restaurant>({
         type: Schema.Types.ObjectId,
         ref: 'Table',
         required: false,
-        default:[]
+        default: []
     }],
     waiters: [{
         type: Schema.Types.ObjectId,
         ref: 'Waiter',
         required: false,
-        default:[]
+        default: []
     }]
 }, { timestamps: true })
 
-schema.plugin(uniqueValidator, { message: '{PATH} debe ser unico' });
+
 
 export default model<Restaurant>('Restaurant', schema);

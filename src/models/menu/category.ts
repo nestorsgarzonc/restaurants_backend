@@ -4,6 +4,7 @@ interface Categories {
     name: String;
     imgUrl?: String;
     menuItems: Types.ObjectId[];
+    restaurantId: Types.ObjectId;
     isAvaliable: Boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -17,6 +18,9 @@ const scheme = new Schema<Categories>({
     imgUrl: {
         type: String,
         required: false
+    },
+    restaurantId:{
+        
     },
     menuItems: [{
         type: Schema.Types.ObjectId,
