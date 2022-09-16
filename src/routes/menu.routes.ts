@@ -15,7 +15,7 @@ router.get(
 
 router.get(
     //TODO: get all menu
-    '/:restaurantId',
+    '/:tableId',
     [tokenIsValid],
     menuController.getRestaurantMenu,
 )
@@ -54,6 +54,8 @@ router.delete(
 )
 
 
+
+
 router.post(
     
     '/category/:categoryId',
@@ -73,6 +75,8 @@ router.get(
     [tokenIsValid],
     menuController.getMenuToppings,
 )
+
+
 
 router.post(
     '/menuitem/:menuId',
