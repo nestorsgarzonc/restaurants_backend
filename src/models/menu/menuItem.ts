@@ -5,6 +5,7 @@ interface MenuItem {
     price: Number;
     imgUrl?: String;
     toppings: Types.ObjectId[];
+    categoryId: Types.ObjectId;
     isAvaliable: Boolean;
     discount?: Number;
     createdAt: Date;
@@ -29,6 +30,10 @@ const scheme = new Schema<MenuItem>({
         ref: 'Toppings',
         default: []
     }],
+    categoryId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category'
+    },
     isAvaliable: {
         type: Boolean,
         default: true,

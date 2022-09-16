@@ -51,7 +51,7 @@ const schema = new Schema<Restaurant>({
     },
     menu: [{
         type: Schema.Types.ObjectId,
-        ref: 'Categories',
+        ref: 'Category',
         default: [],
         required: false
     }],
