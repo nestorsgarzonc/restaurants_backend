@@ -25,13 +25,7 @@ export const getRestaurantMenu = async (req: Request, res: Response) => {
             .populate({
                 path: 'menu',
                   populate: {
-                    path: 'menuItems',
-                    populate: {
-                        path: 'toppings',
-                        populate: {
-                            path: 'options'
-                        }
-                    }
+                    path: 'menuItems'
                 }
             })
 

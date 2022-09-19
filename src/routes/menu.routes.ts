@@ -16,7 +16,6 @@ router.get(
 router.get(
     //TODO: get all menu
     '/:tableId',
-    [tokenIsValid],
     menuController.getRestaurantMenu,
 )
 
