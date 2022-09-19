@@ -37,6 +37,7 @@ router.put(
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('logoUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
         body('toppings').isArray().withMessage('Invalid menu').optional({ nullable: true }),
         body('isAvaliable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
         body('discount').isNumeric().withMessage('Discount must be a number').optional({ nullable: true }),
