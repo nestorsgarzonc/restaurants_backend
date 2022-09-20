@@ -63,6 +63,7 @@ router.post(
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('price').isNumeric().withMessage('Price must be a number'),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('description').trim().isLength({ min: 1 }).withMessage('Description is required'),
         tokenIsValid,
         errorHandler,
     ],

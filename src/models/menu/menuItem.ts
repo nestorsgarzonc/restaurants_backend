@@ -3,6 +3,7 @@ import { Schema, model, Types } from 'mongoose';
 interface MenuItem {
     name: String;
     price: Number;
+    description: String;
     imgUrl?: String;
     toppings: Types.ObjectId[];
     categoryId: Types.ObjectId;
@@ -19,6 +20,10 @@ const scheme = new Schema<MenuItem>({
     },
     price: {
         type: Number,
+        required: true
+    },
+    description:{
+        type: String,
         required: true
     },
     imgUrl: {

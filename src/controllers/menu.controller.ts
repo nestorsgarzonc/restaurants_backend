@@ -32,7 +32,7 @@ export const getRestaurantMenu = async (req: Request, res: Response) => {
 
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
     
-        return res.json(restaurant);
+        return res.json({restaurant:restaurant,table:table});
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
