@@ -108,13 +108,18 @@ export const deleteMenu = async (req: Request, res: Response) => {
 }
 
 export const getMenuToppings = async (req: Request, res: Response) => {
-    try {
+    try{
         const menu = await Menu.findById(req.params.id)
-            .populate('Toppings');
+            .populate({
+                path: 'toppings',
+                  populate: {
+                    path: 'options'
+                }
+            })
         if (!menu) {
             return res.status(404).json({ msg: 'Toppings not found' });
         }
-        return res.json(menu.toppings);
+        return res.json(menu);
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
