@@ -73,7 +73,6 @@ router.post(
 
 router.get(
     '/toppings/:id',
-    [tokenIsValid],
     menuController.getMenuToppings,
 )
 
