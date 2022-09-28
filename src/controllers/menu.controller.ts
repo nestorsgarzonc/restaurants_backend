@@ -24,15 +24,15 @@ export const getRestaurantMenu = async (req: Request, res: Response) => {
         const restaurant = await Restaurant.findById(table.restaurantId)
             .populate({
                 path: 'menu',
-                  populate: {
+                populate: {
                     path: 'menuItems'
                 }
             })
 
 
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
-    
-        return res.json({restaurant:restaurant,table:table});
+
+        return res.json({ restaurant: restaurant, table: table });
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
@@ -108,11 +108,11 @@ export const deleteMenu = async (req: Request, res: Response) => {
 }
 
 export const getMenuToppings = async (req: Request, res: Response) => {
-    try{
+    try {
         const menu = await Menu.findById(req.params.id)
             .populate({
                 path: 'toppings',
-                  populate: {
+                populate: {
                     path: 'options'
                 }
             })
@@ -173,7 +173,7 @@ export const addToppingOptionToTopping = async (req: Request, res: Response) => 
         const topping = await Topping.findById(req.params.toppingId);
         if (!topping) return res.status(404).json({ msg: 'Topping not found' });
         const toppingOption = new ToppingOption(req.body);
-    
+
         await toppingOption.save();
         topping.options.push(toppingOption._id);
         await topping.save();
