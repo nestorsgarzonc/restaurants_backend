@@ -1,15 +1,17 @@
 import { Schema, model, Types } from 'mongoose';
 
-interface Categories {
+interface Category {
     name: String;
     imgUrl?: String;
+    description: String;
     menuItems: Types.ObjectId[];
+    restaurantId: Types.ObjectId;
     isAvaliable: Boolean;
     createdAt: Date;
     updatedAt: Date;
 }
 
-const scheme = new Schema<Categories>({
+const scheme = new Schema<Category>({
     name: {
         type: String,
         required: true
@@ -17,6 +19,15 @@ const scheme = new Schema<Categories>({
     imgUrl: {
         type: String,
         required: false
+    },
+    description:{
+        type: String,
+        default: ""
+    },
+    restaurantId:{
+        type: Schema.Types.ObjectId,
+        ref: 'Restaurant',
+        required: true
     },
     menuItems: [{
         type: Schema.Types.ObjectId,
@@ -29,4 +40,4 @@ const scheme = new Schema<Categories>({
     },
 }, { timestamps: true });
 
-export default model<Categories>('Categories', scheme);
+export default model<Category>('Category', scheme);

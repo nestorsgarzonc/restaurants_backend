@@ -27,7 +27,6 @@ router.post(
             .withMessage('Password must be at least 5 characters long'),
         body('firstName').isLength({ min: 1 }).withMessage('First name must be at least 1 character long'),
         body('lastName').isLength({ min: 1 }).withMessage('Last name must be at least 1 character long'),
-        body('address').isLength({ min: 1 }).withMessage('Address must be at least 1 character long'),
         body('phone').isLength({min:10}).withMessage('You must add a valid phone number'),
         errorHandler,
     ],

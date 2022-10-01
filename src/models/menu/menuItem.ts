@@ -3,8 +3,10 @@ import { Schema, model, Types } from 'mongoose';
 interface MenuItem {
     name: String;
     price: Number;
+    description: String;
     imgUrl?: String;
     toppings: Types.ObjectId[];
+    categoryId: Types.ObjectId;
     isAvaliable: Boolean;
     discount?: Number;
     createdAt: Date;
@@ -20,6 +22,10 @@ const scheme = new Schema<MenuItem>({
         type: Number,
         required: true
     },
+    description:{
+        type: String,
+        required: true
+    },
     imgUrl: {
         type: String,
         required: false
@@ -29,6 +35,10 @@ const scheme = new Schema<MenuItem>({
         ref: 'Toppings',
         default: []
     }],
+    categoryId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category'
+    },
     isAvaliable: {
         type: Boolean,
         default: true,

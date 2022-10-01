@@ -15,8 +15,7 @@ router.get(
 
 router.get(
     //TODO: get all menu
-    '/:restaurantId',
-    [tokenIsValid],
+    '/:tableId',
     menuController.getRestaurantMenu,
 )
 
@@ -38,6 +37,7 @@ router.put(
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('logoUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
         body('toppings').isArray().withMessage('Invalid menu').optional({ nullable: true }),
         body('isAvaliable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
         body('discount').isNumeric().withMessage('Discount must be a number').optional({ nullable: true }),
@@ -54,6 +54,8 @@ router.delete(
 )
 
 
+
+
 router.post(
     
     '/category/:categoryId',
@@ -61,6 +63,7 @@ router.post(
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('price').isNumeric().withMessage('Price must be a number'),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('description').trim().isLength({ min: 1 }).withMessage('Description is required'),
         tokenIsValid,
         errorHandler,
     ],
@@ -70,9 +73,10 @@ router.post(
 
 router.get(
     '/toppings/:id',
-    [tokenIsValid],
     menuController.getMenuToppings,
 )
+
+
 
 router.post(
     '/menuitem/:menuId',

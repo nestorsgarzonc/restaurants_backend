@@ -7,6 +7,7 @@ interface Restaurant {
     description: String;
     email: String;
     imageUrl?: String;
+    logoUrl?: String;
     menu: Types.ObjectId[],
     name: String;
     owner: Types.ObjectId,
@@ -49,10 +50,14 @@ const schema = new Schema<Restaurant>({
         type: String,
         required: false
     },
+    logoUrl:{
+        type: String,
+        required: false
+    },
     menu: [{
         type: Schema.Types.ObjectId,
-        ref: 'Categories',
-        default:[],
+        ref: 'Category',
+        default: [],
         required: false
     }],
     owner: {
@@ -64,16 +69,16 @@ const schema = new Schema<Restaurant>({
         type: Schema.Types.ObjectId,
         ref: 'Table',
         required: false,
-        default:[]
+        default: []
     }],
     waiters: [{
         type: Schema.Types.ObjectId,
         ref: 'Waiter',
         required: false,
-        default:[]
+        default: []
     }]
 }, { timestamps: true })
 
-schema.plugin(uniqueValidator, { message: '{PATH} debe ser unico' });
+
 
 export default model<Restaurant>('Restaurant', schema);
