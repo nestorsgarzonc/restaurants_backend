@@ -57,7 +57,6 @@ router.delete(
 
 
 router.post(
-    
     '/category/:categoryId',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
@@ -83,7 +82,7 @@ router.post(
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('type').trim().isLength({ min: 1 }).withMessage('Type must be at least 1 characters long'),
-        body('options').isArray().withMessage('Invalid options').optional({nullable: true}),
+        body('options').isArray().withMessage('Invalid options').optional({ nullable: true }),
         body('minOptions').isNumeric().withMessage('Min toppings must be a number').optional({ nullable: true }),
         body('maxOptions').isNumeric().withMessage('Max toppings must be a number').optional({ nullable: true }),
         tokenIsValid,

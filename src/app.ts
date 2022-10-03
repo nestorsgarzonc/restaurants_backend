@@ -12,6 +12,7 @@ import restaurantRoutes from "./routes/restaurant.routes";
 import menuRoutes from "./routes/menu.routes";
 import db from './core/db';
 import { configEnv } from "./core/config_env";
+import { tokenIsValidSocket } from "./middlewares/auth.middleware";
 
 configEnv();
 db();
@@ -60,12 +61,18 @@ io.on('connection', async (socket) => {
     })
 
 
-    socket.on('join_to_restaurant_table', (data) => {
+
+    socket.on('join_to_restaurant_table', async (data) => {
 
         let parsedData = JSON.parse(data);
+        let res = await tokenIsValidSocket(parsedData.token);
+        if (!res) {
+            let timestamp = Date.now().toString();
+            socket.join(timestamp);
+            io.to(timestamp).emit('error', { reason: 'no token' });
+            return;
+        }
         socket.join(parsedData.table_id);
-
-
         console.log(parsedData.table_id);
         //TODO: SEND ORDER STATUS TO ALL USERS IN THE TABLE
         io.to(parsedData.table_id).emit('new_user_joined', { ...parsedData, 'connected': true });
