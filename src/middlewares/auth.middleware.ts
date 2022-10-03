@@ -18,7 +18,7 @@ export const tokenIsValid = async (req: Request, res: Response, next: NextFuncti
 export const tokenIsValidSocket = async (token: string) => {
     try {
         const verified = await baseVerification(false, token);
-        return verified;
+        return (verified as jwt.JwtPayload).userId;
     } catch (err) {
         console.log(err);
         return null;
