@@ -17,7 +17,8 @@ const scheme = new Schema<Toppings>({
     },
     type: {
         type: String,
-        required: true
+        required: true,
+        enum: ['checkBox', 'radioButton']
     },
     options: [{
         type: Schema.Types.ObjectId,
@@ -26,11 +27,13 @@ const scheme = new Schema<Toppings>({
     }],
     minOptions: {
         type: Number,
-        required: false
+        required: false,
+        default: 0
     },
     maxOptions: {
         type: Number,
-        required: false
+        required: false,
+        default: 1
     }
 }, { timestamps: true });
 
