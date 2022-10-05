@@ -36,7 +36,6 @@ export const register = async (req: Request, res: Response) => {
         console.log(user);
         return res.status(201).json({ msg: "User created successfully." });
     } catch (error) {
-        console.log("mmondá");
         return res.status(400).json({ msg: error.message });
     }
 }
