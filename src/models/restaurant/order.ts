@@ -5,6 +5,8 @@ interface Order {
     status: String;
     totalPrice: Number;
     restaurantId: String;
+    waiterId: Types.ObjectId;
+    tip: Number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -29,6 +31,16 @@ const scheme = new Schema<Order>(
             type: String,
             required: true
         },
+        waiterId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Waiter',
+            required: true
+        },
+        tip: {
+            type: Number,
+            required: true,
+            default: 0
+        }
     }, { timestamps: true }
 );
 

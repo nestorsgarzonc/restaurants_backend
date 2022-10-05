@@ -138,6 +138,7 @@ export const getAllToppings = async (req: Request, res: Response) => {
 export const addToppingToMenu = async (req: Request, res: Response) => {
     try {
         const menu = await Menu.findById(req.params.menuId);
+
         if (!menu) {
             return res.status(404).json({ msg: 'Menu not found' });
         }
