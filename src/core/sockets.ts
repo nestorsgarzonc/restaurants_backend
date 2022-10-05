@@ -5,7 +5,7 @@ import { Server } from "socket.io";
 import { tokenIsValidSocket } from "../middlewares/auth.middleware";
 import User from "../models/user/user";
 
-
+//TODO: Modularizar las funciones y crear 
 export const socketServer = async(app) => {
     
     const server = createServer(app);
@@ -61,7 +61,7 @@ export const socketServer = async(app) => {
             
            
             socket.join(parsedData.table_id);
-            io.to(parsedData.table_id).emit('new_user_joined', { ...parsedData, 'connected': true, userName: `${user.firstName} ${user.lastName}` });
+            io.to(parsedData.table_id).emit('new_user_joined', { users:currentTableParsed.usersConnected, 'connected': true, userName: `${user.firstName} ${user.lastName}` });
         });
 
         socket.on('add_product_to_order',async(data)=>{
