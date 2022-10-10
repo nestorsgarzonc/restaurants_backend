@@ -28,8 +28,8 @@ const schema = new Schema<Table>({
         enum: ['available', 'unavailable'],
         default: 'available'
     },
-    //TODO: ADD orderStatus: ['empty', ]
-
+    //TODO: ADD orderStatus: ['empty', 'ordering', 'waiting for food', 'eating', 'paying']
+    
 }, { timestamps: true });
 
 export default model<Table>('Table', schema);
