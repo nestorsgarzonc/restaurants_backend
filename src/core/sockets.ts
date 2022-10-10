@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { tokenIsValidSocket } from "../middlewares/auth.middleware";
 import User from "../models/user/user";
+import Table from "../models/restaurant/table";
 
 //TODO: Modularizar las funciones y crear 
 export const socketServer = async(app) => {
@@ -48,6 +49,7 @@ export const socketServer = async(app) => {
             let currentTableParsed: any = {}
             if (!currentTable) {
                 currentTableParsed.usersConnected = [{userId,firstName:user.firstName,lastName:user.lastName,orderProducts:[]}];
+                currentTableParsed.tableStatus = 'ordering';
                 redisClient.set(`table${parsedData.table_id}`, JSON.stringify(currentTableParsed));
             } else {
                 currentTableParsed = JSON.parse(currentTable);
@@ -83,7 +85,7 @@ export const socketServer = async(app) => {
         });
 
         socket.on('paid_account',async(data)=>{
-
+            
         })
 
 
