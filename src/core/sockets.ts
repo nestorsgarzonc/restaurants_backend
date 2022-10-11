@@ -91,14 +91,9 @@ export const socketServer = async(app) => {
                 let currentTable = await redisClient.get(`table${parsedData.tableId}`)
                 let currentTableParsed = JSON.parse(currentTable);
                 currentTableParsed.usersConnected.find(user => user.userId === userId).orderProducts.push(orderData);
-                currentTableParsed.usersConnected.find(user => user.userId === userId).price += data.price;
-                currentTableParsed.totalPrice += data.price;
-                data.toppings.forEach(topping => {
-                    topping.options.forEach(toppingOption =>{
-                        currentTableParsed.totalPrice += toppingOption.price;
-                        currentTableParsed.usersConnected.find(user => user.userId === userId).price += toppingOption.price;
-                    })
-                });
+                currentTableParsed.usersConnected.find(user => user.userId === userId).price += data.totalWithToppings;
+                currentTableParsed.totalPrice += data.totalWithToppings;
+                
                 redisClient.set(`table${parsedData.tableId}`, JSON.stringify(currentTableParsed));
                 console.log(currentTableParsed);
                 io.to(parsedData.tableId).emit('list_of_orders',{table:currentTableParsed});
