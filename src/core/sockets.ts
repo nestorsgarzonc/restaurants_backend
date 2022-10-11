@@ -132,15 +132,15 @@ export const socketServer = async(app) => {
                     await userOrder.save();
                     userOrderIds.push(userOrder._id);
                 }); 
-                // const order = new Order({
-                //     usersOrder: userOrderIds,
-                //     status: ,
-                //     totalPrice: currentTableParsed.totalPrice,
-                //     restaurantId: currentTableParsed.restaurantId,
-                //     waiterId: ,
-                //     tip: 
-                // });
-                // await order.save();
+                const order = new Order({
+                    usersOrder: userOrderIds,
+                    status: 'finished',
+                    totalPrice: currentTableParsed.totalPrice,
+                    restaurantId: currentTableParsed.restaurantId,
+                    waiterId: userId,
+                    tip: 5000
+                });
+                await order.save();
             }
                 catch(error){
                 console.log("Ocurrió un error al pagar", error);
