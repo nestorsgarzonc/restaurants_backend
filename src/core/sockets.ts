@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { tokenIsValidSocket } from "../middlewares/auth.middleware";
 import User from "../models/user/user";
+import Table from '../models/restaurant/table';
 
 //TODO: Modularizar las funciones y crear 
 export const socketServer = async(app) => {
@@ -48,6 +49,7 @@ export const socketServer = async(app) => {
             let currentTableParsed: any = {}
             if (!currentTable) {
                 currentTableParsed.usersConnected = [{userId,firstName:user.firstName,lastName:user.lastName,orderProducts:[]}];
+                currentTableParsed.needsWaiter = false;
                 redisClient.set(`table${parsedData.table_id}`, JSON.stringify(currentTableParsed));
             } else {
                 currentTableParsed = JSON.parse(currentTable);
@@ -85,6 +87,81 @@ export const socketServer = async(app) => {
         socket.on('paid_account',async(data)=>{
 
         })
+
+        socket.on('say_hi', async(data) => {
+            console.log('hi...')
+            console.log(data.hola)
+        });
+
+        socket.on('call_waiter', async(data) => {
+            let userId = await tokenIsValidSocket(data.token);
+            if (!userId) {
+                let timestamp = Date.now().toString();
+                socket.join(timestamp);
+                io.to(timestamp).emit('error', { reason: 'no userId' });
+                return;
+            }
+            let table = await Table.findById(data.table_id);
+
+            let tables = await redisClient.get(`${table.restaurantId}_calling_tables`);
+            if(!tables) tables = "";
+
+            let callingTables = new Set(tables.split('$'));
+            callingTables.delete('');
+            callingTables.add(data.table_id);
+
+            redisClient.set(`${table.restaurantId}_calling_tables`, [...callingTables].join('$'));
+
+            let currentTable = await redisClient.get(`table${data.table_id}`);
+            let currentTableParsed = JSON.parse(currentTable);
+            currentTableParsed['needsWaiter'] = true;
+            redisClient.set(`table${data.table_id}`, JSON.stringify(currentTableParsed));
+            
+            io.to(`${table.restaurantId}`).emit('costumers_requests', {requests: [...callingTables]});
+
+        });
+
+        socket.on('attend_table', async(data) =>{
+            let table = await Table.findById(data.table_id);
+            let tables = await redisClient.get(`${table.restaurantId}_calling_tables`);
+
+            if(!tables || tables===""){
+                io.to(`${table.restaurantId}`).emit('error', { reason: 'no table to be attended' });
+                return;
+            }
+
+            let callingTables = new Set(tables.split('$'));
+
+            if(!callingTables.has(data.table_id)){
+                io.to(`${table.restaurantId}`).emit('error', { reason: 'this table do not need attention' });
+                return;
+            }
+
+            callingTables.delete(data.table_id);
+
+            redisClient.set(`${table.restaurantId}_calling_tables`, [...callingTables].join('$'));
+
+            let currentTable = await redisClient.get(`table${data.table_id}`);
+            let currentTableParsed = JSON.parse(currentTable);
+            currentTableParsed['needsWaiter'] = false;
+            redisClient.set(`table${data.table_id}`, JSON.stringify(currentTableParsed));
+
+            io.to(`${table.restaurantId}`).emit('costumers_requests', {requests: [...callingTables]});
+        });
+
+        socket.on('listen_tables', async(data) =>{
+            
+
+            let tables = await redisClient.get(`${data.restaurant_id}_calling_tables`);
+            if(!tables) tables = "";
+            let callingTables = new Set(tables.split('$'));
+            callingTables.delete('');
+
+            io.to(socket.id).emit('costumers_requests', {requests: [...callingTables]});
+
+            socket.join(data.restaurant_id);
+
+        });
 
 
     });
