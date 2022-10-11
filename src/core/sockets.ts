@@ -4,7 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { tokenIsValidSocket } from "../middlewares/auth.middleware";
 import User from "../models/user/user";
-import order from "../models/restaurant/order";
+import Order from "../models/restaurant/order";
 import UserOrder from "../models/restaurant/userOrder";
 import Table from "../models/restaurant/table";
 import restaurant from '../models/restaurant/restaurant';
@@ -132,6 +132,15 @@ export const socketServer = async(app) => {
                     await userOrder.save();
                     userOrderIds.push(userOrder._id);
                 }); 
+                // const order = new Order({
+                //     usersOrder: userOrderIds,
+                //     status: ,
+                //     totalPrice: currentTableParsed.totalPrice,
+                //     restaurantId: currentTableParsed.restaurantId,
+                //     waiterId: ,
+                //     tip: 
+                // });
+                // await order.save();
             }
                 catch(error){
                 console.log("Ocurrió un error al pagar", error);
@@ -152,6 +161,26 @@ export const socketServer = async(app) => {
                 let currentTable = await redisClient.get(`table${parsedData.tableId}`)
                 let currentTableParsed = JSON.parse(currentTable);
                 currentTableParsed.tableStatus = 'paying';
+            }catch(error){
+                console.log("Ocurrió un error al pedir la cuenta", error);
+            }
+        });
+
+        socket.on('change_table_status',async (data) =>{
+            try{
+                let parsedData = data;//JSON.parse(data);
+                const {token,...orderData} = data;
+                let userId = await tokenIsValidSocket(token);
+                if (!userId) {
+                    let timestamp = Date.now().toString();
+                    socket.join(timestamp);
+                    io.to(timestamp).emit('error', { reason: 'no userId' });
+                    return;
+                }
+                let currentTable = await redisClient.get(`table${parsedData.tableId}`)
+                let currentTableParsed = JSON.parse(currentTable);
+                currentTableParsed.tableStatus = data.status;
+                redisClient.set(`table${parsedData.tableId}`, JSON.stringify(currentTableParsed));
             }catch(error){
                 console.log("Ocurrió un error al pedir la cuenta", error);
             }
