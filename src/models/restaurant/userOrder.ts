@@ -4,7 +4,7 @@ interface UserOrder {
     userId: Types.ObjectId;
     restaurantId: Types.ObjectId;
     tableId: Types.ObjectId;
-    orderProducts: Object;
+    orderProducts: Types.ObjectId[];
     status: String;
     price: Number;
     createdAt: Date;
