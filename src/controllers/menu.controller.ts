@@ -135,6 +135,17 @@ export const getAllToppings = async (req: Request, res: Response) => {
     }
 }
 
+export const getAllToppingsOptions = async (req: Request, res: Response) => {
+    //TODO: where do we use this method
+    try {
+        const toppingOptions = await ToppingOption.find();
+        return res.json(toppingOptions);
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+
 export const addToppingToMenu = async (req: Request, res: Response) => {
     try {
         const menu = await Menu.findById(req.params.menuId);

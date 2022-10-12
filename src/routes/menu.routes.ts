@@ -75,7 +75,11 @@ router.get(
     menuController.getMenuToppings,
 )
 
-
+router.get(
+    '/toppingOptions/jiji',
+    [tokenIsValid],
+    menuController.getAllToppings
+)
 
 router.post(
     '/menuitem/:menuId',
