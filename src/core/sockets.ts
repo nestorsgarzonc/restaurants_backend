@@ -155,6 +155,7 @@ export const socketServer = async(app) => {
                 let currentTableParsed = JSON.parse(currentTable);
                 currentTableParsed.tableStatus = data.status;
                 redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+                io.to(data.tableId).emit('list_of_orders',{table:currentTableParsed});
             }catch(error){
                 console.log("Ocurrió un error al pedir la cuenta", error);
             }
