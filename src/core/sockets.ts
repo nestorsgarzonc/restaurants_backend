@@ -39,6 +39,7 @@ export const socketServer = async(app) => {
         socket.on('join_to_restaurant_table', async (data) => {
            try{ 
                 let userId = await tokenIsValidSocket(data.token);
+                
                 if (!userId) {
                     let timestamp = Date.now().toString();
                     socket.join(timestamp);
@@ -219,28 +220,33 @@ export const socketServer = async(app) => {
                 io.to(timestamp).emit('error', { reason: 'no userId' });
                 return;
             }
-            let table = await Table.findById(data.table_id);
+            let table = await Table.findById(data.tableId);
 
             let tables = await redisClient.get(`${table.restaurantId}_calling_tables`);
             if(!tables) tables = "";
 
             let callingTables = new Set(tables.split('$'));
             callingTables.delete('');
-            callingTables.add(data.table_id);
+            callingTables.add(data.tableId);
 
             redisClient.set(`${table.restaurantId}_calling_tables`, [...callingTables].join('$'));
 
-            let currentTable = await redisClient.get(`table${data.table_id}`);
+            let currentTable = await redisClient.get(`table${data.tableId}`);
             let currentTableParsed = JSON.parse(currentTable);
-            currentTableParsed['needsWaiter'] = true;
-            redisClient.set(`table${data.table_id}`, JSON.stringify(currentTableParsed));
+            if(!currentTableParsed.needsWaiter){
+                currentTableParsed.needsWaiter = true;
+            }else{
+                currentTableParsed.needsWaiter = false;
+            }
             
+            redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+            io.to(data.tableId).emit('list_of_orders',{table:currentTableParsed});
             io.to(`${table.restaurantId}`).emit('costumers_requests', {requests: [...callingTables]});
 
         });
 
         socket.on('attend_table', async(data) =>{
-            let table = await Table.findById(data.table_id);
+            let table = await Table.findById(data.tableId);
             let tables = await redisClient.get(`${table.restaurantId}_calling_tables`);
 
             if(!tables || tables===""){
@@ -255,14 +261,14 @@ export const socketServer = async(app) => {
                 return;
             }
 
-            callingTables.delete(data.table_id);
+            callingTables.delete(data.tableId);
 
             redisClient.set(`${table.restaurantId}_calling_tables`, [...callingTables].join('$'));
 
-            let currentTable = await redisClient.get(`table${data.table_id}`);
+            let currentTable = await redisClient.get(`table${data.tableId}`);
             let currentTableParsed = JSON.parse(currentTable);
             currentTableParsed['needsWaiter'] = false;
-            redisClient.set(`table${data.table_id}`, JSON.stringify(currentTableParsed));
+            redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
 
             io.to(`${table.restaurantId}`).emit('costumers_requests', {requests: [...callingTables]});
         });
