@@ -9,21 +9,25 @@ import UserOrder from "../models/restaurant/userOrder";
 import Table from "../models/restaurant/table";
 import restaurant from '../models/restaurant/restaurant';
 
+var socketExp;
+var ioExp;
+
 //TODO: Modularizar las funciones 
 export const socketServer = async(app) => {
     
     const server = createServer(app);
     const io = new Server(server, { /* options */ });
+    ioExp = io;
     const redisClient = createClient(
         {url:'redis://default:cOdlLDjp5YKs7fyDPLUdEZIALL57XFAD@redis-15442.c11.us-east-1-2.ec2.cloud.redislabs.com:15442'}
     );
     redisClient.on('error', (err) => console.log('Redis Client Error', err));
     await redisClient.connect();
 
-
     io.on('connection', async (socket) => {
         console.log('a user connected');
         socket.emit('message', 'Hello World!');
+        socketExp = socket;
 
         socket.on('msg', (data) => {
             console.log(data);
@@ -294,3 +298,5 @@ export const socketServer = async(app) => {
     server.listen(process.env.PORT, () => console.log('Listening at port', process.env.PORT));
     
 }
+
+export{ioExp, socketExp}
