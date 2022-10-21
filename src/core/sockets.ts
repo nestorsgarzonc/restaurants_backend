@@ -202,7 +202,7 @@ export const socketServer = async(app) => {
                     
                 currentTableParsed.usersConnected[userIndexInArray].price += orderData.totalWithToppings;
                 currentTableParsed.totalPrice += orderData.totalWithToppings;
-                currentTableParsed.usersConnected[userIndexInArray].price = currentTableParsed.usersConnected[userIndexInArray]
+                currentTableParsed.usersConnected[userIndexInArray]
                     .orderProducts[itemIndexInArray] = orderData;
 
                 redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
