@@ -28,7 +28,7 @@ const schema = new Schema<Table>({
         enum: ['available', 'unavailable'],
         default: 'available'
     },
-    //TODO: ADD orderStatus: ['empty', 'ordering', 'waiting for food', 'eating', 'paying']
+    //TODO: ADD orderStatus: ['empty', 'ordering', 'confirm_order', 'waiting for food', 'eating', 'paying']
     
 }, { timestamps: true });
 
