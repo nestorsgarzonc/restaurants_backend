@@ -80,7 +80,7 @@ export const socketServer = async(app) => {
 
         socket.on('add_product_to_order',async(data)=>{
             try{
-                const {token,...orderData} = data;
+                const {token,tableId,...orderData} = data;
                 let userId = await tokenIsValidSocket(token);
                 if (!userId) {
                     let timestamp = Date.now().toString();
@@ -88,7 +88,7 @@ export const socketServer = async(app) => {
                     io.to(timestamp).emit('error', { reason: 'no userId' });
                     return;
                 }
-                let currentTable = await redisClient.get(`table${data.tableId}`)
+                let currentTable = await redisClient.get(`table${tableId}`)
                 let currentTableParsed = JSON.parse(currentTable);
                 currentTableParsed.usersConnected.find(user => user.userId === userId).orderProducts.push(orderData);
                 currentTableParsed.usersConnected.find(user => user.userId === userId).price += data.totalWithToppings;
@@ -96,7 +96,7 @@ export const socketServer = async(app) => {
                 
                 redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
                 console.log(currentTableParsed);
-                io.to(data.tableId).emit('list_of_orders',{table:currentTableParsed});
+                io.to(tableId).emit('list_of_orders',{table:currentTableParsed});
             }catch(error){
                 console.log("Ocurrió un al añadir un producto a la orden:", error);
             }
@@ -180,6 +180,37 @@ export const socketServer = async(app) => {
             }
         });
 
+        socket.on('edit_item',async(data)=>{
+            try{
+                const {token,tableId,...orderData} = data;
+                let userId = await tokenIsValidSocket(token);
+                if (!userId) {
+                    let timestamp = Date.now().toString();
+                    socket.join(timestamp);
+                    io.to(timestamp).emit('error', { reason: 'no userId' });
+                    return;
+                }
+                let currentTable = await redisClient.get(`table${tableId}`)
+                let currentTableParsed = JSON.parse(currentTable);
+                let userIndexInArray = currentTableParsed.usersConnected.findIndex(user => user.userId == userId);
+                let itemIndexInArray = currentTableParsed.usersConnected[userIndexInArray].orderProducts.findIndex(item=>item.uuid===orderData.uuid);
+                currentTableParsed.usersConnected[userIndexInArray].price -= currentTableParsed.usersConnected[userIndexInArray]
+                    .orderProducts[itemIndexInArray].totalWithToppings;
+                currentTableParsed.totalPrice -= currentTableParsed.usersConnected[userIndexInArray]
+                    .orderProducts[itemIndexInArray].totalWithToppings;
+                    
+                currentTableParsed.usersConnected[userIndexInArray].price += orderData.totalWithToppings;
+                currentTableParsed.totalPrice += orderData.totalWithToppings;
+                currentTableParsed.usersConnected[userIndexInArray].price = currentTableParsed.usersConnected[userIndexInArray]
+                    .orderProducts[itemIndexInArray] = orderData;
+
+                redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
+                io.to(tableId).emit('list_of_orders',{table:currentTableParsed});
+            }catch(error){
+                console.log("Ocurrió un error al editar el elemento", error);
+            }
+        });
+
         socket.on('delete_item',async(data)=>{
             try{
                 let userId = await tokenIsValidSocket(data.token);
@@ -193,6 +224,8 @@ export const socketServer = async(app) => {
                 let currentTableParsed = JSON.parse(currentTable);
                 let userIndexInArray = currentTableParsed.usersConnected.findIndex(user => user.userId == userId);
                 let itemIndexInArray = currentTableParsed.usersConnected[userIndexInArray].orderProducts.findIndex(item=>item.uuid===data.uuid);
+                console.log(currentTableParsed.usersConnected[userIndexInArray].orderProducts[itemIndexInArray]);
+
                 currentTableParsed.usersConnected[userIndexInArray].price -= currentTableParsed.usersConnected[userIndexInArray]
                     .orderProducts[itemIndexInArray].totalWithToppings;
                 currentTableParsed.totalPrice -= currentTableParsed.usersConnected[userIndexInArray]
