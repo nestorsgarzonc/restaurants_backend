@@ -33,7 +33,7 @@ router.post(
     authController.register,
 )
 
-router.get(
+router.post(
     '/logout',
     [tokenIsValid],
     authController.logout,
