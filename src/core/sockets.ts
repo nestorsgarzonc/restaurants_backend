@@ -50,8 +50,6 @@ export const socketServer = async(app) => {
     await redisClient.connect();
     redisClientExp = redisClient;
 
-    SocketService = require('../services/socket.service')(io);
-
     io.on('connection', onContection);
 
     server.listen(process.env.PORT, () => console.log('Listening at port', process.env.PORT));
