@@ -45,7 +45,7 @@ export const logout = async (req: Request, res: Response) => {
         const user = await User.findById(res.locals.token.userId);
         user.sessionValid = false;
         user.save();
-        return res.json({ msg: "PENDING: Logout successfully." });
+        return res.json({ msg: "Logout successfully." });
     } catch (error) {
         return res.status(400).json({ msg: error.message });
     }

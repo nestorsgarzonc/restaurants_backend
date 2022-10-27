@@ -1,16 +1,10 @@
-module.exports = (io) => {
-    const msg = function (data) {
-        const socket = this;
-        console.log(data);
-        socket.emit('msg', data);
-    }
+import {io, socket} from '../core/sockets';
 
-    const disconnect = function (data) {
-        console.log('user disconnected');
-    }
+export const msg = function (data) {
+    console.log(data);
+    socket.emit('msg', data);
+}
 
-    return{
-        msg,
-        disconnect
-    }
+export const disconnect = function (data) {
+    console.log('user disconnected');
 }

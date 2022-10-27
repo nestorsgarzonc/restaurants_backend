@@ -6,9 +6,9 @@ import { errorHandlerSocket } from '../middlewares/errors.middleware';
 import * as TableService from '../services/table.service';
 import * as OrderService from '../services/order.service';
 import * as WaiterService from '../services/waiter.service';
+import * as SocketService from '../services/socket.service';
 
 
-var SocketService;
 var ioExp;
 var socketExp
 var redisClientExp;
