@@ -1,6 +1,7 @@
 import { checkUser } from "../core/util/sockets.utils";
 import {io, socket} from '../core/sockets';
 import * as TableController from '../service_controllers/table.controller';
+import restaurant from "../models/restaurant/restaurant";
 
 export const join =  async(data) => {
     
@@ -49,4 +50,23 @@ export const stopCallingWaiter = async(data) =>{
     io.to(tableId).emit('list_of_orders',{table:currentTableParsed});
     io.to(`${restaurantId}`).emit('costumers_requests', {requests: callingTablesList});
 
+}
+
+export const orderNow = async(data) =>{
+    try{
+        let{token, tableData} = data;
+
+        let userId = await checkUser(token);
+        if(!userId) return;
+
+        let currentTableParsed = await TableController.orderNowController(tableData);   
+
+        io.to(tableData.tableId).emit('list_of_orders',{table:currentTableParsed});
+        io.to(currentTableParsed.restaurantId).emit('costumers_requests', {table:currentTableParsed});
+    }catch(error){
+        let timestamp = Date.now().toString();
+            socket.join(timestamp);
+            io.to(timestamp).emit('error', error);
+            return;
+    }
 }
