@@ -61,3 +61,20 @@ export const callWaiterController =async (tableId, stopCalling = false) => {
     redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));  
     return {restaurantId, callingTablesList, currentTableParsed}
 }
+
+export const orderNowController =async (data) => {
+    
+    let currentTable = await redisClient.get(`table${data.tableId}`);
+    let currentTableParsed = JSON.parse(currentTable);
+
+    currentTableParsed.tableStatus = data.status;
+    redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+
+    const table = await Table.findById(data.tableId);
+    if (!table) {
+        throw { msg: 'Table not found' };
+    }
+    table.status = data.status;
+    await table.save();
+    return table;
+}
