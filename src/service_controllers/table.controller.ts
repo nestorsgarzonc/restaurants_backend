@@ -72,7 +72,7 @@ export const orderNowController =async (data) => {
 
     const table = await Table.findById(data.tableId);
     if (!table) {
-        throw { msg: 'Table not found' };
+        throw { reason: 'Table not found' };
     }
     table.status = data.status;
     await table.save();
