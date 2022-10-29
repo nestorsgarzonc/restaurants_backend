@@ -2,9 +2,9 @@ import { Schema, model, Types } from 'mongoose';
 
 interface Order {
     usersOrder: Types.ObjectId[];
-    status: String;
+    tableId: Types.ObjectId;
     totalPrice: Number;
-    restaurantId: String;
+    restaurantId: Types.ObjectId;
     waiterId: Types.ObjectId;
     tip: Number;
     createdAt: Date;
@@ -18,8 +18,9 @@ const scheme = new Schema<Order>(
             ref: 'UserOrder',
             required: true
         }],
-        status: {
-            type: String,
+        tableId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Table',
             required: true
         },
         totalPrice: {
@@ -28,13 +29,14 @@ const scheme = new Schema<Order>(
             default: 0
         },
         restaurantId: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'Restaurant',
             required: true
         },
         waiterId: {
             type: Schema.Types.ObjectId,
             ref: 'Waiter',
-            required: true
+            required: false
         },
         tip: {
             type: Number,

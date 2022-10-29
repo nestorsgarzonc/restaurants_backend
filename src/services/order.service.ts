@@ -38,16 +38,6 @@ export const deleteItem = async(data) =>{
     io.to(orderData.tableId).emit('list_of_orders',{table:currentTableParsed});
 }
 
-export const payAccount = async(data) =>{
-    const {token,...orderData} = data;
-    
-    let userId = await checkUser(token);
-    if(!userId) return;
-    
-    await OrderController.payAccountController(userId, orderData);
-    
-}
-
 export const askAccount = async(data) =>{
     const {token,...orderData} = data;
     

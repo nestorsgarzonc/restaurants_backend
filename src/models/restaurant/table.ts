@@ -4,7 +4,6 @@ interface Table {
     name: String;
     capacity: Number;
     restaurantId: Types.ObjectId;
-    status: String;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -22,11 +21,6 @@ const schema = new Schema<Table>({
         type: Schema.Types.ObjectId,
         ref: 'Restaurant',
         required: true
-    },
-    status: {
-        type: String,
-        enum: ['available', 'unavailable'],
-        default: 'available'
     },
     //TODO: ADD orderStatus: ['empty', 'ordering', 'confirm_order', 'waiting for food', 'eating', 'paying']
     

@@ -52,7 +52,7 @@ const scheme = new Schema<User>({
     },
     ordersStory: [{
         type: Schema.Types.ObjectId,
-        ref: 'Order',
+        ref: 'UserOrder',
         default: [],
     }],
     address: {
