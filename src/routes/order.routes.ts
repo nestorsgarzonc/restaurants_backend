@@ -7,10 +7,25 @@ import { errorHandler } from '../middlewares/errors.middleware';
 const router = Router()
 
 router.get(
+    '/user-orders',
+    [tokenIsValid],
+    orderController.getOrders
+)
+
+router.get(
+    '/user-orders/:id',
+    [tokenIsValid],
+    orderController.getUserOrder
+)
+
+router.get(
     '/:id',
     [tokenIsValid],
     orderController.getOrderDetail
 )
+
+
+
 
 //Pass restaurant id as query param
 router.get(

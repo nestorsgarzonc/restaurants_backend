@@ -4,7 +4,7 @@ interface Order {
     usersOrder: Types.ObjectId[];
     status: String;
     totalPrice: Number;
-    restaurantId: String;
+    restaurantId: Types.ObjectId;
     waiterId: Types.ObjectId;
     tip: Number;
     createdAt: Date;
@@ -28,7 +28,8 @@ const scheme = new Schema<Order>(
             default: 0
         },
         restaurantId: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'Restaurant',
             required: true
         },
         waiterId: {
