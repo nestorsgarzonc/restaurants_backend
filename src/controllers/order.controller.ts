@@ -10,6 +10,7 @@ import UserOrder from '../models/restaurant/userOrder';
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
         const orderId = req.params.id;
+        console.log(orderId);
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ msg: 'Order not found' });
@@ -20,6 +21,29 @@ export const getOrderDetail = async (req: Request, res: Response) => {
     }
 }
 
+export const getOrders = async (req: Request, res:Response)=>{
+    try{
+        const userId = res.locals.token.userId;
+        const user = await User.findById(userId)
+            .populate({
+                path:'ordersStory',
+                populate: {
+                    path:'',
+                    select:['totalPrice','createdAt'],
+                    populate: {
+                        path:'restaurantId',
+                        select:['address','name']
+                    }
+                }
+            })
+        if(!user){
+            return res.status(400).json({msg: 'Orders not found'});
+        }
+        return res.json(user.ordersStory);
+    }catch(error){
+        return res.status(400).json({msg: error.message});
+    }
+}
 
 export const getRestaurantOrders = async (req: Request, res: Response) => {
     const restaurantId = req.params.restaurantId;
@@ -155,4 +179,16 @@ export const payAccount = async(req: Request, res: Response) => {
 
     return res.json({ msg: 'User order created successfully', order });
 
+}
+export const getUserOrder = async(req: Request, res: Response)=>{
+    try{
+        const hola = req.params.id;
+        const userOrder = await UserOrder.findById(req.params.id);
+        if (!userOrder) {
+            return res.status(404).json({ msg: 'User order not found' });
+        }
+        return res.json(userOrder);
+    }catch(error){
+        return res.status(400).json({ msg: error.message });
+    }
 }
