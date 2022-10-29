@@ -27,13 +27,10 @@ export const getOrders = async (req: Request, res:Response)=>{
         const user = await User.findById(userId)
             .populate({
                 path:'ordersStory',
+                select:['totalPrice','createdAt'],
                 populate: {
-                    path:'',
-                    select:['totalPrice','createdAt'],
-                    populate: {
-                        path:'restaurantId',
-                        select:['address','name']
-                    }
+                    path:'restaurantId' as 'restaurant',
+                    select:['address','name']
                 }
             })
         if(!user){
@@ -162,10 +159,6 @@ export const payAccount = async(req: Request, res: Response) => {
         await userOrder.save();
         userOrderIds.push(userOrder._id);
 
-        const mongoUser = await User.findById(user.userId);
-        mongoUser.ordersStory.push(userOrder._id);
-        await mongoUser.save();
-
     }
 
     const order = new Order({
@@ -176,18 +169,21 @@ export const payAccount = async(req: Request, res: Response) => {
         tip: req.body.tip
     });
     await order.save();
-
+    for(let user of currentTableParsed.usersConnected){
+        const mongoUser = await User.findById(user.userId);
+        mongoUser.ordersStory.push(order._id);
+        await mongoUser.save();
+    }
     return res.json({ msg: 'User order created successfully', order });
 
 }
-export const getUserOrder = async(req: Request, res: Response)=>{
+export const getOrder = async(req: Request, res: Response)=>{
     try{
-        const hola = req.params.id;
-        const userOrder = await UserOrder.findById(req.params.id);
-        if (!userOrder) {
+        const order = await Order.findById(req.params.id);
+        if (!order) {
             return res.status(404).json({ msg: 'User order not found' });
         }
-        return res.json(userOrder);
+        return res.json(order);
     }catch(error){
         return res.status(400).json({ msg: error.message });
     }
