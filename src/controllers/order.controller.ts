@@ -179,12 +179,31 @@ export const payAccount = async(req: Request, res: Response) => {
 }
 export const getOrder = async(req: Request, res: Response)=>{
     try{
-        const order = await Order.findById(req.params.id);
+        const userId = res.locals.token.userId;
+        const payment = req.body.payment;
+        const order = await Order.findById(req.params.id)
+            .populate({
+                path:'usersOrder',
+                populate:{
+                    path:'orderProducts',
+                    populate:{
+                        path:'toppings',
+                        populate:'toppingOptions'
+                    }
+                }
+            });
         if (!order) {
             return res.status(404).json({ msg: 'User order not found' });
         }
-        return res.json(order);
+        if(payment=='altogether'){
+            return res.json(order);
+        }else{
+            return order.usersOrder.find(userorder=>(userorder as any).userId==userId);
+        }
+        
     }catch(error){
         return res.status(400).json({ msg: error.message });
     }
 }
+
+
