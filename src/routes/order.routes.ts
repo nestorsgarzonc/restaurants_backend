@@ -15,7 +15,7 @@ router.get(
 router.get(
     '/user-orders/:id',
     [tokenIsValid],
-    orderController.getUserOrder
+    orderController.getOrder
 )
 
 router.get(
