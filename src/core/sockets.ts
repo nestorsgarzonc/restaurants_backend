@@ -31,7 +31,6 @@ const onContection = (socket) => {
     socket.on('order:add-item', errorHandlerSocket(OrderService.addItem))
     socket.on('order:edit-item', errorHandlerSocket(OrderService.editItem))
     socket.on('order:delete-item', errorHandlerSocket(OrderService.deleteItem))
-    socket.on('order:pay-account', errorHandlerSocket(OrderService.payAccount))
     socket.on('order:ask-account', errorHandlerSocket(OrderService.askAccount))
 
     socket.on('waiter:attend-table', errorHandlerSocket(TableService.stopCallingWaiter))

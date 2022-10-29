@@ -22,14 +22,12 @@ router.get(
 router.post(
     '/table-order',
     [
-        body('usersOrder').isMongoId(),
-        body('restaurantId').isMongoId(),
-        body('status').isString(),
-        body('totalPrice').isNumeric().isFloat({ min: 0 }),
+        body('tableId').isMongoId(),
+        body('tip').isNumeric(),
         tokenIsValid,
         errorHandler,
     ],
-    orderController.createTableOrder
+    orderController.payAccount
 )
 
 router.put(
