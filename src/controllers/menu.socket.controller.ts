@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 import { tokenIsValidSocket } from "../middlewares/auth.middleware";
 import User from "../models/user/user";
-
+import {io, socket} from '../core/sockets';
 const redisClient = createClient(
     {url:'redis://default:cOdlLDjp5YKs7fyDPLUdEZIALL57XFAD@redis-15442.c11.us-east-1-2.ec2.cloud.redislabs.com:15442'}
 );

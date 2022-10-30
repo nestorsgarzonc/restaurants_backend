@@ -125,12 +125,13 @@ export const payAccount = async(req: Request, res: Response) => {
                 let orderToppingOptionIds = [];
 
                 for(let option of topping.options){
-                    const orderToppingOption = new OrderToppingOption({
+                    /*const orderToppingOption = new OrderToppingOption({
                         toppingOptionId: option._id,
                         price: option.price
                     });
                     await orderToppingOption.save();
-                    orderToppingOptionIds.push(orderToppingOption._id);
+                    orderToppingOptionIds.push(orderToppingOption._id);*/
+                    orderToppingOptionIds.push(option._id);
                 }
 
                 const orderTopping = new OrderTopping({
@@ -180,25 +181,36 @@ export const payAccount = async(req: Request, res: Response) => {
 export const getOrder = async(req: Request, res: Response)=>{
     try{
         const userId = res.locals.token.userId;
-        const payment = req.body.payment;
+        const paymentMode= req.body.paymentMode;
         const order = await Order.findById(req.params.id)
             .populate({
                 path:'usersOrder',
-                populate:{
+                populate:[{
                     path:'orderProducts',
-                    populate:{
+                    populate:[{
                         path:'toppings',
-                        populate:'toppingOptions'
-                    }
-                }
+                        populate:[{
+                            path:'toppingOptions',select:['name','price']
+                        },
+                        {
+                            path:'toppingId', select:['name']
+                        }]
+                    },
+                    {
+                        path:'productId', select:['name','price','imgUrl']
+                    }]
+                },
+                {
+                    path:'userId',select:['firstName','lastName']
+                }]
             });
         if (!order) {
             return res.status(404).json({ msg: 'User order not found' });
         }
-        if(payment=='altogether'){
+        if(paymentMode=='all'){
             return res.json(order);
         }else{
-            return order.usersOrder.find(userorder=>(userorder as any).userId==userId);
+            return res.json(order.usersOrder.find(userorder=>(userorder as any).userId._id==userId));
         }
         
     }catch(error){
