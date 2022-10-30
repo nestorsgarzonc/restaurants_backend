@@ -6,6 +6,7 @@ import OrderProduct from '../models/restaurant/orderProduct';
 import OrderTopping from '../models/restaurant/orderTopping';
 import OrderToppingOption from '../models/restaurant/orderToppingOption';
 import UserOrder from '../models/restaurant/userOrder';
+import restaurant from '../models/restaurant/restaurant';
 
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
@@ -184,7 +185,7 @@ export const getOrder = async(req: Request, res: Response)=>{
         const userId = res.locals.token.userId;
         console.log(userId);
         const order = await Order.findById(req.params.id)
-            .populate({
+            .populate([{
                 path:'usersOrder',
                 populate:[{
                     path:'orderProducts',
@@ -204,7 +205,11 @@ export const getOrder = async(req: Request, res: Response)=>{
                 {
                     path:'userId',select:['firstName','lastName']
                 }]
-            });
+            },
+            {
+                path:'restaurantId',select:['logoUrl','name']
+            }
+        ]);
         if (!order) {
             return res.status(404).json({ msg: 'User order not found' });
         }
