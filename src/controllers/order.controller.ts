@@ -7,6 +7,7 @@ import OrderTopping from '../models/restaurant/orderTopping';
 import OrderToppingOption from '../models/restaurant/orderToppingOption';
 import UserOrder from '../models/restaurant/userOrder';
 import restaurant from '../models/restaurant/restaurant';
+import user from '../models/user/user';
 
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
@@ -28,11 +29,15 @@ export const getOrders = async (req: Request, res:Response)=>{
         const user = await User.findById(userId)
             .populate({
                 path:'ordersStory',
-                select:['totalPrice','createdAt'],
-                populate: {
+                select:['totalPrice','createdAt','paymentWay','paymentMethod'],
+                populate: [{
                     path:'restaurantId' as 'restaurant',
                     select:['address','name','logoUrl']
+                },
+                {
+                    path:'usersOrder', match:{userId:userId}, select:['price']
                 }
+            ]
             })
         if(!user){
             return res.status(400).json({msg: 'Orders not found'});
@@ -169,7 +174,8 @@ export const payAccount = async(req: Request, res: Response) => {
         totalPrice: currentTableParsed.totalPrice,
         restaurantId: currentTableParsed.restaurantId,
         tip: req.body.tip,
-        paymentWay: req.body.paymentWay
+        paymentWay: req.body.paymentWay,
+        paymentMethod: req.body.paymentMethod
     });
     await order.save();
     for(let user of currentTableParsed.usersConnected){
@@ -207,7 +213,7 @@ export const getOrder = async(req: Request, res: Response)=>{
                 }]
             },
             {
-                path:'restaurantId',select:['logoUrl','name']
+                path:'restaurantId',select:['logoUrl','name','address']
             }
         ]);
         if (!order) {
@@ -218,7 +224,7 @@ export const getOrder = async(req: Request, res: Response)=>{
             return res.json(order);
         }else if(order.paymentWay=='split'){
             
-            return res.json(order.usersOrder.find(userorder=>(userorder as any).userId._id==userId));
+            return res.json({order:order.usersOrder.find(userorder=>(userorder as any).userId._id==userId),restaurantId:order.restaurantId,payment:{way:order.paymentWay,method:order.paymentMethod}});
         }
         
     }catch(error){
