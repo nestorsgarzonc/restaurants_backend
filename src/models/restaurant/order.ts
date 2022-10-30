@@ -7,6 +7,7 @@ interface Order {
     restaurantId: Types.ObjectId;
     waiterId: Types.ObjectId;
     tip: Number;
+    paymentWay: String;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -42,7 +43,12 @@ const scheme = new Schema<Order>(
             type: Number,
             required: true,
             default: 0
-        }
+        },
+        paymentWay: {
+            type: String,
+            default: 'all',
+            enum: ['all','split']
+        },
     }, { timestamps: true }
 );
 

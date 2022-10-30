@@ -167,7 +167,8 @@ export const payAccount = async(req: Request, res: Response) => {
         tableId: req.body.tableId,
         totalPrice: currentTableParsed.totalPrice,
         restaurantId: currentTableParsed.restaurantId,
-        tip: req.body.tip
+        tip: req.body.tip,
+        paymentWay: req.body.paymentWay
     });
     await order.save();
     for(let user of currentTableParsed.usersConnected){
@@ -181,7 +182,7 @@ export const payAccount = async(req: Request, res: Response) => {
 export const getOrder = async(req: Request, res: Response)=>{
     try{
         const userId = res.locals.token.userId;
-        const paymentMode= req.body.paymentMode;
+        console.log(userId);
         const order = await Order.findById(req.params.id)
             .populate({
                 path:'usersOrder',
@@ -207,9 +208,11 @@ export const getOrder = async(req: Request, res: Response)=>{
         if (!order) {
             return res.status(404).json({ msg: 'User order not found' });
         }
-        if(paymentMode=='all'){
+        console.log(order.usersOrder);
+        if(order.paymentWay=='all'){
             return res.json(order);
-        }else{
+        }else if(order.paymentWay=='split'){
+            
             return res.json(order.usersOrder.find(userorder=>(userorder as any).userId._id==userId));
         }
         

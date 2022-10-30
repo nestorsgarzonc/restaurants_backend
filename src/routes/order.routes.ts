@@ -14,11 +14,7 @@ router.get(
 
 router.get(
     '/user-orders/:id',
-    [
-        body('paymentMode').isIn(['all','single']),
-        tokenIsValid,
-        errorHandler
-    ],
+    [tokenIsValid],
     orderController.getOrder
 )
 
@@ -41,6 +37,7 @@ router.get(
 router.post(
     '/table-order',
     [
+        body('paymentWay').isIn(['all','split']),
         body('tableId').isMongoId(),
         body('tip').isNumeric(),
         tokenIsValid,
