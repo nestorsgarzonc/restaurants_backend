@@ -4,9 +4,19 @@ interface Table {
     name: String;
     capacity: Number;
     restaurantId: Types.ObjectId;
+    status: String;
     createdAt: Date;
     updatedAt: Date;
 }
+
+export enum TableStatus {
+    Empty = 'empty', 
+    Ordering = 'ordering', 
+    ConfirmOrder = 'confirm_order',
+    OrderConfirmed = 'order_confirmed',
+    Eating = 'eating', 
+    Paying = 'paying'
+  }
 
 const schema = new Schema<Table>({
     name: {
@@ -22,7 +32,12 @@ const schema = new Schema<Table>({
         ref: 'Restaurant',
         required: true
     },
-    //TODO: ADD orderStatus: ['empty', 'ordering', 'confirm_order', 'waiting for food', 'eating', 'paying']
+    status: {
+        type: String,
+        required: false,
+        default: TableStatus.Empty,
+        enum: [TableStatus.Empty, TableStatus.Ordering, TableStatus.ConfirmOrder, TableStatus.OrderConfirmed, TableStatus.Eating, TableStatus.Paying]
+    },
     
 }, { timestamps: true });
 

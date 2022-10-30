@@ -1,6 +1,6 @@
 import User from "../models/user/user";
 
-import Table from "../models/restaurant/table";
+import Table, { TableStatus } from "../models/restaurant/table";
 import { redisClient } from "../core/sockets";
 
 export const joinController = async(userId, tableId) =>{
@@ -64,17 +64,25 @@ export const callWaiterController =async (tableId, stopCalling = false) => {
 
 export const orderNowController =async (data) => {
     
+    console.log("entered");
     let currentTable = await redisClient.get(`table${data.tableId}`);
+    if(!currentTable){
+        console.log("No se tiene un registro de la mesa")
+        throw new Error("No se tiene un registro de la mesa")
+    }
     let currentTableParsed = JSON.parse(currentTable);
-
-    currentTableParsed.tableStatus = data.status;
+    
+    console.log("test");
+    currentTableParsed.tableStatus = TableStatus.ConfirmOrder;
     redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+    console.log("Redis");
 
     const table = await Table.findById(data.tableId);
     if (!table) {
-        throw { reason: 'Table not found' };
+        throw new Error("No se encontró esta mesa");
     }
-    //table.status = data.status;
+    table.status = TableStatus.ConfirmOrder;
     await table.save();
+    console.log(table);
     return table;
 }

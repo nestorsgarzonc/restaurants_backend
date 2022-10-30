@@ -54,19 +54,26 @@ export const stopCallingWaiter = async(data) =>{
 
 export const orderNow = async(data) =>{
     try{
-        let{token, tableData} = data;
+        console.log("############");
+        console.log("data recived on orderNow:", data)
 
-        let userId = await checkUser(token);
+        let userId = await checkUser(data.token);
         if(!userId) return;
 
-        let currentTableParsed = await TableController.orderNowController(tableData);   
+        console.log("prev");
+        let currentTableParsed = await TableController.orderNowController(data);   
 
-        io.to(tableData.tableId).emit('list_of_orders',{table:currentTableParsed});
-        io.to(currentTableParsed.restaurantId).emit('costumers_requests', {table:currentTableParsed});
-    }catch(error){
+        console.log("after:", currentTableParsed);
+        io.to(data.tableId).emit('list_of_orders',{table:currentTableParsed});
+        console.log("data emited for list_of_orders:", currentTableParsed);
+        io.to(currentTableParsed.restaurantId).emit('costumers_requests', { table: currentTableParsed });
+        console.log("data emited for costumers_required:", currentTableParsed);
+        console.log("############");
+    } catch (error) {
+        console.log("OrderNowError:", error);
         let timestamp = Date.now().toString();
-            socket.join(timestamp);
-            io.to(timestamp).emit('error', error);
-            return;
+        socket.join(timestamp);
+        io.to(timestamp).emit('error', error);
+        return;
     }
 }
