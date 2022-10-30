@@ -46,12 +46,16 @@ export const socketServer = async(app) => {
     const redisClient = createClient(
         {url:'redis://default:cOdlLDjp5YKs7fyDPLUdEZIALL57XFAD@redis-15442.c11.us-east-1-2.ec2.cloud.redislabs.com:15442'}
     );
-    redisClient.on('error', (err) => console.log('Redis Client Error', err));
+   
     await redisClient.connect();
+    redisClient.on('error', (err) => console.log('Redis Client Error', err));
     redisClientExp = redisClient;
-
+    redisClient.on('ready', function() {
+        console.log('connected to redis');
+    });
+    
     io.on('connection', onContection);
-
+        
     server.listen(process.env.PORT, () => console.log('Listening at port', process.env.PORT));
 
 }

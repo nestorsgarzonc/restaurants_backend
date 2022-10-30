@@ -30,7 +30,7 @@ export const getOrders = async (req: Request, res:Response)=>{
                 select:['totalPrice','createdAt'],
                 populate: {
                     path:'restaurantId' as 'restaurant',
-                    select:['address','name']
+                    select:['address','name','logoUrl']
                 }
             })
         if(!user){

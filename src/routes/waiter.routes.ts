@@ -24,4 +24,6 @@ router.post(
     waiterController.createWaiter
 )
 
+
+
 export default router

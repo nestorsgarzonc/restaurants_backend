@@ -6,6 +6,8 @@ import Restaurant from '../models/restaurant/restaurant';
 export const getWaiter = async (req: Request, res: Response) => {
 }
 
+
+
 export const createWaiter = async (req: Request, res: Response) => {
     const user = await User.findOne({'email': req.body.waiterEmail});
     if(!user) return res.status(404).json({msg:'waiters email is not found'});

@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import { hashSync, compareSync } from 'bcrypt';
 import { getToken } from '../core/jwt';
 import User from '../models/user/user';
+import Waiter from '../models/restaurant/waiter';
 import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
+import { waitForDebugger } from 'inspector';
 
 export const login = async (req: Request, res: Response) => {
     try{
@@ -134,4 +136,22 @@ export const refreshToken = async (req: Request, res: Response) => {
         token,
         user: userProtected,
     });
+}
+
+export const isWaiter = async (req: Request, res: Response) => {
+    try{
+        const user = await User.findById(res.locals.token.userId);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+        if(user.rol=='waiter'){
+            const waiter = await Waiter.findOne({user:user._id});
+            return res.json({restaurantId : waiter.restaurant});
+        }else{
+            return res.status(401).json({msg:'User is not waiter'});
+        }
+        
+    } catch (error) {
+        return res.json({ msg: error.message })
+    }
 }

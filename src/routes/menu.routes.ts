@@ -19,6 +19,11 @@ router.get(
     menuController.getRestaurantMenu,
 )
 
+router.get(
+    '/get-menu/:restaurantId',
+    menuController.getRestaurantMenuWithRestaurantId
+)
+
 router.post(
     //This is where I create a category
     '/:restaurantId',
@@ -76,7 +81,7 @@ router.get(
 )
 
 router.get(
-    '/toppingOptions/jiji',
+    '/toppingOptions/',
     [tokenIsValid],
     menuController.getAllToppings
 )

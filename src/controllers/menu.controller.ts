@@ -15,7 +15,25 @@ export const getAllMenus = async (req: Request, res: Response) => {
         return res.status(400).json({ msg: error });
     }
 }
+export const getRestaurantMenuWithRestaurantId = async (req: Request, res: Response) => {
+    //TODO: this is what I need to complete ajaja
+    try {
+        const restaurant = await Restaurant.findById(req.params.restaurantId)
+            .populate({
+                path: 'menu',
+                populate: {
+                    path: 'menuItems'
+                }
+            })
 
+
+        if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
+
+        return res.json({ restaurant: restaurant});
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
 export const getRestaurantMenu = async (req: Request, res: Response) => {
     //TODO: this is what I need to complete ajaja
     try {

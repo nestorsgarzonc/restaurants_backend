@@ -14,7 +14,11 @@ router.get(
 
 router.get(
     '/user-orders/:id',
-    [tokenIsValid],
+    [
+        body('paymentMode').isIn(['all','single']),
+        tokenIsValid,
+        errorHandler
+    ],
     orderController.getOrder
 )
 

@@ -64,4 +64,10 @@ router.get(
     authController.refreshToken,
 )
 
+router.get(
+    '/is-waiter',
+    [tokenIsValid],
+    authController.isWaiter
+)
+
 export default router;
