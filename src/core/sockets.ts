@@ -7,6 +7,7 @@ import * as TableService from '../services/table.service';
 import * as OrderService from '../services/order.service';
 import * as WaiterService from '../services/waiter.service';
 import * as SocketService from '../services/socket.service';
+import * as RestaurantService from '../services/restaurant.service';
 
 
 var ioExp;
@@ -32,6 +33,8 @@ const onContection = (socket) => {
     socket.on('order:edit-item', errorHandlerSocket(OrderService.editItem))
     socket.on('order:delete-item', errorHandlerSocket(OrderService.deleteItem))
     socket.on('order:ask-account', errorHandlerSocket(OrderService.askAccount))
+
+    socket.on('restaurant:join', errorHandlerSocket(RestaurantService.join))
 
     socket.on('waiter:attend-table', errorHandlerSocket(TableService.stopCallingWaiter))
     socket.on('waiter:listen-tables', errorHandlerSocket(WaiterService.listenTables))
