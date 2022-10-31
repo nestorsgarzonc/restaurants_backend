@@ -34,11 +34,14 @@ const changeStatusRedis = async (data) => {
     let currentTableParsed = JSON.parse(currentTable);
     currentTableParsed.tableStatus = data.status;
     redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+    console.log('Redis');
+    
     return currentTableParsed;
 }
 
 const changeStatusMongo = async (data) => {
     try {
+        console.log('Mongo');
         const table = await Table.findById(data.tableId);
         if (!table) {
             throw new Error('No se encontró la mesa');

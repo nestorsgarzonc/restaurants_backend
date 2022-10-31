@@ -14,10 +14,16 @@ export const join = async (data) => {
 };
 
 export const changeStatus = async (data) => {
+    
     let { token, ...tableData } = data;
+    
+    
     let userId = await checkUser(token);
     if (!userId) return;
     let [redisRes, { tables, restaurantId }] = await TableController.changeStatusController(tableData);
+    console.log(data.tableId);
+    console.log(redisRes);
+    
     io.to(data.tableId).emit('list_of_orders', { table: redisRes })
     io.to(restaurantId.toString()).emit('restaurant:tables', { tables: tables });
 }
@@ -32,7 +38,7 @@ export const callWaiter = async (data) => {
     console.log('your request was on table: ', tableId);
     console.log('your request will be attended by restaurant: ', restaurantId)
     io.to(tableId).emit('list_of_orders', { table: currentTableParsed });
-    io.to(`${restaurantId}`).emit('costumers_requests', { requests: callingTablesList });
+    io.to(`${restaurantId}`).emit('customer_requests', { callingTables: callingTablesList });
 }
 
 export const stopCallingWaiter = async (data) => {
@@ -44,7 +50,7 @@ export const stopCallingWaiter = async (data) => {
     let { restaurantId, callingTablesList, currentTableParsed } = await TableController.callWaiterController(tableId, true);
 
     io.to(tableId).emit('list_of_orders', { table: currentTableParsed });
-    io.to(`${restaurantId}`).emit('costumers_requests', { requests: callingTablesList });
+    io.to(`${restaurantId}`).emit('customer_requests', { callingTables: callingTablesList });
 
 }
 

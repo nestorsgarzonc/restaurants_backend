@@ -5,9 +5,11 @@ export const join =  async(data) => {
     
     let userId = await checkUser(data.token);
     if(!userId) return;
-    const tables = await RestaurantController.getTableListController(data);
+    const {tables,callingTables} = await RestaurantController.getTableListController(data);
     socket.join(data.restaurantId);
     io.to(data.restaurantId).emit('restaurant:tables',{tables:tables});
+    console.log(callingTables);
+    io.to(data.restaurantId).emit('customer_requests',{callingTables:callingTables});
 };
 
 export const getTableList = async(data)=>{
