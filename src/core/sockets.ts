@@ -28,6 +28,7 @@ const onContection = (socket) => {
     socket.on('table:call-waiter', errorHandlerSocket(TableService.callWaiter))
     socket.on('table:stop-calling-waiter', errorHandlerSocket(TableService.stopCallingWaiter))
     socket.on('table:order-now', errorHandlerSocket(TableService.orderNow))
+    
 
     socket.on('order:add-item', errorHandlerSocket(OrderService.addItem))
     socket.on('order:edit-item', errorHandlerSocket(OrderService.editItem))
@@ -35,6 +36,7 @@ const onContection = (socket) => {
     socket.on('order:ask-account', errorHandlerSocket(OrderService.askAccount))
 
     socket.on('restaurant:join', errorHandlerSocket(RestaurantService.join))
+    socket.on('restaurant:tables-status',errorHandlerSocket(RestaurantService.getTableList))
 
     socket.on('waiter:attend-table', errorHandlerSocket(TableService.stopCallingWaiter))
     socket.on('waiter:listen-tables', errorHandlerSocket(WaiterService.listenTables))

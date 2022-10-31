@@ -1,6 +1,6 @@
 import User from "../models/user/user";
-
 import Table, { TableStatus } from "../models/restaurant/table";
+import Restaurant from "../models/restaurant/restaurant";
 import { redisClient } from "../core/sockets";
 
 export const joinController = async(userId, tableId) =>{
@@ -30,14 +30,39 @@ export const joinController = async(userId, tableId) =>{
 }
 
 export const changeStatusController = async(data) =>{
-
+    /*
     let currentTable = await redisClient.get(`table${data.tableId}`)
     let currentTableParsed = JSON.parse(currentTable);
     currentTableParsed.tableStatus = data.status;
     redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+    return currentTableParsed;*/
+    try{
+        const table = await Table.findById(data.tableId);
+        //console.log(table);
+        if(!table){
+            throw new Error('No se encontró la mesa');
+        }
+        table.status = data.status;
+        table.save();
+        const restaurantId = table.restaurantId;
+        const restaurant = await Restaurant.findById(restaurantId)
+            .populate({
+                path:'tables',select:['status','name']
+            })
+        if(!restaurant ){
+            throw new Error("No se encontró el restaurante");
+        }
+        //console.log(restaurant.tables);
+        return {tables:restaurant.tables,restaurantId};
+    }catch(error){
+        console.log(error);
+    }
     
-    return currentTableParsed;
+
 }
+
+
+
 
 export const callWaiterController = async (tableId, stopCalling = false) => {
 

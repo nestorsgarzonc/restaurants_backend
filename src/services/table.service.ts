@@ -18,11 +18,13 @@ export const changeStatus = async(data) =>{
 
     let userId = await checkUser(token);
     if(!userId) return;
+    let {tables,restaurantId} = await TableController.changeStatusController(tableData);
+    console.log(tables);
     
-    let currentTableParsed = await TableController.changeStatusController(tableData);
-
-    io.to(data.tableId).emit('list_of_orders',{table:currentTableParsed});
+    io.to(restaurantId.toString()).emit('restaurant:tables',{tables:tables});
 }
+
+
 
 export const callWaiter =async (data) => {
     
