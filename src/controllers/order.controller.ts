@@ -8,7 +8,7 @@ import OrderToppingOption from '../models/restaurant/orderToppingOption';
 import UserOrder from '../models/restaurant/userOrder';
 import restaurant from '../models/restaurant/restaurant';
 import user from '../models/user/user';
-
+import { io, socket } from '../core/sockets';
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
         const orderId = req.params.id;
@@ -155,6 +155,7 @@ export const payAccount = async(req: Request, res: Response) => {
             });
             await orderProduct.save();
             orderProductIds.push(orderProduct._id);
+            
         }
 
 
@@ -166,6 +167,7 @@ export const payAccount = async(req: Request, res: Response) => {
         await userOrder.save();
         userOrderIds.push(userOrder._id);
         await redisClient.del(`table${req.body.tableId}`);
+        io.to(req.body.tableId).emit('list_of_orders',{table:{}});
     }
 
     const order = new Order({
