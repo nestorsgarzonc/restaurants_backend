@@ -39,7 +39,7 @@ export const changeStatusController = async(data) =>{
     return currentTableParsed;
 }
 
-export const callWaiterController =async (tableId, stopCalling = false) => {
+export const callWaiterController = async (tableId, stopCalling = false) => {
 
     let currentTable = await redisClient.get(`table${tableId}`);
     let currentTableParsed = JSON.parse(currentTable);

@@ -165,7 +165,7 @@ export const payAccount = async(req: Request, res: Response) => {
         });
         await userOrder.save();
         userOrderIds.push(userOrder._id);
-
+        await redisClient.del(`table${req.body.tableId}`);
     }
 
     const order = new Order({
