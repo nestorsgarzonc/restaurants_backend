@@ -5,6 +5,7 @@ import { redisClient } from "../core/sockets";
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
+    const table = await Table.findOneAndUpdate({_id:tableId},{status:TableStatus.Ordering});
     let currentTable = await redisClient.get(`table${tableId}`)
     let currentTableParsed: any = {}
     if (!currentTable) {
