@@ -2,19 +2,21 @@ import User from "../models/user/user";
 import Table, { TableStatus } from "../models/restaurant/table";
 import Restaurant from "../models/restaurant/restaurant";
 import { redisClient } from "../core/sockets";
+import {createTableInRedis} from "../core/util/sockets.utils"
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
     let currentTable = await redisClient.get(`table${tableId}`)
     let currentTableParsed: any = {}
     if (!currentTable) {
-        const table = await Table.findById(tableId);
+        /*const table = await Table.findById(tableId);
         currentTableParsed.usersConnected = [{ userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 }];
         currentTableParsed.needsWaiter = false;
         currentTableParsed.tableStatus = 'ordering';
         currentTableParsed.totalPrice = 0;
         currentTableParsed.restaurantId = table.restaurantId;
-        redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
+        redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));*/
+        currentTableParsed = await createTableInRedis(tableId, userId, user.firstName, user.lastName);
     } else {
         currentTableParsed = JSON.parse(currentTable);
         if (!currentTableParsed.usersConnected.some(user => user.userId === userId)) {

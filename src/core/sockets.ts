@@ -15,7 +15,7 @@ var ioExp;
 var socketExp
 var redisClientExp:RedisClientType;
 
-const onContection = (socket) => {
+const onConection = (socket) => {
 
     console.log('a user connected');
     socket.emit('message', 'Hello World!');
@@ -23,6 +23,7 @@ const onContection = (socket) => {
     
     socket.on('msg', SocketService.msg)
     socket.on('disconnect', SocketService.disconnect)
+    socket.on('show-id',SocketService.showId)
 
     socket.on('table:join', errorHandlerSocket(TableService.join))
     socket.on('table:change-status', errorHandlerSocket(TableService.changeStatus))
@@ -41,6 +42,9 @@ const onContection = (socket) => {
 
     socket.on('waiter:attend-table', errorHandlerSocket(TableService.stopCallingWaiter))
     socket.on('waiter:listen-tables', errorHandlerSocket(WaiterService.listenTables))
+    socket.on('waiter:watch-table', errorHandlerSocket(WaiterService.watchTable))
+    socket.on('waiter:add-item-to-table', errorHandlerSocket(WaiterService.addItemToTable))
+    socket.on('waiter:leave-table', errorHandlerSocket(WaiterService.leaveTable))
 
 }
 
@@ -58,7 +62,15 @@ export const socketServer = async(app) => {
         console.log('connected to redis');
     });
     
-    io.on('connection', onContection);
+    io.on('connection', onConection);
+
+    io.of("/").adapter.on("create-room", (room) => {
+        console.log(`\x1b[35mroom ${room} was created! \x1b[0m`);
+      });
+      
+      io.of("/").adapter.on("join-room", (room, id) => {
+        console.log(`\x1b[35msocket ${id} has joined room ${room} \x1b[0m`);
+      });
         
     server.listen(process.env.PORT, () => console.log('Listening at port', process.env.PORT));
 
