@@ -8,11 +8,12 @@ import * as OrderService from '../services/order.service';
 import * as WaiterService from '../services/waiter.service';
 import * as SocketService from '../services/socket.service';
 import * as RestaurantService from '../services/restaurant.service';
+import RedisClient, { RedisClientType } from '@redis/client/dist/lib/client';
 
 
 var ioExp;
 var socketExp
-var redisClientExp;
+var redisClientExp:RedisClientType;
 
 const onContection = (socket) => {
 
@@ -48,14 +49,12 @@ export const socketServer = async(app) => {
     const io = new Server(server, { /* options  */});
     ioExp = io;
 
-    const redisClient = createClient(
+    redisClientExp= createClient(
         {url:'redis://default:cOdlLDjp5YKs7fyDPLUdEZIALL57XFAD@redis-15442.c11.us-east-1-2.ec2.cloud.redislabs.com:15442'}
     );
-   
-    await redisClient.connect();
-    redisClient.on('error', (err) => console.log('Redis Client Error', err));
-    redisClientExp = redisClient;
-    redisClient.on('ready', function() {
+    await redisClientExp.connect();
+    redisClientExp.on('error', (err) => console.log('Redis Client Error', err));
+    redisClientExp.on('ready', function() {
         console.log('connected to redis');
     });
     

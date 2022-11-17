@@ -166,8 +166,8 @@ export const payAccount = async(req: Request, res: Response) => {
         });
         await userOrder.save();
         userOrderIds.push(userOrder._id);
-        await redisClient.del(`table${req.body.tableId}`);
-        io.to(req.body.tableId).emit('list_of_orders',{table:{}});
+        
+        
     }
 
     const order = new Order({
@@ -185,8 +185,10 @@ export const payAccount = async(req: Request, res: Response) => {
         mongoUser.ordersStory.push(order._id);
         await mongoUser.save();
     }
+    await redisClient.del(`table${req.body.tableId}`);
+    io.to(req.body.tableId).emit('list_of_orders',{table:null});
     return res.json({ msg: 'User order created successfully', order });
-
+    //TODO: Marcar el status en mongo como empty
 }
 export const getOrder = async(req: Request, res: Response)=>{
     try{

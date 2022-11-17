@@ -21,8 +21,8 @@ export const changeStatus = async (data) => {
     let userId = await checkUser(token);
     if (!userId) return;
     let [redisRes, { tables, restaurantId }] = await TableController.changeStatusController(tableData);
+    console.log(tables);
     console.log(data.tableId);
-    console.log(redisRes);
     
     io.to(data.tableId).emit('list_of_orders', { table: redisRes })
     io.to(restaurantId.toString()).emit('restaurant:tables', { tables: tables });

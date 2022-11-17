@@ -28,14 +28,31 @@ export const joinController = async (userId, tableId) => {
 
     return { user, currentTableParsed };
 }
-
+//TODO: Si se vacía la mesa, se borra del redis y se retorna null.
+//Si la mesa no existe y se cambia el estado, se añade al redis estando vacía y se retorna.
 const changeStatusRedis = async (data) => {
+    if(data.status == TableStatus.Empty){
+        await redisClient.del(`table${data.tableId}`);
+        return null;
+    }
+
     let currentTable = await redisClient.get(`table${data.tableId}`)
-    let currentTableParsed = JSON.parse(currentTable);
+    let currentTableParsed: any = {}
+    if (!currentTable) {
+        const table = await Table.findById(data.tableId);
+        currentTableParsed.usersConnected = [];
+        currentTableParsed.needsWaiter = false;
+        currentTableParsed.tableStatus = data.status;
+        currentTableParsed.totalPrice = 0;
+        currentTableParsed.restaurantId = table.restaurantId;
+        redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+        return currentTableParsed;
+    }
+    currentTableParsed = JSON.parse(currentTable);
     currentTableParsed.tableStatus = data.status;
     redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
     console.log('Redis');
-    
+
     return currentTableParsed;
 }
 
