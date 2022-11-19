@@ -25,7 +25,7 @@ export const watchTable = async(data) =>{
 
     let currentTableParsed = await WaiterController.watchTableController(tableId);
 
-    io.to(socket.id).emit('watch-table', {table: currentTableParsed})
+    io.to(socket.id).emit('list_of_orders', {table: currentTableParsed})
     socket.join(tableId);
 
 }
