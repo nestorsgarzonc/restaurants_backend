@@ -11,7 +11,8 @@ export const listenTables = async(data) =>{
     let {callingTables, restaurantId} = await WaiterController.listenTablesController(userId);
 
     console.log(`your waiter is conected to restaurant room: ${restaurantId}`);
-    io.to(socket.id).emit('costumers_requests', {requests: [...callingTables]});
+    socket.join(userId);
+    io.to(userId).emit('costumers_requests', {requests: [...callingTables]});
     socket.join(`${restaurantId}`);
 
 }
@@ -25,7 +26,8 @@ export const watchTable = async(data) =>{
 
     let currentTableParsed = await WaiterController.watchTableController(tableId);
 
-    io.to(socket.id).emit('list_of_orders', {table: currentTableParsed})
+    socket.join(userId);
+    io.to(userId).emit('list_of_orders', {table: currentTableParsed})
     socket.join(tableId);
 
 }
@@ -44,10 +46,11 @@ export const addItemToTable = async(data) =>{
 }
 
 export const leaveTable = async(data) =>{
-    console.log(socket.id)
-    console.log("---------------------",data.tableId)
-    console.log(socket.rooms);
-    socket.leave(data.tableId);
-    console.log(socket.rooms);
-    io.to(socket.id).emit('msg', {msg:'room leaved successfully'})
+
+    let {token, tableId} = data;
+    let userId = await checkUser(token);
+    if(!userId) return;
+    
+    socket.leave(tableId);
+    io.to(userId).emit('msg', {msg:'room leaved successfully'})
 }
