@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Restaurant from '../models/restaurant/restaurant';
 import Table from '../models/restaurant/table'
+import { redisClient } from '../core/sockets';
 
 export const createTable = async (req: Request, res: Response) => {
     try {
@@ -18,4 +19,20 @@ export const createTable = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(404).json({ msg: error.message })
     }
+}
+
+export const getUsersByTable = async(req: Request, res: Response) => {
+    
+    let currentTable = await redisClient.get(`table${req.body.tableId}`);
+    if(!currentTable) res.json({msg: "No user conected to this table"})
+    let currentTableParsed = JSON.parse(currentTable);
+
+    let usersList = []
+
+    currentTableParsed.usersConnected.forEach(user => {
+        usersList.push({userid: user.userId, firstName: user.firstName, lastName: user.lastName});
+    });
+
+    res.json({users: usersList})
+
 }
