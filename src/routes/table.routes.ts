@@ -20,7 +20,7 @@ router.post(
 )
 
 //TODO: MAKE WITH SOCKETS
-router.get(
+router.post(
     '/get-users-by-table',
     [
         body('tableId').isMongoId(),
