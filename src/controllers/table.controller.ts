@@ -30,7 +30,7 @@ export const getUsersByTable = async(req: Request, res: Response) => {
     let usersList = []
 
     currentTableParsed.usersConnected.forEach(user => {
-        usersList.push([user.userId, user.firstName, user.lastName]);
+        usersList.push({userid: user.userId, firstName: user.firstName, lastName: user.lastName});
     });
 
     res.json({users: usersList})
