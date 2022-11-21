@@ -191,13 +191,11 @@ export const payAccount = async(req: Request, res: Response) => {
     }
     await redisClient.del(`table${req.body.tableId}`);
 
-    const userPays = await User.findById(res.locals.token.userId);
-    const restaurant = await Restaurant.findById(currentTableParsed.restaurantId);
-    const table = await Table.findOneAndUpdate({_id:req.body.tableId},{status:TableStatus.Empty });
-    io.to(req.body.tableId).emit(EventNames.onBoarding,{user:userPays,date:Date.now().toString(),price:currentTableParsed.totalPrice,restaurant});
+    io.to(req.body.tableId).emit(EventNames.onPayedAccount,{orderId:order._id});
     
     return res.json({ msg: 'User order created successfully', order });
-    //TODO: Marcar el status en mongo como empty
+    //TODO: Enviar id de la transacción con evento para ir al resumen
+
 }
 export const getOrder = async(req: Request, res: Response)=>{
     try{
