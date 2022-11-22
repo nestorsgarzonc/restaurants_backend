@@ -66,14 +66,14 @@ export const orderNow = async (data) => {
         console.log("prev");
         //Promise.all([])
         let currentTableParsed = await TableController.orderNowController(data);
-        let currentOrderParsed = await TableController.orderListQController(data.tableId, currentTableParsed.restaurantId);
+        let currentOrderParsed = await TableController.orderListQueueController(data.tableId, currentTableParsed.restaurantId);
 
         console.log("after:", currentTableParsed);
         io.to(data.tableId).emit('list_of_orders', { table: currentTableParsed });
         console.log("data emited for list_of_orders:", currentTableParsed);
         io.to(currentTableParsed.restaurantId).emit('costumers_requests', { table: currentTableParsed });
         console.log("data emited for costumers_required:", currentTableParsed);
-        io.to(currentTableParsed.restaurantId).emit('order_list', { orders: currentOrderParsed });
+        io.to(currentTableParsed.restaurantId).emit('order_queue', { orders: currentOrderParsed });
         console.log("data emited for order_list:", currentOrderParsed);
         console.log("############");
     } catch (error) {

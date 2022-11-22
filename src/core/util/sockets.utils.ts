@@ -30,7 +30,7 @@ export const createTableInRedis =async (tableId, userId, firstName, lastName) =>
     return currentTableParsed;
 }
 
-export const createOrderQInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
+export const createOrderQueueInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
     const restaurant = await Restaurant.findById(restaurantId);
     let currentOrdersParsed: any = {}
     currentOrdersParsed.orders = [{ productId: productId, tableId: tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
