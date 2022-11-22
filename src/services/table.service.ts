@@ -2,6 +2,7 @@ import { checkUser } from "../core/util/sockets.utils";
 import { io, socket } from '../core/sockets';
 import * as TableController from '../service_controllers/table.controller';
 import restaurant from "../models/restaurant/restaurant";
+import Table from "../models/restaurant/table";
 
 export const join = async (data) => {
 
@@ -63,13 +64,17 @@ export const orderNow = async (data) => {
         if (!userId) return;
 
         console.log("prev");
+        //Promise.all([])
         let currentTableParsed = await TableController.orderNowController(data);
+        let currentOrderParsed = await TableController.orderListQController(data.tableId, currentTableParsed.restaurantId);
 
         console.log("after:", currentTableParsed);
         io.to(data.tableId).emit('list_of_orders', { table: currentTableParsed });
         console.log("data emited for list_of_orders:", currentTableParsed);
         io.to(currentTableParsed.restaurantId).emit('costumers_requests', { table: currentTableParsed });
         console.log("data emited for costumers_required:", currentTableParsed);
+        io.to(currentTableParsed.restaurantId).emit('order_list', { orders: currentOrderParsed });
+        console.log("data emited for order_list:", currentOrderParsed);
         console.log("############");
     } catch (error) {
         console.log("OrderNowError:", error);
