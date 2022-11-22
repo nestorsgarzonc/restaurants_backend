@@ -1,6 +1,7 @@
 import { tokenIsValidSocket } from "../../middlewares/auth.middleware";
 import {io, socket} from '../sockets';
 import Table from "../../models/restaurant/table";
+import Restaurant from "../../models/restaurant/restaurant";
 import { redisClient } from "../sockets";
 
 export const checkUser = async (token) => {
@@ -29,3 +30,11 @@ export const createTableInRedis =async (tableId, userId, firstName, lastName) =>
     return currentTableParsed;
 }
 
+export const createOrderQInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
+    const restaurant = await Restaurant.findById(restaurantId);
+    let currentOrdersParsed: any = {}
+    currentOrdersParsed.orders = [{ productId: productId, tableId: tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
+    //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
+    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
+    return currentOrdersParsed;
+}
