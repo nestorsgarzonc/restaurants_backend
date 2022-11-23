@@ -31,9 +31,21 @@ export const createTableInRedis =async (tableId, userId, firstName, lastName) =>
 }
 
 export const createOrderQueueInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
-    const restaurant = await Restaurant.findById(restaurantId);
     let currentOrdersParsed: any = {}
     currentOrdersParsed.orders = [{ productId: productId, tableId: tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
+    //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
+    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
+    return currentOrdersParsed;
+}
+
+export const updateOrderQueueInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
+    let currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
+    if(!currentOrder){
+        console.log("Error al actualizar las ordenes");
+        throw new Error("Error al actualizar las ordenes");
+    }
+    let currentOrdersParsed = JSON.parse(currentOrder);
+    currentOrdersParsed.orders = [...currentOrdersParsed.orders, { productId: productId, tableId: tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
     //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
     redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
     return currentOrdersParsed;

@@ -68,7 +68,7 @@ export const orderNow = async (data) => {
         let currentTableParsed = await TableController.orderNowController(data);
         let currentOrderParsed = await TableController.orderListQueueController(data.tableId, currentTableParsed.restaurantId);
 
-        console.log("after:", currentTableParsed);
+        console.log("after - currentTableParsed:", currentTableParsed, "\ncurrentOrderParsed:", currentOrderParsed);
         io.to(data.tableId).emit('list_of_orders', { table: currentTableParsed });
         console.log("data emited for list_of_orders:", currentTableParsed);
         io.to(currentTableParsed.restaurantId).emit('costumers_requests', { table: currentTableParsed });

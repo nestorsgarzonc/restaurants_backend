@@ -3,7 +3,7 @@ import Table, { TableStatus } from "../models/restaurant/table";
 import Restaurant from "../models/restaurant/restaurant";
 import MenuItem from "../models/menu/menuItem";
 import { redisClient } from "../core/sockets";
-import {createOrderQueueInRedis, createTableInRedis} from "../core/util/sockets.utils"
+import {updateOrderQueueInRedis, createOrderQueueInRedis, createTableInRedis} from "../core/util/sockets.utils"
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
@@ -152,23 +152,31 @@ export const orderListQueueController = async (tableId, restaurantId) => {
         console.log("usersConnected:", usersConnected);
         usersConnected.forEach(async user => {
             console.log("entered forEach1");
-            console.log("user.orderProducts:", usersConnected);
+            console.log("user.orderProducts:", user.orderProducts);
             user.orderProducts.forEach(async item => {
                 console.log("entered forEach2");
+                console.log("item:", item);
                 const product = await MenuItem.findById(item._id);
                 if (!product) {
                     console.log(`Error al buscar el producto: ${item.name}`);
                     throw new Error(`Error al buscar el producto: ${item.name}`);
                 }
-                currentOrderParsed = await createOrderQueueInRedis(product.id, restaurantId, tableId, table.name, product.name);
-                console.log("createOrderQueueInRedis");
+                if(!currentOrder){
+                    console.log("currentOrder:", currentOrder);
+                    currentOrderParsed = await createOrderQueueInRedis(product.id, restaurantId, tableId, table.name, product.name);
+                    currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
+                    console.log("createOrderQueueInRedis");
+                }else{
+                    currentOrderParsed = await updateOrderQueueInRedis(product.id, restaurantId, tableId, table.name, product.name);
+                    console.log("updateOrderQueueInRedis");
+                }
             });
         });
     } else {
         console.log("entered else");
         currentOrderParsed = JSON.parse(currentOrder);
         let usersConnected = currentTableParsed.usersConnected;
-        usersConnected.forEach(user => {
+        usersConnected.forEach(async user => {
             user.orderProducts.forEach(async item => {
                 const product = await MenuItem.findById(item._id);
                 if (!product) {
