@@ -15,6 +15,7 @@ export const getAllMenus = async (req: Request, res: Response) => {
         return res.status(400).json({ msg: error });
     }
 }
+
 export const getRestaurantMenuWithRestaurantId = async (req: Request, res: Response) => {
     //TODO: this is what I need to complete ajaja
     try {
@@ -29,7 +30,7 @@ export const getRestaurantMenuWithRestaurantId = async (req: Request, res: Respo
 
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
 
-        return res.json({ restaurant: restaurant});
+        return res.json({ restaurant: restaurant });
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
