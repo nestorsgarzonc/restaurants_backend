@@ -1,5 +1,4 @@
 import winston from "winston";
-import morgan from 'morgan';
 import { S3StreamLogger } from 's3-streamlogger'
 
 const colors = {
@@ -11,11 +10,11 @@ const colors = {
 }
 
 const s3stream = new S3StreamLogger({
-    bucket: "mys3bucket",
+    bucket: process.env.BUCKET_NAME,
     folder: "logs/",
-    access_key_id: "...",
-    secret_access_key: "..."
-});
+    access_key_id: process.env.ACCESS_KEY_ID,
+    secret_access_key: process.env.SECRET_ACCESS_KEY
+})
 
 let transport = new (winston.transports.Stream)({
     stream: s3stream

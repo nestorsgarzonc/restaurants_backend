@@ -10,8 +10,6 @@ import * as SocketService from '../services/socket.service';
 import * as RestaurantService from '../services/restaurant.service';
 import RedisClient, { RedisClientType } from '@redis/client/dist/lib/client';
 import { logger } from './logger/custom_logger';
-
-
 var ioExp;
 var socketExp
 var redisClientExp: RedisClientType;

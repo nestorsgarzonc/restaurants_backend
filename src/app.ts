@@ -10,40 +10,38 @@ import menuRoutes from "./routes/menu.routes";
 import db from './core/db';
 import { configEnv } from "./core/config_env";
 import { socketServer } from "./core/sockets";
-import { logger } from "./core/logger/custom_logger";
 
-configEnv();
-db();
+function main() {
+    configEnv();
+    db();
 
-logger.log({
-    level: 'info',
-    message: '{}'
-})
+    const app = express();
+    socketServer(app);
 
-const app = express();
-socketServer(app);
+    app.disable('x-powered-by')
 
-app.disable('x-powered-by')
+    app.use(express.json())
 
-app.use(express.json())
+    app.use(cors({
+        "origin": "*",
+        "methods": "*",
+    }))
 
-app.use(cors({
-    "origin": "*",
-    "methods": "*",
-}))
+    //TODO: ADD MIDDLEWARE
 
-//TODO: ADD MIDDLEWARE
+    app.get('/', (_, res) => {
+        res.json({
+            date: Date.now().toString()
+        })
+    });
 
-app.get('/', (_, res) => {
-    res.json({
-        date: Date.now().toString()
-    })
-});
+    app.use('/api/auth', authRoutes);
+    app.use('/api/waiter', waiterRoutes);
+    app.use('/api/table', tableRoutes);
+    app.use('/api/user', userRoutes);
+    app.use('/api/order', orderRoutes);
+    app.use('/api/restaurant', restaurantRoutes);
+    app.use('/api/menu', menuRoutes)
+}
 
-app.use('/api/auth', authRoutes);
-app.use('/api/waiter', waiterRoutes);
-app.use('/api/table', tableRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/order', orderRoutes);
-app.use('/api/restaurant', restaurantRoutes);
-app.use('/api/menu', menuRoutes)
+main();
