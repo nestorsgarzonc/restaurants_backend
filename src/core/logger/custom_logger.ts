@@ -10,20 +10,6 @@ const colors = {
     debug: 'white',
 }
 
-const s3stream = new S3StreamLogger({
-    bucket: "mys3bucket",
-    folder: "logs/",
-    access_key_id: "...",
-    secret_access_key: "..."
-});
-
-let transport = new (winston.transports.Stream)({
-    stream: s3stream
-});
-
-transport.on('error', function (err) {
-    console.log("Winston transport error: " + err);
-});
 
 winston.addColors(colors)
 
@@ -39,7 +25,6 @@ export const logger = winston.createLogger({
     level: 'info',
     format: format,
     transports: [
-        transport,
         new winston.transports.Console(),
         new winston.transports.File({ filename: 'combined.log' })
     ],
