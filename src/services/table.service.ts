@@ -2,6 +2,7 @@ import { checkUser } from "../core/util/sockets.utils";
 import { io, socket } from '../core/sockets';
 import * as TableController from '../service_controllers/table.controller';
 import restaurant from "../models/restaurant/restaurant";
+import Table from "../models/restaurant/table";
 import * as EventNames from '../core/constants/sockets.events';
 
 export const join = async (data) => {
@@ -64,13 +65,20 @@ export const orderNow = async (data) => {
         if (!userId) return;
 
         console.log("prev");
-        let currentTableParsed = await TableController.orderNowController(data);
-
-        console.log("after:", currentTableParsed);
+        const [currentTableParsed, currentOrderParsed] = await Promise.all([
+            TableController.orderNowController(data),
+            TableController.orderListQueueController(data),
+        ])
+        //TODO: cambiar logs de dataemited for... a funciones
+        const restaurantId=currentTableParsed.restaurantId._id.toString()
+        console.log("after - currentTableParsed:", currentTableParsed, "\ncurrentOrderParsed:", currentOrderParsed);
         io.to(data.tableId).emit('list_of_orders', { table: currentTableParsed });
         console.log("data emited for list_of_orders:", currentTableParsed);
-        io.to(currentTableParsed.restaurantId).emit('costumers_requests', { table: currentTableParsed });
+        io.to(restaurantId).emit('costumers_requests', { table: currentTableParsed });
         console.log("data emited for costumers_required:", currentTableParsed);
+        io.to(restaurantId).emit('order_queue', { orders: currentOrderParsed.orders });
+        console.log("restaurantId:", restaurantId);
+        console.log("data emited for order_queue:", currentOrderParsed.orders);
         console.log("############");
     } catch (error) {
         console.log("OrderNowError:", error);

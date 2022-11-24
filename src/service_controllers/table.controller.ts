@@ -1,8 +1,9 @@
 import User from "../models/user/user";
 import Table, { TableStatus } from "../models/restaurant/table";
 import Restaurant from "../models/restaurant/restaurant";
+import MenuItem from "../models/menu/menuItem";
 import { redisClient } from "../core/sockets";
-import {createTableInRedis} from "../core/util/sockets.utils"
+import {updateOrderQueueInRedis, createOrderQueueInRedis, createTableInRedis} from "../core/util/sockets.utils"
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
@@ -120,17 +121,92 @@ export const orderNowController = async (data) => {
     }
     let currentTableParsed = JSON.parse(currentTable);
 
-    console.log("test");
+    //console.log("test");
     currentTableParsed.tableStatus = TableStatus.ConfirmOrder;
     redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
-    console.log("Redis");
+    //console.log("Redis");
 
     const table = await Table.findById(data.tableId);
+    console.log("#############")
+    console.log("finded table:")
+    console.log(table)
+    console.log("#############")
     if (!table) {
         throw new Error("No se encontró esta mesa");
     }
     table.status = TableStatus.ConfirmOrder;
     await table.save();
+    console.log("#############")
     console.log(table);
+    console.log("#############")
     return table;
+}
+
+export const orderListQueueController = async (tableClient) => {
+    const {tableId}=tableClient
+    let table = await Table.findById(tableId);
+    const {restaurantId}=table
+    let currentTable = await redisClient.get(`table${tableId}`);
+    //console.log("orderListQ restaurantId:",restaurantId);
+    if (!currentTable) {
+        return {orders:[]};
+    }
+    let currentTableParsed = JSON.parse(currentTable);
+    let currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
+    let currentOrderParsed: any = {}
+    if (!currentOrder) {
+        console.log("entered !currentOrder");
+        currentOrderParsed = await createNewOrderQueueRedisObject(currentTableParsed, currentOrder, tableId, restaurantId, table.name);
+    } else {
+        console.log("entered else");
+        currentOrderParsed = await updateNewOrderQueueRedisObject(currentTableParsed, currentOrder, tableId, restaurantId, table.name);
+    }
+    console.log("currentOrderParsed:", currentOrderParsed);
+
+    return currentOrderParsed ;
+}
+
+const createNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, tableId, restaurantId, tableName) => {
+    let currentOrderParsed: any = {}
+    let usersConnected = currentTableParsed.usersConnected;
+    console.log("usersConnected:", usersConnected);
+    for (var i = 0; i < usersConnected.length; i++) {
+        let user = usersConnected[i];
+        console.log("entered create for1");
+        console.log("user.orderProducts:", user.orderProducts);
+        for (var j = 0; j < user.orderProducts.length; j++) {
+            let item = user.orderProducts[j];
+            console.log("entered create for2");
+            console.log("item:", item);
+            if (!currentOrder) {
+                console.log("currentOrder:", currentOrder);
+                currentOrderParsed = await createOrderQueueInRedis(item._id, restaurantId, tableId, tableName, item.name);
+                currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
+                console.log("createOrderQueueInRedis");
+            } else {
+                currentOrderParsed = await updateOrderQueueInRedis(item._id, restaurantId, tableId, tableName, item.name);
+                console.log("updateOrderQueueInRedis");
+            }
+        };
+    };
+    return currentOrderParsed;
+}
+
+const updateNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, tableId, restaurantId, tableName) => {
+    let currentOrderParsed = JSON.parse(currentOrder);
+    let usersConnected = currentTableParsed.usersConnected;
+    for (var i = 0; i < usersConnected.length; i++) {
+        //usersConnected.forEach(async user => {
+        let user = usersConnected[i];
+        console.log("entered for1");
+        console.log("user.orderProducts:", user.orderProducts);
+        for (var j = 0; j < user.orderProducts.length; j++) {
+            let item = user.orderProducts[j];
+            currentOrderParsed.orders = [...currentOrderParsed.orders, { productId: item.id, tableId, tableName, productName: item.name, estado: "confirmado" }];
+        }
+    }
+    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrderParsed));
+    console.log("Set RedisOrderQueue", currentOrderParsed);
+
+    return currentOrderParsed;
 }

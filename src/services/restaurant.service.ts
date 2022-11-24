@@ -7,8 +7,9 @@ export const join =  async(data) => {
     if(!userId) return;
     const {tables,callingTables} = await RestaurantController.getTableListController(data);
     socket.join(data.restaurantId);
+    console.log("data emited to restaurant:tables ->", tables);
     io.to(data.restaurantId).emit('restaurant:tables',{tables:tables});
-    console.log(callingTables);
+    console.log("data emited to customer_requests ->", callingTables);
     io.to(data.restaurantId).emit('customer_requests',{callingTables:callingTables});
 };
 

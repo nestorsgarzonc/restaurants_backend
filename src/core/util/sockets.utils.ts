@@ -1,6 +1,7 @@
 import { tokenIsValidSocket } from "../../middlewares/auth.middleware";
 import {io, socket} from '../sockets';
 import Table from "../../models/restaurant/table";
+import Restaurant from "../../models/restaurant/restaurant";
 import { redisClient } from "../sockets";
 
 export const checkUser = async (token) => {
@@ -29,3 +30,20 @@ export const createTableInRedis =async (tableId, userId, firstName, lastName) =>
     return currentTableParsed;
 }
 
+export const createOrderQueueInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
+    let currentOrdersParsed: any = {}
+    currentOrdersParsed.orders = [{ productId, tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
+    //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
+    //TODO: cear constantes para los strings de redis
+    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
+    return currentOrdersParsed;
+}
+
+export const updateOrderQueueInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
+    let currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
+    let currentOrdersParsed = JSON.parse(currentOrder);
+    currentOrdersParsed.orders = [...currentOrdersParsed.orders, { productId: productId, tableId: tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
+    //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
+    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
+    return currentOrdersParsed;
+}

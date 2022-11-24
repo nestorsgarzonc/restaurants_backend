@@ -1,6 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 
-interface Table {
+class Table {
     name: String;
     capacity: Number;
     restaurantId: Types.ObjectId;
@@ -16,7 +16,7 @@ export enum TableStatus {
     OrderConfirmed = 'order_confirmed',
     Eating = 'eating', 
     Paying = 'paying'
-  }
+}
 
 const schema = new Schema<Table>({
     name: {
