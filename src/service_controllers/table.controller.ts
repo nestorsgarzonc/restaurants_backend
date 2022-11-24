@@ -126,18 +126,25 @@ export const orderNowController = async (data) => {
     //console.log("Redis");
 
     const table = await Table.findById(data.tableId);
+    console.log("#############")
+    console.log("finded table:")
+    console.log(table)
+    console.log("#############")
     if (!table) {
         throw new Error("No se encontró esta mesa");
     }
     table.status = TableStatus.ConfirmOrder;
     await table.save();
+    console.log("#############")
     console.log(table);
+    console.log("#############")
     return table;
 }
 
-export const orderListQueueController = async (tableId, restaurantId) => {
-
+export const orderListQueueController = async (tableClient) => {
+    const {tableId}=tableClient
     let table = await Table.findById(tableId);
+    const {restaurantId}=table
     let currentTable = await redisClient.get(`table${tableId}`);
     //console.log("orderListQ restaurantId:",restaurantId);
     if (!currentTable) {
@@ -148,49 +155,57 @@ export const orderListQueueController = async (tableId, restaurantId) => {
     let currentOrderParsed: any = {}
     if (!currentOrder) {
         console.log("entered !currentOrder");
-        let usersConnected = currentTableParsed.usersConnected;
-        console.log("usersConnected:", usersConnected);
-        usersConnected.forEach(async user => {
-            console.log("entered forEach1");
-            console.log("user.orderProducts:", user.orderProducts);
-            user.orderProducts.forEach(async item => {
-                console.log("entered forEach2");
-                console.log("item:", item);
-                const product = await MenuItem.findById(item._id);
-                if (!product) {
-                    console.log(`Error al buscar el producto: ${item.name}`);
-                    throw new Error(`Error al buscar el producto: ${item.name}`);
-                }
-                if(!currentOrder){
-                    console.log("currentOrder:", currentOrder);
-                    currentOrderParsed = await createOrderQueueInRedis(product.id, restaurantId, tableId, table.name, product.name);
-                    currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
-                    console.log("createOrderQueueInRedis");
-                }else{
-                    currentOrderParsed = await updateOrderQueueInRedis(product.id, restaurantId, tableId, table.name, product.name);
-                    console.log("updateOrderQueueInRedis");
-                }
-            });
-        });
+        currentOrderParsed = await createNewOrderQueueRedisObject(currentTableParsed, currentOrder, tableId, restaurantId, table.name);
     } else {
         console.log("entered else");
-        currentOrderParsed = JSON.parse(currentOrder);
-        let usersConnected = currentTableParsed.usersConnected;
-        usersConnected.forEach(async user => {
-            user.orderProducts.forEach(async item => {
-                const product = await MenuItem.findById(item._id);
-                if (!product) {
-                    console.log(`Error al buscar el producto: ${item.name}`);
-                    throw new Error(`Error al buscar el producto: ${item.name}`);
-                }
-                currentOrderParsed.orders = [...currentOrderParsed.orders, { productId: product.id, tableId: tableId, tableName: table.name, productName: product.name, estado: "confirmado" }];
-            });
-        });
-        redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrderParsed));
-        console.log("Set RedisOrderQueue");
-
+        currentOrderParsed = await updateNewOrderQueueRedisObject(currentTableParsed, currentOrder, tableId, restaurantId, table.name);
     }
     console.log("currentOrderParsed:", currentOrderParsed);
 
     return currentOrderParsed ;
+}
+
+const createNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, tableId, restaurantId, tableName) => {
+    let currentOrderParsed: any = {}
+    let usersConnected = currentTableParsed.usersConnected;
+    console.log("usersConnected:", usersConnected);
+    for (var i = 0; i < usersConnected.length; i++) {
+        let user = usersConnected[i];
+        console.log("entered create for1");
+        console.log("user.orderProducts:", user.orderProducts);
+        for (var j = 0; j < user.orderProducts.length; j++) {
+            let item = user.orderProducts[j];
+            console.log("entered create for2");
+            console.log("item:", item);
+            if (!currentOrder) {
+                console.log("currentOrder:", currentOrder);
+                currentOrderParsed = await createOrderQueueInRedis(item._id, restaurantId, tableId, tableName, item.name);
+                currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
+                console.log("createOrderQueueInRedis");
+            } else {
+                currentOrderParsed = await updateOrderQueueInRedis(item._id, restaurantId, tableId, tableName, item.name);
+                console.log("updateOrderQueueInRedis");
+            }
+        };
+    };
+    return currentOrderParsed;
+}
+
+const updateNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, tableId, restaurantId, tableName) => {
+    let currentOrderParsed = JSON.parse(currentOrder);
+    let usersConnected = currentTableParsed.usersConnected;
+    for (var i = 0; i < usersConnected.length; i++) {
+        //usersConnected.forEach(async user => {
+        let user = usersConnected[i];
+        console.log("entered for1");
+        console.log("user.orderProducts:", user.orderProducts);
+        for (var j = 0; j < user.orderProducts.length; j++) {
+            let item = user.orderProducts[j];
+            currentOrderParsed.orders = [...currentOrderParsed.orders, { productId: item.id, tableId, tableName, productName: item.name, estado: "confirmado" }];
+        }
+    }
+    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrderParsed));
+    console.log("Set RedisOrderQueue", currentOrderParsed);
+
+    return currentOrderParsed;
 }
