@@ -39,6 +39,7 @@ export const deleteItem = async(data) =>{
 }
 
 export const askAccount = async(data) =>{
+    
     const {token,...orderData} = data;
     
     let userId = await checkUser(token);

@@ -6,9 +6,13 @@ import OrderProduct from '../models/restaurant/orderProduct';
 import OrderTopping from '../models/restaurant/orderTopping';
 import OrderToppingOption from '../models/restaurant/orderToppingOption';
 import UserOrder from '../models/restaurant/userOrder';
-import restaurant from '../models/restaurant/restaurant';
 import user from '../models/user/user';
 import { io, socket } from '../core/sockets';
+import * as EventNames from '../core/constants/sockets.events';
+import Restaurant from '../models/restaurant/restaurant';
+import Table from '../models/restaurant/table';
+import { TableStatus } from '../models/restaurant/table';
+
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
         const orderId = req.params.id;
@@ -186,9 +190,12 @@ export const payAccount = async(req: Request, res: Response) => {
         await mongoUser.save();
     }
     await redisClient.del(`table${req.body.tableId}`);
-    io.to(req.body.tableId).emit('list_of_orders',{table:null});
+
+    io.to(req.body.tableId).emit(EventNames.onPayedAccount,{orderId:order._id});
+    
     return res.json({ msg: 'User order created successfully', order });
-    //TODO: Marcar el status en mongo como empty
+    //TODO: Enviar id de la transacción con evento para ir al resumen
+
 }
 export const getOrder = async(req: Request, res: Response)=>{
     try{

@@ -6,9 +6,10 @@ import Waiter from '../models/restaurant/waiter';
 import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
 import { waitForDebugger } from 'inspector';
+import { logger } from '../core/logger/custom_logger';
 
 export const login = async (req: Request, res: Response) => {
-    try{
+    try {
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return res.status(404).json({ msg: 'Oops, usuario incorrecto' });
@@ -23,7 +24,7 @@ export const login = async (req: Request, res: Response) => {
         const token = getToken(user.id);
         return res.json({
             token,
-            user:userProtected,
+            user: userProtected,
         });
     } catch (error) {
         return res.status(400).json({ msg: error.message });
@@ -88,7 +89,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
             // send mail with defined transport object
             let info = await transporter.sendMail({
-                from: '"On Yor Table" <'+ process.env.EMAIL_AUTH +'>', // sender address
+                from: '"On Yor Table" <' + process.env.EMAIL_AUTH + '>', // sender address
                 to: user.email, // list of receivers
                 subject: "Forgot password", // Subject line
                 text: "Hello world?", // plain text body
@@ -139,18 +140,17 @@ export const refreshToken = async (req: Request, res: Response) => {
 }
 
 export const isWaiter = async (req: Request, res: Response) => {
-    try{
+    try {
         const user = await User.findById(res.locals.token.userId);
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
-        if(user.rol=='waiter'){
-            const waiter = await Waiter.findOne({user:user._id});
-            return res.json({restaurantId : waiter.restaurant});
-        }else{
-            return res.status(401).json({msg:'User is not waiter'});
+        if (user.rol == 'waiter') {
+            const waiter = await Waiter.findOne({ user: user._id });
+            return res.json({ restaurantId: waiter.restaurant });
+        } else {
+            return res.status(401).json({ msg: 'User is not waiter' });
         }
-        
     } catch (error) {
         return res.json({ msg: error.message })
     }

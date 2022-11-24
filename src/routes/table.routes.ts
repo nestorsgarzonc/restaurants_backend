@@ -20,15 +20,22 @@ router.post(
 )
 
 //TODO: MAKE WITH SOCKETS
-router.get(
+router.post(
     '/get-users-by-table',
-    [tokenIsValid],    
-    userController.getUser
+    [
+        body('tableId').isMongoId(),
+        tokenIsValid, 
+        errorHandler],    
+    tableController.getUsersByTable
 )
 
 router.put(
+    //We´re not using this LOL
     '/get-user-orders',
-    [tokenIsValid],
+    [
+        body('tableId').isMongoId(),
+        tokenIsValid, 
+        errorHandler],
     userController.updateUser
 )
 
