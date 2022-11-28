@@ -1,9 +1,6 @@
 import { checkUser } from "../core/util/sockets.utils";
 import { io, socket } from '../core/sockets';
 import * as TableController from '../service_controllers/table.controller';
-import restaurant from "../models/restaurant/restaurant";
-import Table from "../models/restaurant/table";
-import * as EventNames from '../core/constants/sockets.events';
 
 export const join = async (data) => {
     let userId = await checkUser(data.token);

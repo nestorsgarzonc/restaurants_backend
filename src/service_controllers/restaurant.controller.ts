@@ -5,8 +5,18 @@ import { redisClient } from "../core/sockets";
 export const getTableListController = async (data) => {
     try {
         const restaurantId = data.restaurantId;
-        let tables = await redisClient.get(`${restaurantId}_calling_tables`);
+        let [tables, orders] = await Promise.all([
+            redisClient.get(`${restaurantId}_calling_tables`),
+            redisClient.get(`orderListRestaurant${restaurantId}`),
+        ])
         if (!tables) tables = "";
+        let ordersParsed: any = {};
+        if (!orders) {
+            ordersParsed.orders = [];
+        }
+        else {
+            ordersParsed = JSON.parse(orders);
+        }
         let callingTables = tables.split('$');
         console.log(callingTables);
         console.log(restaurantId);
@@ -17,7 +27,7 @@ export const getTableListController = async (data) => {
         if (!restaurant) {
             throw new Error("No se encontró el restaurante");
         }
-        return { tables: restaurant.tables, callingTables: callingTables };
+        return { tables: restaurant.tables, callingTables, ordersParsed };
     } catch (error) {
         console.log(error);
     }
