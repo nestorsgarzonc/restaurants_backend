@@ -3,43 +3,35 @@ import Table, { TableStatus } from "../models/restaurant/table";
 import Restaurant from "../models/restaurant/restaurant";
 import MenuItem from "../models/menu/menuItem";
 import { redisClient } from "../core/sockets";
-import {updateOrderQueueInRedis, createOrderQueueInRedis, createTableInRedis} from "../core/util/sockets.utils"
+import { updateOrderQueueInRedis, createOrderQueueInRedis, createTableInRedis } from "../core/util/sockets.utils"
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
-    const table = await Table.findOneAndUpdate({_id:tableId},{status:TableStatus.Ordering});
-    let currentTable = await redisClient.get(`table${tableId}`)
+    let [_, currentTable] = await Promise.all([
+        Table.findOneAndUpdate({ _id: tableId }, { status: TableStatus.Ordering }),
+        redisClient.get(`table${tableId}`)
+    ])
     let currentTableParsed: any = {}
     if (!currentTable) {
-        /*const table = await Table.findById(tableId);
-        currentTableParsed.usersConnected = [{ userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 }];
-        currentTableParsed.needsWaiter = false;
-        currentTableParsed.tableStatus = 'ordering';
-        currentTableParsed.totalPrice = 0;
-        currentTableParsed.restaurantId = table.restaurantId;
-        redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));*/
         currentTableParsed = await createTableInRedis(tableId, userId, user.firstName, user.lastName);
     } else {
         currentTableParsed = JSON.parse(currentTable);
         if (!currentTableParsed.usersConnected.some(user => user.userId === userId)) {
             currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 }];
             currentTableParsed.tableStatus = 'ordering';
-            redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
+            await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
         }
-
     }
     console.log(currentTableParsed);
-
     return { user, currentTableParsed };
 }
 //TODO: Si se vacía la mesa, se borra del redis y se retorna null.
 //Si la mesa no existe y se cambia el estado, se añade al redis estando vacía y se retorna.
 const changeStatusRedis = async (data) => {
-    if(data.status == TableStatus.Empty){
+    if (data.status == TableStatus.Empty) {
         await redisClient.del(`table${data.tableId}`);
         return null;
     }
-
     let currentTable = await redisClient.get(`table${data.tableId}`)
     let currentTableParsed: any = {}
     if (!currentTable) {
@@ -49,14 +41,13 @@ const changeStatusRedis = async (data) => {
         currentTableParsed.tableStatus = data.status;
         currentTableParsed.totalPrice = 0;
         currentTableParsed.restaurantId = table.restaurantId;
-        redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+        await redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
         return currentTableParsed;
     }
     currentTableParsed = JSON.parse(currentTable);
     currentTableParsed.tableStatus = data.status;
-    redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+    await redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
     console.log('Redis');
-
     return currentTableParsed;
 }
 
@@ -68,7 +59,7 @@ const changeStatusMongo = async (data) => {
             throw new Error('No se encontró la mesa');
         }
         table.status = data.status;
-        table.save();
+        await table.save();
         const restaurantId = table.restaurantId;
         const restaurant = await Restaurant.findById(restaurantId)
             .populate({
@@ -89,30 +80,24 @@ export const changeStatusController = async (data) => {
 }
 
 export const callWaiterController = async (tableId, stopCalling = false) => {
-
     let currentTable = await redisClient.get(`table${tableId}`);
     let currentTableParsed = JSON.parse(currentTable);
     currentTableParsed.needsWaiter = !currentTableParsed.needsWaiter;
-
     let restaurantId = currentTableParsed.restaurantId;
-
     let tables = await redisClient.get(`${restaurantId}_calling_tables`);
     if (!tables) tables = "";
-
     let callingTables = new Set(tables.split('$'));
     callingTables.delete('');
     stopCalling ? callingTables.delete(tableId) : callingTables.add(tableId);
-
     let callingTablesList = [...callingTables];
-
-    redisClient.set(`${restaurantId}_calling_tables`, callingTablesList.join('$'));
-
-    redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
+    await Promise.all([
+        redisClient.set(`${restaurantId}_calling_tables`, callingTablesList.join('$')),
+        redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed)),
+    ])
     return { restaurantId, callingTablesList, currentTableParsed }
 }
 
 export const orderNowController = async (data) => {
-
     console.log("entered");
     let currentTable = await redisClient.get(`table${data.tableId}`);
     if (!currentTable) {
@@ -123,10 +108,10 @@ export const orderNowController = async (data) => {
 
     //console.log("test");
     currentTableParsed.tableStatus = TableStatus.ConfirmOrder;
-    redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
-    //console.log("Redis");
-
-    const table = await Table.findById(data.tableId);
+    const [_, table] = await Promise.all([
+        redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed)),
+        Table.findById(data.tableId),
+    ])
     console.log("#############")
     console.log("finded table:")
     console.log(table)
@@ -139,17 +124,18 @@ export const orderNowController = async (data) => {
     console.log("#############")
     console.log(table);
     console.log("#############")
-    return table;
+    return currentTableParsed;
 }
 
 export const orderListQueueController = async (tableClient) => {
-    const {tableId}=tableClient
-    let table = await Table.findById(tableId);
-    const {restaurantId}=table
-    let currentTable = await redisClient.get(`table${tableId}`);
-    //console.log("orderListQ restaurantId:",restaurantId);
+    const { tableId } = tableClient
+    const [table, currentTable] = await Promise.all([
+        Table.findById(tableId),
+        redisClient.get(`table${tableId}`),
+    ])
+    const { restaurantId } = table
     if (!currentTable) {
-        return {orders:[]};
+        return { orders: [] };
     }
     let currentTableParsed = JSON.parse(currentTable);
     let currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
@@ -162,8 +148,7 @@ export const orderListQueueController = async (tableClient) => {
         currentOrderParsed = await updateNewOrderQueueRedisObject(currentTableParsed, currentOrder, tableId, restaurantId, table.name);
     }
     console.log("currentOrderParsed:", currentOrderParsed);
-
-    return currentOrderParsed ;
+    return currentOrderParsed;
 }
 
 const createNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, tableId, restaurantId, tableName) => {
@@ -205,8 +190,7 @@ const updateNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, 
             currentOrderParsed.orders = [...currentOrderParsed.orders, { productId: item.id, tableId, tableName, productName: item.name, estado: "confirmado" }];
         }
     }
-    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrderParsed));
+    await redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrderParsed));
     console.log("Set RedisOrderQueue", currentOrderParsed);
-
     return currentOrderParsed;
 }

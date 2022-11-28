@@ -1,12 +1,12 @@
 import { tokenIsValidSocket } from "../../middlewares/auth.middleware";
-import {io, socket} from '../sockets';
+import { io, socket } from '../sockets';
 import Table from "../../models/restaurant/table";
 import Restaurant from "../../models/restaurant/restaurant";
 import { redisClient } from "../sockets";
 
 export const checkUser = async (token) => {
     let userId = await tokenIsValidSocket(token);
-                
+
     if (!userId) {
         let timestamp = Date.now().toString();
         socket.join(timestamp);
@@ -17,7 +17,7 @@ export const checkUser = async (token) => {
     return userId;
 }
 
-export const createTableInRedis =async (tableId, userId, firstName, lastName) => {
+export const createTableInRedis = async (tableId, userId, firstName, lastName) => {
     const table = await Table.findById(tableId);
     let currentTableParsed: any = {}
     currentTableParsed.usersConnected = [{ userId, firstName: firstName, lastName: lastName, orderProducts: [], price: 0 }];
@@ -25,12 +25,11 @@ export const createTableInRedis =async (tableId, userId, firstName, lastName) =>
     currentTableParsed.tableStatus = 'ordering';
     currentTableParsed.totalPrice = 0;
     currentTableParsed.restaurantId = table.restaurantId;
-    redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
-
+    await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
     return currentTableParsed;
 }
 
-export const createOrderQueueInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
+export const createOrderQueueInRedis = async (productId, restaurantId, tableId, tableName, productName) => {
     let currentOrdersParsed: any = {}
     currentOrdersParsed.orders = [{ productId, tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
     //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
@@ -39,7 +38,7 @@ export const createOrderQueueInRedis =async (productId, restaurantId, tableId, t
     return currentOrdersParsed;
 }
 
-export const updateOrderQueueInRedis =async (productId, restaurantId, tableId, tableName, productName) => {
+export const updateOrderQueueInRedis = async (productId, restaurantId, tableId, tableName, productName) => {
     let currentOrder = await redisClient.get(`orderListRestaurant${restaurantId}`);
     let currentOrdersParsed = JSON.parse(currentOrder);
     currentOrdersParsed.orders = [...currentOrdersParsed.orders, { productId: productId, tableId: tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];

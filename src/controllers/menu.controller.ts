@@ -204,7 +204,6 @@ export const addToppingOptionToTopping = async (req: Request, res: Response) => 
         const topping = await Topping.findById(req.params.toppingId);
         if (!topping) return res.status(404).json({ msg: 'Topping not found' });
         const toppingOption = new ToppingOption(req.body);
-
         await toppingOption.save();
         topping.options.push(toppingOption._id);
         await topping.save();

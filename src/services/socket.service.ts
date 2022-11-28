@@ -1,4 +1,4 @@
-import {io, socket} from '../core/sockets';
+import { io, socket } from '../core/sockets';
 
 export const msg = function (data) {
     console.log(data);
@@ -9,7 +9,7 @@ export const disconnect = function (data) {
     console.log('user disconnected');
 }
 
-export const showId =async (data) => {
+export const showId = async (data) => {
     console.log(socket.id)
-    socket.emit('msg', {id: socket.id})
+    socket.emit('msg', { id: socket.id })
 }

@@ -5,8 +5,6 @@ import User from '../models/user/user';
 import Waiter from '../models/restaurant/waiter';
 import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
-import { waitForDebugger } from 'inspector';
-import { logger } from '../core/logger/custom_logger';
 
 export const login = async (req: Request, res: Response) => {
     try {
@@ -18,7 +16,7 @@ export const login = async (req: Request, res: Response) => {
             return res.status(404).json({ msg: 'Usuario o contraseña incorrecta' });
         }
         user.sessionValid = true;
-        user.save();
+        await user.save();
         const userProtected = user.toObject();
         delete userProtected.password;
         const token = getToken(user.id);
@@ -61,10 +59,8 @@ export const resetPassword = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(400).json({ msg: 'Please enter a valid user' });
         }
-        const message = 'Chech your email for a link to reset your password'
         const token = getToken(user.id);
         let verifLink = process.env.RECOVER_PASSWORD_URL + token;
-
         // sendEmail
         let emailStatus = 'Ok';
         try {
