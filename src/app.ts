@@ -11,6 +11,7 @@ import db from './core/db';
 import { configEnv } from "./core/config_env";
 import { socketServer } from "./core/sockets";
 import { logger } from "./core/logger/custom_logger";
+import mongoSanitize from 'express-mongo-sanitize'
 
 configEnv();
 db();
@@ -32,7 +33,8 @@ app.use(cors({
     "methods": "*",
 }))
 
-//TODO: ADD MIDDLEWARE
+app.use(mongoSanitize());
+
 
 app.get('/', (_, res) => {
     res.json({
