@@ -8,13 +8,22 @@ const router = Router();
 
 
 router.post(
-    '/login',
+    '/login_first',
     [
         body('email').isEmail().withMessage('Invalid email'),
         body('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters long'),
         errorHandler,
     ],
-    authController.login,
+    authController.login_first,
+);
+
+router.post(
+    '/login_second',
+    [
+        body('verification').isNumeric().isLength({min:6,max:6}).withMessage('Invalid verification code'),
+        errorHandler,
+    ],
+    authController.login_second,
 );
 
 router.post(
