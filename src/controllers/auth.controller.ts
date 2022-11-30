@@ -64,6 +64,7 @@ export const send_verification_code = async(req: Request, res: Response)=>{
     const verification_code = String(Math.floor(100000 + Math.random() * 900000));
     await redisClient.set(req.body.email+'_'+verification_code,verification_code);
     redisClient.expire(req.body.email+'_'+verification_code,60);
+    //TODO: Añadir envio de sms contwilio
 }
 
 export const register = async (req: Request, res: Response) => {
