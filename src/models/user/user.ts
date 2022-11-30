@@ -18,6 +18,15 @@ interface User {
     sessionValid : boolean;
 }
 
+export enum UserRols {
+    Empty = 'empty', 
+    Ordering = 'ordering', 
+    Customer = 'customer',
+    Waiter = 'waiter',
+    Owner = 'owner',
+    Admin = 'admin'
+}
+
 const scheme = new Schema<User>({
     firstName: {
         type: String,

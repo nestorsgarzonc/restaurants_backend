@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { hashSync, compareSync } from 'bcrypt';
 import { getToken } from '../core/jwt';
-import User from '../models/user/user';
+import User, { UserRols } from '../models/user/user';
 import Waiter from '../models/restaurant/waiter';
 import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
-
+import { redisClient } from '../core/sockets';
 const accountSid = "ACefc662245232bf3edef8448e82e8c4d3";
 const authToken = "2058932182361ee5408fc7c5736c85dd";
 const client = require('twilio')(accountSid, authToken);
@@ -21,6 +21,11 @@ export const login = async (req: Request, res: Response) => {
         }
         if (!compareSync(req.body.password, user.password.toString())) {
             return res.status(404).json({ msg: 'Usuario o contraseña incorrecta' });
+        }
+        if(user.rol==UserRols.Waiter){
+            const verification_code = String(Math.floor(100000 + Math.random() * 900000));
+            await redisClient.set(user.email+'_'+verification_code,verification_code);
+            redisClient.expire(user.email+'_'+verification_code,120);
         }
         user.sessionValid = true;
         await user.save();
@@ -148,6 +153,10 @@ export const isWaiter = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
+        if(!await redisClient.get(req.body.email+'_'+req.body.verification)){
+            return res.status(403).json({msg: 'Codigo de verificación incorrecto o expirado'});
+        }
+        await redisClient.del(user.email+'_'+req.body.verification);
         if (user.rol == 'waiter') {
             const waiter = await Waiter.findOne({ user: user._id });
             return res.json({ restaurantId: waiter.restaurant });
