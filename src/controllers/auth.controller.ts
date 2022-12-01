@@ -7,14 +7,11 @@ import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
 import { redisClient } from '../core/sockets';
 const accountSid = "ACefc662245232bf3edef8448e82e8c4d3";
-const authToken = "2058932182361ee5408fc7c5736c85dd";
+const authToken = "f828d483d7b312c51ecc018c2820004d";
 const client = require('twilio')(accountSid, authToken);
-
 export const login = async (req: Request, res: Response) => {
     try {
-        client.messages
-        .create({body: 'Hi there', from: '+12057493933', to: '+573122664400'})
-        .then(message => console.log(message.body));
+        
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return res.status(404).json({ msg: 'Oops, usuario incorrecto' });
@@ -26,6 +23,9 @@ export const login = async (req: Request, res: Response) => {
             const verification_code = String(Math.floor(100000 + Math.random() * 900000));
             await redisClient.set(user.email+'_'+verification_code,verification_code);
             redisClient.expire(user.email+'_'+verification_code,120);
+            client.messages
+            .create({body: 'Tu código de verificación en On your table es '+verification_code, from: '+12057493933', to: '+57'+user.phone})
+            .then(message => console.log(message.body));
         }
         user.sessionValid = true;
         await user.save();
