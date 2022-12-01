@@ -6,9 +6,11 @@ import Waiter from '../models/restaurant/waiter';
 import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
 import { redisClient } from '../core/sockets';
-const accountSid = "ACefc662245232bf3edef8448e82e8c4d3";
-const authToken = "f828d483d7b312c51ecc018c2820004d";
+require('dotenv').config();
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
+console.log(process.env.EMAIL_PASSWORD)
 export const login = async (req: Request, res: Response) => {
     try {
         
