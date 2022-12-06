@@ -3,6 +3,7 @@ import { io, socket } from '../core/sockets';
 import * as TableController from '../service_controllers/table.controller';
 
 export const join = async (data) => {
+    //TODO: emitir cambio de estado de la mesa a restaurante
     let userId = await checkUser(data.token);
     if (!userId) return;
     let { user, currentTableParsed } = await TableController.joinController(userId, data.tableId);
