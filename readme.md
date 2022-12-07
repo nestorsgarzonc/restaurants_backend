@@ -13,3 +13,8 @@ docker stop CONTAINER_ID
 # Get container logs
 
 docker logs CONTAINER_ID
+
+
+# Update dependencies
+
+npx npm-upgrade
