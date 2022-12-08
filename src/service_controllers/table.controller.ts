@@ -9,7 +9,7 @@ export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
     let [_, currentTable] = await Promise.all([
         Table.findOneAndUpdate({ _id: tableId }, { status: TableStatus.Ordering }),
-        await redisClient.get(`table${tableId}`)
+        redisClient.get(`table${tableId}`)
     ])
     let currentTableParsed: any = {}
     if (!currentTable) {
@@ -91,8 +91,8 @@ export const callWaiterController = async (tableId, stopCalling = false) => {
     stopCalling ? callingTables.delete(tableId) : callingTables.add(tableId);
     let callingTablesList = [...callingTables];
     await Promise.all([
-        await redisClient.set(`${restaurantId}_calling_tables`, callingTablesList.join('$')),
-        await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed)),
+        redisClient.set(`${restaurantId}_calling_tables`, callingTablesList.join('$')),
+        redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed)),
     ])
     return { restaurantId, callingTablesList, currentTableParsed }
 }
@@ -109,7 +109,7 @@ export const orderNowController = async (data) => {
     //console.log("test");
     currentTableParsed.tableStatus = TableStatus.ConfirmOrder;
     const [_, table] = await Promise.all([
-        await redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed)),
+        redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed)),
         Table.findById(data.tableId),
     ])
     console.log("#############")
@@ -131,7 +131,7 @@ export const orderListQueueController = async (tableClient) => {
     const { tableId } = tableClient
     const [table, currentTable] = await Promise.all([
         Table.findById(tableId),
-        await redisClient.get(`table${tableId}`),
+        redisClient.get(`table${tableId}`),
     ])
     const { restaurantId } = table
     if (!currentTable) {
