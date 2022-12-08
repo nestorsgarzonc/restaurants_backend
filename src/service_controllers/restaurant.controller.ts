@@ -6,8 +6,8 @@ export const getTableListController = async (data) => {
     try {
         const restaurantId = data.restaurantId;
         let [tables, orders] = await Promise.all([
-            redisClient.get(`${restaurantId}_calling_tables`),
-            redisClient.get(`orderListRestaurant${restaurantId}`),
+            await redisClient.get(`${restaurantId}_calling_tables`),
+            await redisClient.get(`orderListRestaurant${restaurantId}`),
         ])
         if (!tables) tables = "";
         let ordersParsed: any = {};

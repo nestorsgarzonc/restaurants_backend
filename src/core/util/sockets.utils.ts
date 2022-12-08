@@ -34,7 +34,7 @@ export const createOrderQueueInRedis = async (productId, restaurantId, tableId, 
     currentOrdersParsed.orders = [{ productId, tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
     //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
     //TODO: cear constantes para los strings de redis
-    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
+    await redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
     return currentOrdersParsed;
 }
 
@@ -43,6 +43,6 @@ export const updateOrderQueueInRedis = async (productId, restaurantId, tableId, 
     let currentOrdersParsed = JSON.parse(currentOrder);
     currentOrdersParsed.orders = [...currentOrdersParsed.orders, { productId: productId, tableId: tableId, tableName: tableName, productName: productName, estado: "Confirmado" }];
     //estados: [Confirmado, Cocinando, Listo para entrega, Entregado]
-    redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
+    await redisClient.set(`orderListRestaurant${restaurantId}`, JSON.stringify(currentOrdersParsed));
     return currentOrdersParsed;
 }

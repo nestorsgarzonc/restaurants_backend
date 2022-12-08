@@ -25,12 +25,12 @@ export const joinToTable = async (data: any,) => {
     let currentTableParsed: any = {}
     if (!currentTable) {
         currentTableParsed.usersConnected = [{ userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [] }];
-        redisClient.set(`table${parsedData.table_id}`, JSON.stringify(currentTableParsed));
+        await redisClient.set(`table${parsedData.table_id}`, JSON.stringify(currentTableParsed));
     } else {
         currentTableParsed = JSON.parse(currentTable);
         if (!currentTableParsed.usersConnected.some(user => user.userId === userId)) {
             currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [] }];
-            redisClient.set(`table${parsedData.table_id}`, JSON.stringify(currentTableParsed));
+            await redisClient.set(`table${parsedData.table_id}`, JSON.stringify(currentTableParsed));
         }
     }
     console.log(currentTableParsed);

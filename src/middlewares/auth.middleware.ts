@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
-import User from '../models/user/user';
+import { sessionValid } from '../core/constants/redis.constants';
+import { redisClient } from '../core/sockets';
 
 export const tokenIsValid = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('auth-token');
@@ -29,8 +30,8 @@ const baseVerification = async (checkDbUser: boolean, token: string) => {
     try {
         const verified = jwt.verify(token, process.env.JWT_SECRET);
         if (checkDbUser) {
-            const user = await User.findById((verified as jwt.JwtPayload).userId);
-            if (!user || !user.sessionValid) {
+            const user = await redisClient.get(sessionValid+(verified as jwt.JwtPayload).userId);
+            if (!user) {
                 return null;
             }
         }
