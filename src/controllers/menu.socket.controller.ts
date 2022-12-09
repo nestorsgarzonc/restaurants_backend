@@ -2,7 +2,7 @@ import { createClient } from 'redis';
 import { tokenIsValidSocket } from "../middlewares/auth.middleware";
 import User from "../models/user/user";
 import { io, socket } from '../core/sockets';
-
+import * as socketEvents from "../core/constants/sockets.events";
 const redisClient = createClient(
     { url: 'redis://default:cOdlLDjp5YKs7fyDPLUdEZIALL57XFAD@redis-15442.c11.us-east-1-2.ec2.cloud.redislabs.com:15442' }
 );
@@ -16,7 +16,7 @@ export const joinToTable = async (data: any,) => {
     if (!userId) {
         let timestamp = Date.now().toString();
         socket.join(timestamp);
-        io.to(timestamp).emit('error', { reason: 'no userId' });
+        io.to(timestamp).emit(socketEvents.error, { reason: 'no userId' });
         return;
     }
 
@@ -35,5 +35,5 @@ export const joinToTable = async (data: any,) => {
     }
     console.log(currentTableParsed);
     socket.join(parsedData.table_id);
-    io.to(parsedData.table_id).emit('new_user_joined', { users: currentTableParsed.usersConnected, 'connected': true, userName: `${user.firstName} ${user.lastName}` });
+    // io.to(parsedData.table_id).emit(socketEvents.newUserJoined, { users: currentTableParsed.usersConnected, 'connected': true, userName: `${user.firstName} ${user.lastName}` });
 }

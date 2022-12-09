@@ -1,14 +1,14 @@
 import { io, socket } from '../core/sockets';
 import { checkUser } from "../core/util/sockets.utils";
 import * as OrderController from '../service_controllers/order.controller';
-
+import * as socketEvents from "../core/constants/sockets.events";
 
 export const addItem = async (data) => {
     const { token, tableId, ...orderData } = data;
     let userId = await checkUser(token);
     if (!userId) return;
     let currentTableParsed = await OrderController.addItemController(userId, tableId, orderData);
-    io.to(data.tableId).emit('list_of_orders', { table: currentTableParsed });
+    io.to(data.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
 }
 
 export const editItem = async (data) => {
@@ -17,7 +17,7 @@ export const editItem = async (data) => {
     let userId = await checkUser(token);
     if (!userId) return;
     let currentTableParsed = await OrderController.editItemController(userId, tableId, orderData);
-    io.to(tableId).emit('list_of_orders', { table: currentTableParsed });
+    io.to(tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
 }
 
 export const deleteItem = async (data) => {
@@ -25,7 +25,7 @@ export const deleteItem = async (data) => {
     let userId = await checkUser(token);
     if (!userId) return;
     let currentTableParsed = await OrderController.deleteItemController(userId, orderData);
-    io.to(orderData.tableId).emit('list_of_orders', { table: currentTableParsed });
+    io.to(orderData.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
 }
 
 export const askAccount = async (data) => {
@@ -33,5 +33,5 @@ export const askAccount = async (data) => {
     const userId = await checkUser(token);
     if (!userId) return;
     const currentTableParsed = await OrderController.askAccountController(orderData);
-    io.to(data.tableId).emit('list_of_orders', { table: currentTableParsed });
+    io.to(data.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
 }

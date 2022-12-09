@@ -8,7 +8,7 @@ import OrderToppingOption from '../models/restaurant/orderToppingOption';
 import UserOrder from '../models/restaurant/userOrder';
 import user from '../models/user/user';
 import { io, socket } from '../core/sockets';
-import * as EventNames from '../core/constants/sockets.events';
+import * as socketEvents from '../core/constants/sockets.events';
 import Restaurant from '../models/restaurant/restaurant';
 import Table from '../models/restaurant/table';
 import { TableStatus } from '../models/restaurant/table';
@@ -191,7 +191,7 @@ export const payAccount = async (req: Request, res: Response) => {
     }
     await redisClient.del(`table${req.body.tableId}`);
 
-    io.to(req.body.tableId).emit(EventNames.onPayedAccount, { orderId: order._id });
+    io.to(req.body.tableId).emit(socketEvents.onPayedAccount, { orderId: order._id });
 
     return res.json({ msg: 'User order created successfully', order });
     //TODO: Enviar id de la transacción con evento para ir al resumen

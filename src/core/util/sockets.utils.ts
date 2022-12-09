@@ -3,6 +3,7 @@ import { io, socket } from '../sockets';
 import Table from "../../models/restaurant/table";
 import Restaurant from "../../models/restaurant/restaurant";
 import { redisClient } from "../sockets";
+import * as socketEvents from "../../core/constants/sockets.events";
 
 export const checkUser = async (token) => {
     let userId = await tokenIsValidSocket(token);
@@ -10,7 +11,7 @@ export const checkUser = async (token) => {
     if (!userId) {
         let timestamp = Date.now().toString();
         socket.join(timestamp);
-        io.to(timestamp).emit('error', { reason: 'no userId' });
+        io.to(timestamp).emit(socketEvents.error, { reason: 'no userId' });
         return null;
     }
 
