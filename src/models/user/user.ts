@@ -15,7 +15,6 @@ interface User {
     coordinates?: Number[];
     createdAt: Date;
     updatedAt: Date;
-    sessionValid : boolean;
 }
 
 const scheme = new Schema<User>({
@@ -70,11 +69,6 @@ const scheme = new Schema<User>({
     coordinates: {
         type: [Number],
         required: false
-    },
-    sessionValid:{
-        type: Boolean,
-        required: false,
-        default: false
     }
 }, { timestamps: true });
 

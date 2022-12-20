@@ -5,6 +5,8 @@ import User from '../models/user/user';
 import Waiter from '../models/restaurant/waiter';
 import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
+import { redisClient } from '../core/sockets';
+import { sessionTime, sessionValid } from '../core/constants/redis.constants';
 
 export const login = async (req: Request, res: Response) => {
     try {
@@ -15,8 +17,8 @@ export const login = async (req: Request, res: Response) => {
         if (!compareSync(req.body.password, user.password.toString())) {
             return res.status(404).json({ msg: 'Usuario o contraseña incorrecta' });
         }
-        user.sessionValid = true;
-        await user.save();
+        await redisClient.set(sessionValid+user._id,user._id.toString());
+        await redisClient.expire(sessionValid+user._id,sessionTime);
         const userProtected = user.toObject();
         delete userProtected.password;
         const token = getToken(user.id);
@@ -44,7 +46,7 @@ export const register = async (req: Request, res: Response) => {
 export const logout = async (req: Request, res: Response) => {
     try {
         const user = await User.findById(res.locals.token.userId);
-        user.sessionValid = false;
+        await redisClient.del(sessionValid+user._id);
         user.save();
         return res.json({ msg: "Logout successfully." });
     } catch (error) {

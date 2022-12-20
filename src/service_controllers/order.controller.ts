@@ -1,15 +1,17 @@
 import { redisClient } from '../core/sockets';
 import UserOrder from '../models/restaurant/userOrder';
 import Order from '../models/restaurant/order';
+import { ListOfOrdersDto } from '../models_sockets/listOfOrders';
 
 export const addItemController = async (userId, tableId, data) => {
     let currentTable = await redisClient.get(`table${tableId}`)
-    let currentTableParsed = JSON.parse(currentTable);
+    let currentTableParsed = new ListOfOrdersDto(JSON.parse(currentTable)) ;
+    console.log(currentTableParsed);
     currentTableParsed.usersConnected.find(user => user.userId === userId).orderProducts.push(data);
     currentTableParsed.usersConnected.find(user => user.userId === userId).price += data.totalWithToppings;
     currentTableParsed.totalPrice += data.totalWithToppings;
     await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
-    console.log(currentTableParsed);
+    //console.log(currentTableParsed);
     return currentTableParsed;
 }
 
