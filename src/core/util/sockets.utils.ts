@@ -1,9 +1,10 @@
 import { tokenIsValidSocket } from "../../middlewares/auth.middleware";
 import { io, socket } from '../sockets';
-import Table from "../../models/restaurant/table";
+import Table, { TableStatus } from "../../models/restaurant/table";
 import Restaurant from "../../models/restaurant/restaurant";
 import { redisClient } from "../sockets";
 import * as socketEvents from "../../core/constants/sockets.events";
+import { ListOfOrdersDto } from "../../models_sockets/listOfOrders";
 
 export const checkUser = async (token) => {
     let userId = await tokenIsValidSocket(token);
@@ -20,12 +21,21 @@ export const checkUser = async (token) => {
 
 export const createTableInRedis = async (tableId, userId, firstName, lastName) => {
     const table = await Table.findById(tableId);
-    let currentTableParsed: any = {}
-    currentTableParsed.usersConnected = [{ userId, firstName: firstName, lastName: lastName, orderProducts: [], price: 0 }];
-    currentTableParsed.needsWaiter = false;
-    currentTableParsed.tableStatus = 'ordering';
-    currentTableParsed.totalPrice = 0;
-    currentTableParsed.restaurantId = table.restaurantId;
+    let currentTableParsed = new ListOfOrdersDto({
+        needsWaiter: false,
+         tableStatus: TableStatus.Ordering,
+         totalPrice: 0,
+         restaurantId:table.restaurantId,
+         usersConnected: [{
+            userId,
+            firstName,
+            lastName,
+            price: 0,
+            orderProducts: []
+         }]
+    });
+
+
     await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
     return currentTableParsed;
 }

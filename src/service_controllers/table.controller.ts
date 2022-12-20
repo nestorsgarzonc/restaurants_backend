@@ -18,7 +18,7 @@ export const joinController = async (userId, tableId) => {
         currentTableParsed = JSON.parse(currentTable);
         if (!currentTableParsed.usersConnected.some(user => user.userId === userId)) {
             currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 }];
-            currentTableParsed.tableStatus = 'ordering';
+            currentTableParsed.tableStatus = TableStatus.Ordering;
             await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
         }
     }
