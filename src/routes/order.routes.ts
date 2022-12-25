@@ -38,7 +38,6 @@ router.post(
     '/table-order',
     [
         body('paymentMethod').isIn(['cash','card','pse']),
-        body('paymentWay').isIn(['all','split']),
         body('tableId').isMongoId(),
         body('tip').isNumeric(),
         tokenIsValid,

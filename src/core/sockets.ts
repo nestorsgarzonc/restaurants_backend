@@ -37,6 +37,7 @@ const onConection = (socket) => {
     socket.on('order:edit-item', errorHandlerSocket(OrderService.editItem))
     socket.on('order:delete-item', errorHandlerSocket(OrderService.deleteItem))
     socket.on('order:ask-account', errorHandlerSocket(OrderService.askAccount))
+    socket.on('order:pay-account-single',errorHandlerSocket(OrderService.payAccount))
 
     socket.on('restaurant:join', errorHandlerSocket(RestaurantService.join))
     socket.on('restaurant:tables-status', errorHandlerSocket(RestaurantService.getTableList))

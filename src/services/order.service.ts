@@ -5,6 +5,8 @@ import * as socketEvents from "../core/constants/sockets.events";
 import { ItemDto } from '../models_sockets/Item';
 import { ItemUuidDto } from '../models_sockets/itemUuidDto';
 import { TableInfoDto } from '../models_sockets/tableInfo';
+import { AskAccountDto, PaymentWays } from '../models_sockets/askAccount';
+import { PayAccountDto } from '../models_sockets/payAccount';
 
 export const addItem = async (data) => {
     const tableInfo = new TableInfoDto(data);
@@ -38,10 +40,32 @@ export const deleteItem = async (data) => {
 }
 
 export const askAccount = async (data) => {
-    data = new TableInfoDto(data);
+    data = new AskAccountDto(data);
     const { token, ...orderData } = data;
     const userId = await checkUser(token);
     if (!userId) return;
     const currentTableParsed = await OrderController.askAccountController(orderData);
-    io.to(data.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
+    //TODO:Añadir notificación push
+    if(data.paymentWay==PaymentWays.Equal){
+        io.to(data.tableId).emit(socketEvents.EqualPayment, { table: currentTableParsed, pricePerPerson: Math.ceil(currentTableParsed.totalPrice/currentTableParsed.usersConnected.length)});
+    }else if(data.paymentWay==PaymentWays.Single){
+        io.to(data.tableId).emit(socketEvents.singlePayment, { table: currentTableParsed });
+    }else if(data.paymentWay==PaymentWays.Altogether){
+        io.to(data.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
+    }
+}
+
+export const payAccount = async(data) =>{
+    data = new PayAccountDto(data);
+    const userId = await checkUser(data.token);
+    if (!userId) return;
+    const response = await OrderController.payAccountController(userId,data);
+    if (response.error && response.error=='already_payed'){
+        io.to(data.tableId).emit(socketEvents.error,{reason:response.error, userIdPayed:response.userIdPayed});
+    }else if(response.allPayed){
+        io.to(data.tableId).emit(socketEvents.onPayedAccount, { orderId: response.orderId });
+    }else{
+        io.to(data.tableId).emit(socketEvents.listOfOrders, { table: response.table});
+    }
+
 }

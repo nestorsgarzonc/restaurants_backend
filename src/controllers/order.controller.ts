@@ -2,16 +2,15 @@ import { Request, Response } from 'express';
 import { redisClient } from '../core/sockets';
 import Order from '../models/restaurant/order';
 import User from '../models/user/user';
-import OrderProduct from '../models/restaurant/orderProduct';
-import OrderTopping from '../models/restaurant/orderTopping';
-import OrderToppingOption from '../models/restaurant/orderToppingOption';
+
 import UserOrder from '../models/restaurant/userOrder';
-import user from '../models/user/user';
 import { io, socket } from '../core/sockets';
 import * as socketEvents from '../core/constants/sockets.events';
 import Restaurant from '../models/restaurant/restaurant';
 import Table from '../models/restaurant/table';
 import { TableStatus } from '../models/restaurant/table';
+import { PaymentWays } from '../models_sockets/askAccount';
+import { saveOrderFromRedis } from '../core/util/sockets.utils';
 
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
@@ -120,81 +119,11 @@ export const updateUserOrder = async (req: Request, res: Response) => {
 
 export const payAccount = async (req: Request, res: Response) => {
 
-    let currentTable = await redisClient.get(`table${req.body.tableId}`);
-    let currentTableParsed = JSON.parse(currentTable);
+    const orderId = await saveOrderFromRedis(req.body.tableId,res.locals.token.userId,req.body.tip,req.body.paymentWay,req.body.paymentMethod);
+    
 
-    let userOrderIds = [];
-
-    for (let user of currentTableParsed.usersConnected) {
-        let orderProductIds = [];
-
-        for (let product of user.orderProducts) {
-            let orderToppingIds = [];
-
-            for (let topping of product.toppings) {
-                let orderToppingOptionIds = [];
-
-                for (let option of topping.options) {
-                    /*const orderToppingOption = new OrderToppingOption({
-                        toppingOptionId: option._id,
-                        price: option.price
-                    });
-                    await orderToppingOption.save();
-                    orderToppingOptionIds.push(orderToppingOption._id);*/
-                    orderToppingOptionIds.push(option._id);
-                }
-
-                const orderTopping = new OrderTopping({
-                    toppingId: topping._id,
-                    toppingOptions: orderToppingOptionIds,
-                });
-                await orderTopping.save();
-                orderToppingIds.push(orderTopping._id);
-            }
-
-            const orderProduct = new OrderProduct({
-                productId: product._id,
-                toppings: orderToppingIds,
-                price: product.totalWithToppings,
-            });
-            await orderProduct.save();
-            orderProductIds.push(orderProduct._id);
-
-        }
-
-
-        const userOrder = new UserOrder({
-            userId: user.userId,
-            orderProducts: orderProductIds,
-            price: user.price
-        });
-        await userOrder.save();
-        userOrderIds.push(userOrder._id);
-
-
-    }
-
-    const order = new Order({
-        usersOrder: userOrderIds,
-        tableId: req.body.tableId,
-        totalPrice: currentTableParsed.totalPrice,
-        restaurantId: currentTableParsed.restaurantId,
-        tip: req.body.tip,
-        paymentWay: req.body.paymentWay,
-        paymentMethod: req.body.paymentMethod
-    });
-    await order.save();
-    for (let user of currentTableParsed.usersConnected) {
-        const mongoUser = await User.findById(user.userId);
-        mongoUser.ordersStory.push(order._id);
-        await mongoUser.save();
-    }
-    await redisClient.del(`table${req.body.tableId}`);
-
-    io.to(req.body.tableId).emit(socketEvents.onPayedAccount, { orderId: order._id });
-
-    return res.json({ msg: 'User order created successfully', order });
-    //TODO: Enviar id de la transacción con evento para ir al resumen
+    io.to(req.body.tableId).emit(socketEvents.onPayedAccount, { orderId: orderId });
+    return res.json({ msg: 'User order created successfully', orderId:orderId });
 
 }
 export const getOrder = async (req: Request, res: Response) => {

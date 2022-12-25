@@ -2,6 +2,10 @@ import { redisClient } from '../core/sockets';
 import UserOrder from '../models/restaurant/userOrder';
 import Order from '../models/restaurant/order';
 import { ListOfOrdersDto } from '../models_sockets/listOfOrders';
+import { AskAccountDto } from '../models_sockets/askAccount';
+import { PaymentStatus } from '../models_sockets/userConnected';
+import { saveOrderFromRedis } from '../core/util/sockets.utils';
+import { TableStatus } from '../models/restaurant/table';
 
 export const addItemController = async (userId, tableId, data) => {
     let currentTable = await redisClient.get(`table${tableId}`)
@@ -47,38 +51,41 @@ export const deleteItemController = async (userId, data) => {
     return currentTableParsed;
 }
 
-export const payAccountController = async (userId, data) => {
-    let userOrderIds = [];
-    let currentTable = await redisClient.get(`table${data.tableId}`)
-    let currentTableParsed = JSON.parse(currentTable);
-    const usersOrdersProm = await Promise.all(
-        currentTableParsed.usersConnected.map(user => {
-            const userOrder = new UserOrder({
-                userId: user.userId,
-                restaurantId: currentTableParsed.restaurantId,
-                tableId: data.tableId,
-                orderProducts: user.orderProducts,
-                price: user.price
-            });
-            return userOrder.save();
-        })
-    )
-    userOrderIds = usersOrdersProm.map(userOrder => userOrder._id);
-    const order = new Order({
-        usersOrder: userOrderIds,
-        status: 'finished',
-        totalPrice: currentTableParsed.totalPrice,
-        restaurantId: currentTableParsed.restaurantId,
-        waiterId: userId,
-        tip: 5000
-    });
-    await order.save();
-}
+
 
 export const askAccountController = async (data) => {
     let currentTable = await redisClient.get(`table${data.tableId}`)
     let currentTableParsed = JSON.parse(currentTable);
-    currentTableParsed.tableStatus = data.status;
+    currentTableParsed.tableStatus = TableStatus.Paying;
     await redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
     return currentTableParsed;
+}
+
+export const payAccountController = async(userId,data)  => {
+    let currentTable = await redisClient.get(`table${data.tableId}`);
+    let currentTableParsed = JSON.parse(currentTable);
+    let allPayed = true;
+    let alreadyPayed = false;
+    let userIdPayed;
+    //TODO: Pasarela de pagos dependiendo de como se pague
+    
+    currentTableParsed.usersConnected.forEach(user => {
+        if(user.userId==userId || data.paysFor.has(user.userId)){
+            if(user.paymentStatus===PaymentStatus.Payed){
+                alreadyPayed = true;
+                userIdPayed = user.userId;
+            }
+            user.payedBy = userId;
+            user.paymentStatus = PaymentStatus.Payed;
+        }
+        if(user.paymentStatus==PaymentStatus.NotPayed)allPayed = false;
+    })
+    if(alreadyPayed)return {error:'already_payed',userIdPayed:userIdPayed};
+    await redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
+    if(allPayed){
+        const orderId = await saveOrderFromRedis(data.tableId,userId,data.tip,data.paymentWay,data.paymentMethod);
+        return {allPayed,orderId:orderId};
+    }
+    return {allPayed,table:currentTableParsed};
+    
 }

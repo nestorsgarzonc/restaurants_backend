@@ -47,8 +47,8 @@ const scheme = new Schema<Order>(
         },
         paymentWay: {
             type: String,
-            default: 'all',
-            enum: ['all','split']
+            default: 'altogether',
+            enum: ['altogether','equal','single']
         },
         paymentMethod:{
             type:String,

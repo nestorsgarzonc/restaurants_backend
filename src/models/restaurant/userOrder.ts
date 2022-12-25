@@ -4,6 +4,7 @@ interface UserOrder {
     userId: Types.ObjectId;
     orderProducts: Types.ObjectId[];
     price: Number;
+    payedBy: Types.ObjectId
     createdAt: Date;
     updatedAt: Date;
 }
@@ -24,6 +25,11 @@ const scheme = new Schema<UserOrder>({
         required: true,
         default: 0
     },
+    payedBy:{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
     
 }, { timestamps: true });
 

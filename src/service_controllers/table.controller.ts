@@ -4,6 +4,7 @@ import Restaurant from "../models/restaurant/restaurant";
 import MenuItem from "../models/menu/menuItem";
 import { redisClient } from "../core/sockets";
 import { updateOrderQueueInRedis, createOrderQueueInRedis, createTableInRedis } from "../core/util/sockets.utils"
+import { PaymentStatus } from "../models_sockets/userConnected";
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
@@ -17,7 +18,7 @@ export const joinController = async (userId, tableId) => {
     } else {
         currentTableParsed = JSON.parse(currentTable);
         if (!currentTableParsed.usersConnected.some(user => user.userId === userId)) {
-            currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 }];
+            currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 ,paymentStatus:PaymentStatus.NotPayed}];
             currentTableParsed.tableStatus = TableStatus.Ordering;
             await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
         }
