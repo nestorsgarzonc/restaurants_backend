@@ -13,6 +13,7 @@ export class UserConnectedDto{
     price:         number;
     paymentStatus: string;
     payedBy:       string;
+    pushToken:     string;
     constructor(data:any){
         this.userId = data.userId;
         this.firstName = data.firstName;
@@ -21,6 +22,7 @@ export class UserConnectedDto{
         data.orderProducts.forEach(item=>this.orderProducts.push(new ItemDto(item)));
         this.price = data.price;
         this.paymentStatus = data.paymentStatus;
+        this.pushToken = data.pushToken;
         if(!this.paymentStatus)throw new Error('Se requiere un estado del pago.');
     }
 }

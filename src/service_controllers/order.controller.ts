@@ -6,6 +6,7 @@ import { AskAccountDto } from '../models_sockets/askAccount';
 import { PaymentStatus } from '../models_sockets/userConnected';
 import { saveOrderFromRedis } from '../core/util/sockets.utils';
 import { TableStatus } from '../models/restaurant/table';
+import { sendPush } from '../core/util/push.utils';
 
 export const addItemController = async (userId, tableId, data) => {
     let currentTable = await redisClient.get(`table${tableId}`)
@@ -75,6 +76,7 @@ export const payAccountController = async(userId,data)  => {
                 alreadyPayed = true;
                 userIdPayed = user.userId;
             }
+            sendPush(user.pushToken,'Pagaste', 'Estás a paz y salvo, espera a que el resto de tu mesa termine de pagar');
             user.payedBy = userId;
             user.paymentStatus = PaymentStatus.Payed;
         }
