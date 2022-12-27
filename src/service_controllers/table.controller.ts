@@ -14,11 +14,11 @@ export const joinController = async (userId, tableId) => {
     ])
     let currentTableParsed: any = {}
     if (!currentTable) {
-        currentTableParsed = await createTableInRedis(tableId, userId, user.firstName, user.lastName);
+        currentTableParsed = await createTableInRedis(tableId, userId, user.firstName, user.lastName,user.deviceToken);
     } else {
         currentTableParsed = JSON.parse(currentTable);
         if (!currentTableParsed.usersConnected.some(user => user.userId === userId)) {
-            currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 ,paymentStatus:PaymentStatus.NotPayed}];
+            currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 ,paymentStatus:PaymentStatus.NotPayed,deviceToke:user.deviceToken}];
             currentTableParsed.tableStatus = TableStatus.Ordering;
             await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
         }

@@ -19,6 +19,8 @@ export const login = async (req: Request, res: Response) => {
         }
         await redisClient.set(sessionValid+user._id,user._id.toString());
         await redisClient.expire(sessionValid+user._id,sessionTime);
+        user.deviceToken = req.body.deviceToken;
+        await user.save();
         const userProtected = user.toObject();
         delete userProtected.password;
         const token = getToken(user.id);

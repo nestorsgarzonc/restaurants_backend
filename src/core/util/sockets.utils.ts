@@ -26,7 +26,7 @@ export const checkUser = async (token) => {
     return userId;
 }
 
-export const createTableInRedis = async (tableId, userId, firstName, lastName) => {
+export const createTableInRedis = async (tableId, userId, firstName, lastName,deviceToken) => {
     const table = await Table.findById(tableId);
     let currentTableParsed = new ListOfOrdersDto({
         needsWaiter: false,
@@ -39,7 +39,8 @@ export const createTableInRedis = async (tableId, userId, firstName, lastName) =
             lastName,
             price: 0,
             orderProducts: [],
-            paymentStatus: PaymentStatus.NotPayed
+            paymentStatus: PaymentStatus.NotPayed,
+            deviceToken
          }]
     });
 

@@ -2,7 +2,7 @@ import { io, socket } from '../core/sockets';
 import { checkUser } from '../core/util/sockets.utils';
 import * as WaiterController from '../service_controllers/waiter.controller';
 import * as socketEvents from "../core/constants/sockets.events";
-
+import User from '../models/user/user';
 export const listenTables = async (data) => {
     let { token } = data;
     let userId = await checkUser(token);
@@ -29,9 +29,10 @@ export const watchTable = async (data) => {
 export const addItemToTable = async (data) => {
     let { token, tableId, clientId, ...orderData } = data;
     let userId = await checkUser(token);
+    const user = await User.findById(userId);
     if (!userId) return;
     console.log(clientId)
-    let currentTableParsed = await WaiterController.addItemToTableController(clientId, tableId, orderData);
+    let currentTableParsed = await WaiterController.addItemToTableController(clientId, tableId, orderData,user.deviceToken);
     socket.join(tableId);
     io.to(tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
 

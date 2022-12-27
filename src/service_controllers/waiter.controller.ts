@@ -20,13 +20,13 @@ export const watchTableController = async (tableId) => {
     return currentTableParsed;
 }
 
-export const addItemToTableController = async (userId, tableId, data) => {
+export const addItemToTableController = async (userId, tableId, data,deviceToken) => {
     //In this case the userId field makes references to the user who the order is gonna be added to
     if (!userId) {
         let currentTable = await redisClient.get(`table${tableId}`)
         let currentTableParsed = JSON.parse(currentTable);
         if (!currentTable) {
-            await createTableInRedis(tableId, tableId, "Restaurant", "")
+            await createTableInRedis(tableId, tableId, "Restaurant", "",deviceToken)
         } else {
             currentTableParsed.usersConnected.push({
                 userId: tableId,
