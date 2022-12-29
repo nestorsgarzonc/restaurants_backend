@@ -119,7 +119,7 @@ export const updateUserOrder = async (req: Request, res: Response) => {
 
 export const payAccount = async (req: Request, res: Response) => {
 
-    const orderId = await saveOrderFromRedis(req.body.tableId,res.locals.token.userId,req.body.tip,req.body.paymentWay,req.body.paymentMethod);
+    const orderId = await saveOrderFromRedis(req.body.tableId,res.locals.token.userId,req.body.tip,req.body.paymentWay,req.body.paymentMethods);
     
 
     io.to(req.body.tableId).emit(socketEvents.onPayedAccount, { orderId: orderId });

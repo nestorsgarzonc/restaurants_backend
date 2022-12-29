@@ -8,6 +8,7 @@ import { PaymentStatus } from "../models_sockets/userConnected";
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
+    
     let [_, currentTable] = await Promise.all([
         Table.findOneAndUpdate({ _id: tableId }, { status: TableStatus.Ordering }),
         redisClient.get(`table${tableId}`)
@@ -18,7 +19,7 @@ export const joinController = async (userId, tableId) => {
     } else {
         currentTableParsed = JSON.parse(currentTable);
         if (!currentTableParsed.usersConnected.some(user => user.userId === userId)) {
-            currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 ,paymentStatus:PaymentStatus.NotPayed,deviceToke:user.deviceToken}];
+            currentTableParsed.usersConnected = [...currentTableParsed.usersConnected, { userId, firstName: user.firstName, lastName: user.lastName, orderProducts: [], price: 0 ,paymentStatus:PaymentStatus.NotPayed,deviceToken:user.deviceToken}];
             currentTableParsed.tableStatus = TableStatus.Ordering;
             await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
         }

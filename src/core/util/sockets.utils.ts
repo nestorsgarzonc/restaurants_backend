@@ -12,6 +12,8 @@ import OrderToppingOption from '../../models/restaurant/orderToppingOption';
 import User from '../../models/user/user';
 import UserOrder from '../../models/restaurant/userOrder';
 import Order from '../../models/restaurant/order';
+import { PaymentWays } from "../../models_sockets/askAccount";
+import { sendPush } from "./push.utils";
 
 export const checkUser = async (token) => {
     let userId = await tokenIsValidSocket(token);
@@ -135,6 +137,12 @@ export const saveOrderFromRedis = async(tableId,userId,tip,paymentWay,paymentMet
         const mongoUser = await User.findById(user.userId);
         mongoUser.ordersStory.push(order._id);
         await mongoUser.save();
+    }
+    if(paymentWay==PaymentWays.Altogether){
+        const payer = currentTableParsed.usersConnected.find(user=>user.userId==userId);
+        currentTableParsed.usersConnected.forEach(user=>{
+            sendPush(user.deviceToken,"Cuenta pagada",`${payer.firstName} ${payer.lastName} ha pagado toda la cuenta.`)
+        })
     }
     await redisClient.del(`table${tableId}`);
     return order._id;

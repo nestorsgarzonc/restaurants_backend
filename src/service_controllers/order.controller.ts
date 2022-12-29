@@ -7,7 +7,7 @@ import { PaymentStatus } from '../models_sockets/userConnected';
 import { saveOrderFromRedis } from '../core/util/sockets.utils';
 import { TableStatus } from '../models/restaurant/table';
 import { sendPush } from '../core/util/push.utils';
-
+import User from '../models/user/user';
 export const addItemController = async (userId, tableId, data) => {
     let currentTable = await redisClient.get(`table${tableId}`)
     let currentTableParsed = new ListOfOrdersDto(JSON.parse(currentTable)) ;
@@ -69,14 +69,16 @@ export const payAccountController = async(userId,data)  => {
     let alreadyPayed = false;
     let userIdPayed;
     //TODO: Pasarela de pagos dependiendo de como se pague
-    
+    const payer = currentTableParsed.usersConnected.find(user=>user.userId==userId);
     currentTableParsed.usersConnected.forEach(user => {
         if(user.userId==userId || data.paysFor.has(user.userId)){
             if(user.paymentStatus===PaymentStatus.Payed){
                 alreadyPayed = true;
                 userIdPayed = user.userId;
             }
-            sendPush(user.pushToken,'Pagaste', 'Estás a paz y salvo, espera a que el resto de tu mesa termine de pagar');
+            console.log(user);
+            if(user.userId==userId)sendPush(user.deviceToken,'Pagaste', 'Estás a paz y salvo, espera a que el resto de tu mesa termine de pagar.');
+            else sendPush(user.deviceToken,'Te invitaron',`${payer.firstName} ${payer.lastName} ha pagado tu cuenta.`);
             user.payedBy = userId;
             user.paymentStatus = PaymentStatus.Payed;
         }
