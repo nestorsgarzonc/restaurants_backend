@@ -19,6 +19,38 @@ router.post(
     tableController.createTable
 )
 
+router.put(
+    '/',
+    [
+        body('tableId').trim().isMongoId().withMessage('Invalid tableId'),
+        body('name').trim().isLength({ min: 1 }).withMessage('Name must be at least 1 characters long'),
+        body('capacity').isNumeric().withMessage('Capacity must be a number'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    tableController.editTable
+)
+
+router.delete(
+    '/',
+    [
+        body('tableId').trim().isMongoId().withMessage('Invalid tableId'),
+        tokenIsValid,
+        errorHandler
+    ],
+    tableController.deleteTable
+)
+
+router.get(
+    '/',
+    [
+        body('tableId').trim().isMongoId().withMessage('Invalid tableId'),
+        tokenIsValid,
+        errorHandler
+    ],
+    tableController.getTable
+)
+
 //TODO: MAKE WITH SOCKETS
 router.post(
     '/get-users-by-table',
