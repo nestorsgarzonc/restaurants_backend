@@ -46,10 +46,8 @@ export const askAccount = async (data) => {
     if (!userId) return;
     const currentTableParsed = await OrderController.askAccountController(orderData);
     //TODO:Añadir notificación push
-    if(data.paymentWay==PaymentWays.Equal){
-        io.to(data.tableId).emit(socketEvents.EqualPayment, { table: currentTableParsed, pricePerPerson: Math.ceil(currentTableParsed.totalPrice/currentTableParsed.usersConnected.length)});
-    }else if(data.paymentWay==PaymentWays.Single){
-        io.to(data.tableId).emit(socketEvents.singlePayment, { table: currentTableParsed });
+    if(data.paymentWay==PaymentWays.Equal || data.paymentWay==PaymentWays.Single){
+        io.to(data.tableId).emit(socketEvents.singlePayment, { table: currentTableParsed,paymentWay:data.paymentWay});
     }else if(data.paymentWay==PaymentWays.Altogether){
         io.to(data.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
     }
@@ -60,8 +58,8 @@ export const payAccount = async(data) =>{
     const userId = await checkUser(data.token);
     if (!userId) return;
     const response = await OrderController.payAccountController(userId,data);
-    if (response.error && response.error=='already_payed'){
-        io.to(data.tableId).emit(socketEvents.error,{reason:response.error, userIdPayed:response.userIdPayed});
+    if (response.error){
+        io.to(data.tableId).emit(socketEvents.error,{reason:response.error});
     }else if(response.allPayed){
         io.to(data.tableId).emit(socketEvents.onPayedAccount, { orderId: response.orderId });
     }else{

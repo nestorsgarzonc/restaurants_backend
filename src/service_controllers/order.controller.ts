@@ -67,14 +67,14 @@ export const payAccountController = async(userId,data)  => {
     let currentTableParsed = JSON.parse(currentTable);
     let allPayed = true;
     let alreadyPayed = false;
-    let userIdPayed;
+    let userNamePayed;
     //TODO: Pasarela de pagos dependiendo de como se pague
     const payer = currentTableParsed.usersConnected.find(user=>user.userId==userId);
     currentTableParsed.usersConnected.forEach(user => {
         if(user.userId==userId || data.paysFor.has(user.userId)){
             if(user.paymentStatus===PaymentStatus.Payed){
                 alreadyPayed = true;
-                userIdPayed = user.userId;
+                userNamePayed = user.firstName+' '+user.lastName;
             }
             console.log(user);
             if(user.userId==userId)sendPush(user.deviceToken,'Pagaste', 'Estás a paz y salvo, espera a que el resto de tu mesa termine de pagar.');
@@ -84,7 +84,7 @@ export const payAccountController = async(userId,data)  => {
         }
         if(user.paymentStatus==PaymentStatus.NotPayed)allPayed = false;
     })
-    if(alreadyPayed)return {error:'already_payed',userIdPayed:userIdPayed};
+    if(alreadyPayed)return {error:`${userNamePayed} ya pagó su cuenta.`};
     await redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
     if(allPayed){
         const orderId = await saveOrderFromRedis(data.tableId,userId,data.tip,data.paymentWay,data.paymentMethod);
