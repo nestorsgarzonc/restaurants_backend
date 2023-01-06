@@ -70,4 +70,10 @@ router.get(
     authController.isWaiter
 )
 
+router.get(
+    '/is-admin',
+    [tokenIsValid],
+    authController.isAdmin
+)
+
 export default router;

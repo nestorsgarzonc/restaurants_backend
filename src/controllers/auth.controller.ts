@@ -3,6 +3,7 @@ import { hashSync, compareSync } from 'bcrypt';
 import { getToken } from '../core/jwt';
 import User from '../models/user/user';
 import Waiter from '../models/restaurant/waiter';
+import Admin from '../models/restaurant/admin';
 import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
 import { redisClient } from '../core/sockets';
@@ -151,6 +152,25 @@ export const isWaiter = async (req: Request, res: Response) => {
         } else {
             return res.status(401).json({ msg: 'User is not waiter' });
         }
+    } catch (error) {
+        return res.json({ msg: error.message })
+    }
+}
+
+export const isAdmin = async (req: Request, res: Response) => {
+    try {
+        const user = await User.findById(res.locals.token.userId);
+        console.log(user._id);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+        if (user.rol == 'admin') {
+            const admin = await Admin.findOne();
+            console.log(admin);
+            //return res.json({ restaurants: admin.restaurants});
+        } 
+        return res.status(401).json({ msg: 'User is not Admin' });
+        
     } catch (error) {
         return res.json({ msg: error.message })
     }
