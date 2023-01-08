@@ -26,10 +26,11 @@ router.get(
 
 router.post(
     //This is where I create a category
-    '/:restaurantId',
+    '/category/:restaurantId',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('description').trim().optional({nullable:true}),
         tokenIsValid,
         errorHandler,
     ],
@@ -37,7 +38,50 @@ router.post(
 )
 
 router.put(
-    '/:id',
+    //This is where I create a category
+    '/category/:id',
+    [
+        body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
+        body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('description').trim().optional({nullable:true}),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.updateCategory,
+)
+
+router.delete(
+    //This is where I create a category
+    '/category/:id',
+    [
+        body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
+        body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('description').trim().optional({nullable:true}),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.deleteCategory
+)
+
+
+router.post(
+    '/item/:categoryId',
+    [
+        body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
+        body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
+        body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('logoUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('toppings').isArray().withMessage('Invalid menu').optional({ nullable: true }),
+        body('isAvaliable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
+        body('discount').isNumeric().withMessage('Discount must be a number').optional({ nullable: true }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.createMenu,
+)
+
+router.put(
+    '/item/:id',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
@@ -53,7 +97,7 @@ router.put(
 )
 
 router.delete(
-    '/:id',
+    '/item/:id',
     [tokenIsValid],
     menuController.deleteMenu,
 )
@@ -87,11 +131,12 @@ router.get(
 )
 
 router.post(
-    '/menuitem/:menuId',
+    '/toppings/:menuId',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('type').trim().isLength({ min: 1 }).withMessage('Type must be at least 1 characters long'),
         body('options').isArray().withMessage('Invalid options').optional({ nullable: true }),
+        body('menuId').isMongoId().withMessage('Invalid menu Id'),
         body('minOptions').isNumeric().withMessage('Min toppings must be a number').optional({ nullable: true }),
         body('maxOptions').isNumeric().withMessage('Max toppings must be a number').optional({ nullable: true }),
         tokenIsValid,
@@ -100,15 +145,30 @@ router.post(
     menuController.addToppingToMenu,
 )
 
+router.put(
+    '/toppings/:id',
+    [
+        body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
+        body('type').trim().isLength({ min: 1 }).withMessage('Type must be at least 1 characters long'),
+        body('options').isArray().withMessage('Invalid options').optional({ nullable: true }),
+        body('menuId').isMongoId().withMessage('Invalid menu Id'),
+        body('minOptions').isNumeric().withMessage('Min toppings must be a number').optional({ nullable: true }),
+        body('maxOptions').isNumeric().withMessage('Max toppings must be a number').optional({ nullable: true }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.updateTopping,
+)
+
 router.delete(
     //TODO: update this and the other deletes methods haha
-    '/:menuId/toppings/:toppingId',
+    '/toppings/:id',
     [tokenIsValid],
     menuController.deleteToppingFromMenu,
 )
 
 router.post(
-    '/topping/:toppingId',
+    '/option/:toppingId',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
@@ -117,6 +177,25 @@ router.post(
         errorHandler,
     ],
     menuController.addToppingOptionToTopping,
+)
+
+router.put(
+    '/option/:id',
+    [
+        body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
+        body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
+        body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.updateOption,
+)
+
+router.delete(
+    //TODO: update this and the other deletes methods haha
+    '/option/:id',
+    [tokenIsValid],
+    menuController.deleteOption,
 )
 
 export default router

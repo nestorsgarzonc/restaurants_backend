@@ -4,6 +4,7 @@ interface Toppings {
     name: String;
     type: String;
     options: Types.ObjectId[];
+    menuId: Types.ObjectId;
     minOptions?: Number;
     maxOptions?: Number;
     createdAt: Date;
@@ -25,6 +26,11 @@ const scheme = new Schema<Toppings>({
         ref: 'ToppingOption',
         default: []
     }],
+    menuId:{
+        type: Schema.Types.ObjectId,
+        reference: 'MenuItem',  
+        required: true
+    },
     minOptions: {
         type: Number,
         required: false,

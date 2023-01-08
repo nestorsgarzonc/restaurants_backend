@@ -72,6 +72,39 @@ export const createCategory = async (req: Request, res: Response) => {
     }
 }
 
+export const updateCategory = async (req: Request, res: Response) => {
+    try {
+        const category = Category.findById(req.params.id);
+        if(!category)throw new Error('Category not found');
+        await category.updateOne(req.body);
+        return res.json({ msg: 'Category updated successfully', category });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+export const deleteCategory = async (req: Request, res: Response) => {
+    try {
+        const category = await Category.findById(req.params.id);
+        if (!category) {
+            return res.status(404).json({ msg: 'Category not found' });
+        }
+        const restaurant = await Restaurant.findById(category.restaurantId);
+        const categoryIndex = restaurant.menu.indexOf(category._id);
+        if (categoryIndex > -1) { 
+            restaurant.menu.splice(categoryIndex, 1); 
+        } 
+        await restaurant.save();
+        await Category.deleteOne({_id:category._id});
+        return res.json({ msg: 'Category deleted successfully' });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+
+
+
 export const getAllCategories = async (req: Request, res: Response) => {
 
     try {
@@ -118,8 +151,13 @@ export const deleteMenu = async (req: Request, res: Response) => {
         if (!menuItem) {
             return res.status(404).json({ msg: 'Menu item not found' });
         }
-        menuItem.isAvaliable = false
-        await menuItem.save();
+        const category = await Category.findById(menuItem.categoryId);
+        const menuItemIndex = category.menuItems.indexOf(menuItem._id);
+        if (menuItemIndex > -1) { 
+            category.menuItems.splice(menuItemIndex, 1); 
+        } 
+        await category.save();
+        await Menu.deleteOne({_id:menuItem._id});
         return res.json({ msg: 'Menu item deleted successfully' });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -168,11 +206,11 @@ export const getAllToppingsOptions = async (req: Request, res: Response) => {
 export const addToppingToMenu = async (req: Request, res: Response) => {
     try {
         const menu = await Menu.findById(req.params.menuId);
-
         if (!menu) {
             return res.status(404).json({ msg: 'Menu not found' });
         }
         const topping = new Topping(req.body);
+        topping.menuId = menu._id;
         await topping.save();
         menu.toppings.push(topping._id);
         await menu.save();
@@ -182,18 +220,36 @@ export const addToppingToMenu = async (req: Request, res: Response) => {
     }
 }
 
+export const updateTopping = async (req: Request, res: Response) => {
+    try {
+        const topping = await Topping.findById(req.params.id);
+        if (!topping) {
+            return res.status(404).json({ msg: 'Topping item not found' });
+        }
+        await topping.updateOne(req.body);
+        return res.json({ msg: 'Menu item updated successfully', topping});
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+
 export const deleteToppingFromMenu = async (req: Request, res: Response) => {
     try {
-        const menu = await Menu.findById(req.params.menuId);
-        if (!menu) {
-            return res.status(404).json({ msg: 'Menu not found' });
-        }
-        const topping = await Topping.findById(req.params.toppingId);
+        const topping = await Topping.findById(req.params.menuId);
         if (!topping) {
             return res.status(404).json({ msg: 'Topping not found' });
         }
-        menu.toppings = menu.toppings.filter(toppingId => toppingId !== topping._id);
+        const menu = await Menu.findById(topping.menuId);
+        if (!menu) {
+            return res.status(404).json({ msg: 'MenuItem not found' });
+        }
+        const toppingIndex = menu.toppings.indexOf(topping._id);
+        if (toppingIndex > -1) { 
+            menu.toppings.splice(toppingIndex, 1); 
+        } 
         await menu.save();
+        await Topping.deleteOne({_id:topping._id});
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
@@ -204,10 +260,45 @@ export const addToppingOptionToTopping = async (req: Request, res: Response) => 
         const topping = await Topping.findById(req.params.toppingId);
         if (!topping) return res.status(404).json({ msg: 'Topping not found' });
         const toppingOption = new ToppingOption(req.body);
+        toppingOption.toppingId = topping._id;
         await toppingOption.save();
         topping.options.push(toppingOption._id);
         await topping.save();
         return res.json({ msg: 'Topping Option added to menu successfully', toppingOption });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+export const updateOption = async (req: Request, res: Response) => {
+    try {
+        const option = await ToppingOption.findById(req.params.id);
+        if (!option) {
+            return res.status(404).json({ msg: 'Topping item not found' });
+        }
+        await option.updateOne(req.body);
+        return res.json({ msg: 'Menu item updated successfully', option});
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+export const deleteOption = async (req: Request, res: Response) => {
+    try {
+        const option = await ToppingOption.findById(req.params.id);
+        if (!option) {
+            return res.status(404).json({ msg: 'ToppingOption not found' });
+        }
+        const topping = await Topping.findById(option.toppingId);
+        if (!topping) {
+            return res.status(404).json({ msg: 'MenuItem not found' });
+        }
+        const optionIndex = topping.options.indexOf(option._id);
+        if (optionIndex > -1) { 
+            topping.options.splice(optionIndex, 1); 
+        } 
+        await topping.save();
+        await option.deleteOne({_id:topping._id});
     } catch (error) {
         return res.status(400).json({ msg: error });
     }

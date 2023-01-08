@@ -160,14 +160,14 @@ export const isWaiter = async (req: Request, res: Response) => {
 export const isAdmin = async (req: Request, res: Response) => {
     try {
         const user = await User.findById(res.locals.token.userId);
-        console.log(user._id);
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
         if (user.rol == 'admin') {
-            const admin = await Admin.findOne();
+            const admin = await Admin.findOne({user: user._id});
+            if(!admin)throw new Error('Admin not found');
             console.log(admin);
-            //return res.json({ restaurants: admin.restaurants});
+            return res.json({ restaurants: admin.restaurants});
         } 
         return res.status(401).json({ msg: 'User is not Admin' });
         
