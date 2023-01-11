@@ -2,7 +2,7 @@ import { Router } from "express";
 import { tokenIsValid } from "../middlewares/auth.middleware";
 import * as menuController from '../controllers/menu.controller';
 import { errorHandler } from "../middlewares/errors.middleware";
-import { body } from "express-validator";
+import { body,param } from "express-validator";
 
 const router = Router()
 
@@ -28,6 +28,7 @@ router.post(
     //This is where I create a category
     '/category/:restaurantId',
     [
+        param('restaurantId').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
         body('description').trim().optional({nullable:true}),
@@ -49,13 +50,13 @@ router.put(
     ],
     menuController.updateCategory,
 )
-
+//TODO: Arreglar el tema de las imágenes
 router.delete(
     //This is where I create a category
     '/category/:id',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
-        body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
+        body('img').isBase64().withMessage('Invalid image url').optional({ nullable: true }),
         body('description').trim().optional({nullable:true}),
         tokenIsValid,
         errorHandler,
@@ -104,19 +105,6 @@ router.delete(
 
 
 
-
-router.post(
-    '/category/:categoryId',
-    [
-        body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
-        body('price').isNumeric().withMessage('Price must be a number'),
-        body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
-        body('description').trim().isLength({ min: 1 }).withMessage('Description is required'),
-        tokenIsValid,
-        errorHandler,
-    ],
-    menuController.createMenu,
-)
 
 
 router.get(
