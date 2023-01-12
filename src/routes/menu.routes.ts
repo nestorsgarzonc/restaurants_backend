@@ -42,6 +42,7 @@ router.put(
     //This is where I create a category
     '/category/:id',
     [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
         body('description').trim().optional({nullable:true}),
@@ -55,6 +56,7 @@ router.delete(
     //This is where I create a category
     '/category/:id',
     [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('img').isBase64().withMessage('Invalid image url').optional({ nullable: true }),
         body('description').trim().optional({nullable:true}),
@@ -68,6 +70,7 @@ router.delete(
 router.post(
     '/item/:categoryId',
     [
+        param('categoryId').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
@@ -84,6 +87,7 @@ router.post(
 router.put(
     '/item/:id',
     [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
@@ -99,7 +103,10 @@ router.put(
 
 router.delete(
     '/item/:id',
-    [tokenIsValid],
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid
+    ],
     menuController.deleteMenu,
 )
 
@@ -109,6 +116,10 @@ router.delete(
 
 router.get(
     '/toppings/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid
+    ],
     menuController.getMenuToppings,
 )
 
@@ -121,6 +132,7 @@ router.get(
 router.post(
     '/toppings/:menuId',
     [
+        param('menuId').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('type').trim().isLength({ min: 1 }).withMessage('Type must be at least 1 characters long'),
         body('options').isArray().withMessage('Invalid options').optional({ nullable: true }),
@@ -136,6 +148,7 @@ router.post(
 router.put(
     '/toppings/:id',
     [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('type').trim().isLength({ min: 1 }).withMessage('Type must be at least 1 characters long'),
         body('options').isArray().withMessage('Invalid options').optional({ nullable: true }),
@@ -151,13 +164,17 @@ router.put(
 router.delete(
     //TODO: update this and the other deletes methods haha
     '/toppings/:id',
-    [tokenIsValid],
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid
+    ],
     menuController.deleteToppingFromMenu,
 )
 
 router.post(
     '/option/:toppingId',
     [
+        param('toppingId').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
@@ -170,6 +187,7 @@ router.post(
 router.put(
     '/option/:id',
     [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('imgUrl').isURL().withMessage('Invalid image url').optional({ nullable: true }),
@@ -182,7 +200,10 @@ router.put(
 router.delete(
     //TODO: update this and the other deletes methods haha
     '/option/:id',
-    [tokenIsValid],
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid
+    ],
     menuController.deleteOption,
 )
 
