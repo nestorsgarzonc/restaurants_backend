@@ -3,7 +3,7 @@ import { Schema, model, Types } from 'mongoose';
 interface ToppingOption {
     name: String;
     price: Number;
-    imgUrl?: String;
+    img?: String;
     toppingId: Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
@@ -18,7 +18,7 @@ const scheme = new Schema<ToppingOption>({
         type: Number,
         default: 0
     },
-    imgUrl: {
+    img: {
         type: String,
         required: false
     },

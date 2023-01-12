@@ -2,7 +2,7 @@ import { Schema, model, Types } from 'mongoose';
 
 interface Category {
     name: String;
-    imgUrl?: String;
+    img?: String;
     description: String;
     menuItems: Types.ObjectId[];
     restaurantId: Types.ObjectId;
@@ -16,7 +16,7 @@ const scheme = new Schema<Category>({
         type: String,
         required: true
     },
-    imgUrl: {
+    img: {
         type: String,
         required: false
     },

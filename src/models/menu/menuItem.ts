@@ -4,7 +4,7 @@ interface MenuItem {
     name: String;
     price: Number;
     description: String;
-    imgUrl?: String;
+    img?: String;
     toppings: Types.ObjectId[];
     taxes?: Number;
     categoryId: Types.ObjectId;
@@ -27,7 +27,7 @@ const scheme = new Schema<MenuItem>({
         type: String,
         required: true
     },
-    imgUrl: {
+    img: {
         type: String,
         required: false
     },

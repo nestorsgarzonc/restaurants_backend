@@ -18,7 +18,8 @@ export const decodeBase64Img = (base64Img,imgId) => {
 }
 
 
-export const uploadImageS3 = async(imgId)=>{
+export const uploadImageS3 = async(base64Img,imgId)=>{
+    decodeBase64Img(base64Img,imgId);
     const blob = fs.readFileSync(`img${imgId}.jpg`);
     const uploadedImage = await s3.upload({
         Bucket: process.env.AWS_S3_BUCKET_NAME,

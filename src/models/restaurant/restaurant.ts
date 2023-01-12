@@ -6,8 +6,8 @@ interface Restaurant {
     createdAt: Date;
     description: String;
     email: String;
-    imageUrl?: String;
-    logoUrl?: String;
+    image?: String;
+    logo?: String;
     menu: Types.ObjectId[],
     name: String;
     owner: Types.ObjectId,
@@ -46,11 +46,11 @@ const schema = new Schema<Restaurant>({
     secondaryColor: {
         type: String,
     },
-    imageUrl: {
+    image: {
         type: String,
         required: false
     },
-    logoUrl:{
+    logo:{
         type: String,
         required: false
     },
