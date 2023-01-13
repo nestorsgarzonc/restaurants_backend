@@ -1,9 +1,7 @@
 import axios from 'axios';
 
 export const sendPush = async(token:string,title:string,message:string)=>{
-  console.log('/////////////////////////////');
-  console.log(token);
-  console.log('/////////////////////////////');
+    if(!token)return;
     axios.post('https://fcm.googleapis.com/fcm/send',{
       "notification":{
           "title":title,
