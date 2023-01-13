@@ -46,9 +46,9 @@ export const askAccount = async (data) => {
     if (!userId) return;
     const currentTableParsed = await OrderController.askAccountController(orderData);
     //TODO:Añadir notificación push
-    if(data.paymentWay==PaymentWays.Equal || data.paymentWay==PaymentWays.Single){
-        io.to(data.tableId).emit(socketEvents.singlePayment, { table: currentTableParsed,paymentWay:data.paymentWay});
-    }else if(data.paymentWay==PaymentWays.Altogether){
+    if(data.paymentWay==PaymentWays.Split){
+        io.to(data.tableId).emit(socketEvents.singlePayment, { table: currentTableParsed,paymentWay:data.paymentWay,individualPaymentWay:data.individualPaymentWay});
+    }else if(data.paymentWay==PaymentWays.All){
         io.to(data.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
     }
 }

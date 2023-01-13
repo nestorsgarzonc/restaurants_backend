@@ -87,7 +87,7 @@ export const payAccountController = async(userId,data)  => {
     if(alreadyPayed)return {error:`${userNamePayed} ya pagó su cuenta.`};
     await redisClient.set(`table${data.tableId}`, JSON.stringify(currentTableParsed));
     if(allPayed){
-        const orderId = await saveOrderFromRedis(data.tableId,userId,data.tip,data.paymentWay,data.paymentMethod);
+        const orderId = await saveOrderFromRedis(data.tableId,userId,data.tip,data.paymentWay,data.individualPaymentWay,data.paymentMethod);
         return {allPayed,orderId:orderId};
     }
     return {allPayed,table:currentTableParsed};

@@ -17,6 +17,7 @@ export const decodeBase64Img = (base64Img,imgId) => {
       });
 }
 
+//TODO: Borrar imágenes del server
 
 export const uploadImageS3 = async(base64Img,imgId)=>{
     decodeBase64Img(base64Img,imgId);

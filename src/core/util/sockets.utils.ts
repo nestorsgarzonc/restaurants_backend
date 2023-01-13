@@ -69,12 +69,17 @@ export const updateOrderQueueInRedis = async (productId, restaurantId, tableId, 
     return currentOrdersParsed;
 }
 
-export const saveOrderFromRedis = async(tableId,userId,tip,paymentWay,paymentMethod) => {
+export const saveOrderFromRedis = async(tableId,userId,tip,paymentWay,individualPaymentWay,paymentMethod) => {
     
     let currentTable = await redisClient.get(`table${tableId}`);
     let currentTableParsed = JSON.parse(currentTable);
 
     let userOrderIds = [];
+    let equalPrice,individualPayment = false;
+    if(paymentWay==PaymentWays.Split && individualPaymentWay==PaymentWays.Same){
+        equalPrice = Math.ceil(currentTableParsed.totalPrice/currentTableParsed.usersConnected.length);
+        individualPayment = true;
+    }
 
     for (let user of currentTableParsed.usersConnected) {
         let orderProductIds = [];
@@ -110,11 +115,11 @@ export const saveOrderFromRedis = async(tableId,userId,tip,paymentWay,paymentMet
         let payer;
         if(!user.payedBy)payer = userId;
         else payer = user.payedBy;
-
+        if(!individualPayment)equalPrice = user.price;
         const userOrder = new UserOrder({
             userId: user.userId,
             orderProducts: orderProductIds,
-            price: user.price,
+            price: equalPrice,
             payedBy: payer
         });
         await userOrder.save();
@@ -138,7 +143,7 @@ export const saveOrderFromRedis = async(tableId,userId,tip,paymentWay,paymentMet
         mongoUser.ordersStory.push(order._id);
         await mongoUser.save();
     }
-    if(paymentWay==PaymentWays.Altogether){
+    if(paymentWay==PaymentWays.All){
         const payer = currentTableParsed.usersConnected.find(user=>user.userId==userId);
         currentTableParsed.usersConnected.forEach(user=>{
             sendPush(user.deviceToken,"Cuenta pagada",`${payer.firstName} ${payer.lastName} ha pagado toda la cuenta.`)

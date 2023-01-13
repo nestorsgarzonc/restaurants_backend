@@ -53,6 +53,8 @@ export const getCloserRestaurants = async (_: Request, res: Response) => {
     }
 }
 
+
+
 export const createRestaurant = async (req: Request, res: Response) => {
     try {
         const restaurant = new Restaurant(req.body);
