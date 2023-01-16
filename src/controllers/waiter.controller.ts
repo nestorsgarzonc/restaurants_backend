@@ -4,9 +4,17 @@ import { Request, Response, NextFunction } from 'express';
 import Restaurant from '../models/restaurant/restaurant';
 
 export const getWaiter = async (req: Request, res: Response) => {
+    //TODO: wtf where is the method?
 }
 
-
+export const getAllWaiters = async (req: Request, res: Response) => {
+    try {
+        const menus = await Waiter.find();
+        return res.json(menus);
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
 
 export const createWaiter = async (req: Request, res: Response) => {
     const user = await User.findOne({ 'email': req.body.waiterEmail });
