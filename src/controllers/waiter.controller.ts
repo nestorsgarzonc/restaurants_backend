@@ -9,8 +9,8 @@ export const getWaiter = async (req: Request, res: Response) => {
 
 export const getAllWaiters = async (req: Request, res: Response) => {
     try {
-        const menus = await Waiter.find();
-        return res.json(menus);
+        const waiters = await Waiter.find({restaurant : req.header('restaurantId')});
+        return res.json(waiters);
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
