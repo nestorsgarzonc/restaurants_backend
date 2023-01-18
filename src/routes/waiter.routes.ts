@@ -24,6 +24,10 @@ router.post(
     waiterController.createWaiter
 )
 
-
+router.get(
+    '/get-waiters',
+    [tokenIsValid],
+    waiterController.getAllWaiters
+)
 
 export default router
