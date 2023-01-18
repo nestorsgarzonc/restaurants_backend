@@ -35,7 +35,7 @@ export const getOrders = async (req: Request, res: Response) => {
                 select: ['totalPrice', 'createdAt', 'paymentWay', 'paymentMethod'],
                 populate: [{
                     path: 'restaurantId' as 'restaurant',
-                    select: ['address', 'name', 'logoUrl']
+                    select: ['address', 'name', 'logo']
                 },
                 {
                     path: 'usersOrder', match: { userId: userId }, select: ['price']
@@ -145,7 +145,7 @@ export const getOrder = async (req: Request, res: Response) => {
                         }]
                     },
                     {
-                        path: 'productId', select: ['name', 'price', 'imgUrl']
+                        path: 'productId', select: ['name', 'price', 'img']
                     }]
                 },
                 {
@@ -153,7 +153,7 @@ export const getOrder = async (req: Request, res: Response) => {
                 }]
             },
             {
-                path: 'restaurantId', select: ['logoUrl', 'name', 'address']
+                path: 'restaurantId', select: ['logo', 'name', 'address']
             }
             ]);
         if (!order) {

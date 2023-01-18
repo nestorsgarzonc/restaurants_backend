@@ -5,7 +5,7 @@ export class ItemDto {
     name:              string;
     price:             number;
     description:       string;
-    imgUrl:            string;
+    img:            string;
     toppings:          Topping[];
     categoryId:        string;
     note:              string;
@@ -17,7 +17,7 @@ export class ItemDto {
         this.name = data.name;
         this.price = data.price;
         this.description = data.description;
-        this.imgUrl = data.imgUrl;
+        this.img = data.img;
         this.toppings = [];
         data.toppings.forEach(topping=>{
             let options = [];
@@ -58,11 +58,11 @@ export class Option {
     _id:       string;
     name:      string;
     price:     number;
-    imgUrl:    string;
+    img:    string;
     constructor(data:any){
         this._id = data._id;
         this.name = data.name;
         this.price = data.price;
-        this.imgUrl = data.imgUrl;
+        this.img = data.img;
     }
 }
