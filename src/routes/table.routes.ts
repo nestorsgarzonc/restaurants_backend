@@ -15,7 +15,7 @@ router.post(
         body('capacity').isNumeric().withMessage('Capacity must be a number'),
         body('restaurantId').isMongoId().withMessage('Invalid restaurant id'),
         tokenIsValid,
-        checkAdmin,
+        //checkAdmin,
         errorHandler,
     ],
     tableController.createTable

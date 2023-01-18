@@ -4,6 +4,7 @@ import User from '../models/user/user';
 import Table from '../models/restaurant/table';
 import Waiter from '../models/restaurant/waiter';
 import MenuItem from '../models/menu/menuItem';
+import { uploadImageS3 } from '../core/util/s3.utils';
 
 export const getRestaurant = async (req: Request, res: Response) => {
     try {
@@ -58,6 +59,9 @@ export const getCloserRestaurants = async (_: Request, res: Response) => {
 export const createRestaurant = async (req: Request, res: Response) => {
     try {
         const restaurant = new Restaurant(req.body);
+        if(req.body.image)restaurant.image = await uploadImageS3(req.body.image,restaurant._id.toString(),process.env.AWS_S3_BUCKET_NAME_RESTAURANT);
+        if(req.body.logo)restaurant.logo = await uploadImageS3(req.body.logo,`logo${restaurant._id}`,process.env.AWS_S3_BUCKET_NAME_RESTAURANT);
+        console.log(restaurant);
         await restaurant.save();
         return res.json({ msg: 'Restaurant created successfully', restaurant });
     } catch (error) {

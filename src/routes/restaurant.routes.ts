@@ -30,7 +30,7 @@ router.post(
         body('address').trim().isLength({ min: 3 }).withMessage('Address must be at least 3 characters long'),
         body('description').trim().isLength({ min: 3 }).withMessage('Description must be at least 3 characters long'),
         body('email').isEmail().normalizeEmail().withMessage('Invalid email'),
-        body('image').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
+        //body('image').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('logo').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('owner').isMongoId().withMessage('Invalid owner'),
