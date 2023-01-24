@@ -8,23 +8,18 @@ export const s3 = new AWS.S3({
   });
 
 
-export const decodeBase64Img = (base64Img,imgId) => {
-    const buffer =  Buffer.from(base64Img, 'base64');
-    fs.writeFileSync(`img${imgId}.jpg`, buffer,'binary');
-}
 
 export const uploadImageS3 = async(base64Img:string,imgId:string,bucket)=>{
-    decodeBase64Img(base64Img,imgId);
-    const blob = fs.readFileSync(`img${imgId}.jpg`);
-    console.log(blob);
-    const image = jpeg.decode(blob, {useTArray: true});
-    console.log(image);
-    fs.unlink(`img${imgId}.jpg`,(err) => {if (err) throw err;});
+    const buffer =  Buffer.from(base64Img, 'base64');
+    const type = base64Img.split(';')[0].split('/')[1];
     const uploadedImage = await s3.upload({
         Bucket: bucket,
-        Key: `img${imgId}.jpg`,
-        Body: image
+        Key: `img${imgId}`,
+        Body: buffer,
+        ContentEncoding: 'base64',
+        ContentType: `image/${type}`
       }).promise();
+    
     return  uploadedImage.Location;
 
 }

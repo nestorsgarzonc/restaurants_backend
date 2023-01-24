@@ -30,7 +30,7 @@ router.post(
         body('address').trim().isLength({ min: 3 }).withMessage('Address must be at least 3 characters long'),
         body('description').trim().isLength({ min: 3 }).withMessage('Description must be at least 3 characters long'),
         body('email').isEmail().normalizeEmail().withMessage('Invalid email'),
-        //body('image').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
+        body('image').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('logo').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('owner').isMongoId().withMessage('Invalid owner'),
@@ -53,7 +53,6 @@ router.put(
         body('logo').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('menu').isArray().withMessage('Invalid menu').optional({ nullable: true }),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
-        body('owner').isMongoId().withMessage('Invalid owner').optional({ nullable: true }),
         body('phone').isNumeric().withMessage('Phone must be at least 3 characters long').optional({ nullable: true }),
         body('primaryColor').isHexColor().withMessage('Invalid primary color').optional({ nullable: true }),
         body('secondaryColor').isHexColor().withMessage('Invalid secondary color').optional({ nullable: true }),
@@ -63,6 +62,24 @@ router.put(
         errorHandler,
     ],
     restaurantController.updateRestaurant
+)
+
+router.put(
+    '/image/:id',[
+        body('image').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    restaurantController.updateRestaurantImage
+)
+
+router.put(
+    '/logo/:id',[
+        body('logo').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
+        tokenIsValid,
+        errorHandler,
+    ],
+    restaurantController.updateRestaurantLogo
 )
 
 /*router.get(

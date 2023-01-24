@@ -5,7 +5,7 @@ export class ItemDto {
     name:              string;
     price:             number;
     description:       string;
-    img:            string;
+    img:               string;
     toppings:          Topping[];
     categoryId:        string;
     note:              string;
