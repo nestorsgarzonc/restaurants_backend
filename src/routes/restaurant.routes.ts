@@ -34,8 +34,8 @@ router.post(
         body('logo').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('phone').isNumeric().withMessage('Phone must be at least 3 characters long'),
-        body('primaryColor').isRgbColor().withMessage('Invalid primary color').optional({ nullable: true }),
-        body('secondaryColor').isRgbColor().withMessage('Invalid secondary color').optional({ nullable: true }),
+        //body('primaryColor').isRgbColor().withMessage('Invalid primary color').optional({ nullable: true }),
+        //body('secondaryColor').isRgbColor().withMessage('Invalid secondary color').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
     ],
@@ -43,7 +43,7 @@ router.post(
 )
 
 router.put(
-    '/:id',
+    '/',
     [
         body('address').trim().isLength({ min: 3 }).withMessage('Address must be at least 3 characters long').optional({ nullable: true }),
         body('description').trim().isLength({ min: 3 }).withMessage('Description must be at least 3 characters long').optional({ nullable: true }),
@@ -53,8 +53,8 @@ router.put(
         body('menu').isArray().withMessage('Invalid menu').optional({ nullable: true }),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
         body('phone').isNumeric().withMessage('Phone must be at least 3 characters long').optional({ nullable: true }),
-        body('primaryColor').isRgbColor().withMessage('Invalid primary color').optional({ nullable: true }),
-        body('secondaryColor').isRgbColor().withMessage('Invalid secondary color').optional({ nullable: true }),
+        //body('primaryColor').isRgbColor().withMessage('Invalid primary color').optional({ nullable: true }),
+        //body('secondaryColor').isRgbColor().withMessage('Invalid secondary color').optional({ nullable: true }),
         body('tables').isArray().withMessage('Invalid menu').optional({ nullable: true }),
         body('waiters').isArray().withMessage('Invalid menu').optional({ nullable: true }),
         tokenIsValid,
@@ -64,7 +64,7 @@ router.put(
 )
 
 router.put(
-    '/image/:id',[
+    '/image',[
         body('image').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
@@ -73,7 +73,7 @@ router.put(
 )
 
 router.put(
-    '/logo/:id',[
+    '/logo',[
         body('logo').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
