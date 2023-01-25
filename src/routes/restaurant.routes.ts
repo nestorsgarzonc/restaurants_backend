@@ -34,7 +34,7 @@ router.post(
         body('logo').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('phone').isNumeric().withMessage('Phone must be at least 3 characters long'),
-        //body('primaryColor').isRgbColor().withMessage('Invalid primary color').optional({ nullable: true }),
+        //body('primaryColor').matches('/^rgb\((0|255|25[0-4]|2[0-4]\d|1\d\d|0?\d?\d),(0|255|25[0-4]|2[0-4]\d|1\d\d|0?\d?\d),(0|255|25[0-4]|2[0-4]\d|1\d\d|0?\d?\d)\)$/').withMessage('Invalid primary color').optional({ nullable: true }),
         //body('secondaryColor').isRgbColor().withMessage('Invalid secondary color').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,

@@ -5,6 +5,7 @@ import Table from '../models/restaurant/table';
 import Waiter from '../models/restaurant/waiter';
 import MenuItem from '../models/menu/menuItem';
 import { uploadImageS3 } from '../core/util/s3.utils';
+import Admin from '../models/restaurant/admin';
 
 export const getRestaurant = async (req: Request, res: Response) => {
     try {
@@ -60,6 +61,9 @@ export const createRestaurant = async (req: Request, res: Response) => {
     try {
         const restaurant = new Restaurant(req.body);
         restaurant.owner = res.locals.token.userId;
+        const admin = await Admin.findOne({user:restaurant.owner});
+        admin.restaurants.push(restaurant._id);
+        admin.save();
         if(req.body.image)restaurant.image = await uploadImageS3(req.body.image,restaurant._id.toString(),process.env.AWS_S3_RESTAURANT);
         if(req.body.logo)restaurant.logo = await uploadImageS3(req.body.logo,`logo${restaurant._id.toString()}`,process.env.AWS_S3_RESTAURANT);
         console.log(restaurant);
