@@ -20,7 +20,7 @@ router.get(
 )
 
 router.get(
-    '/get-menu/:restaurantId',
+    '/get-menu',
     menuController.getRestaurantMenuWithRestaurantId
 )
 

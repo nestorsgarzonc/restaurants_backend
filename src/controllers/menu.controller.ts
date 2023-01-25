@@ -20,7 +20,7 @@ export const getAllMenus = async (req: Request, res: Response) => {
 export const getRestaurantMenuWithRestaurantId = async (req: Request, res: Response) => {
     //TODO: this is what I need to complete ajaja
     try {
-        const restaurant = await Restaurant.findById(req.params.restaurantId)
+        const restaurant = await Restaurant.findById(req.header('restaurantId'))
             .populate({
                 path: 'menu',
                 populate: {
