@@ -59,6 +59,7 @@ export const getCloserRestaurants = async (_: Request, res: Response) => {
 export const createRestaurant = async (req: Request, res: Response) => {
     try {
         const restaurant = new Restaurant(req.body);
+        restaurant.owner = res.locals.token.userId;
         if(req.body.image)restaurant.image = await uploadImageS3(req.body.image,restaurant._id.toString(),process.env.AWS_S3_RESTAURANT);
         if(req.body.logo)restaurant.logo = await uploadImageS3(req.body.logo,`logo${restaurant._id.toString()}`,process.env.AWS_S3_RESTAURANT);
         console.log(restaurant);
@@ -71,7 +72,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
 
 export const updateRestaurant = async (req: Request, res: Response) => {
     try {
-        const restaurant = await Restaurant.findById(req.params.id);
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
         if (!restaurant) {
             return res.status(404).json({ msg: 'Restaurant not found' });
         }
@@ -86,7 +87,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
 
 export const updateRestaurantImage = async (req: Request, res: Response) =>{
     try {
-        const restaurant = await Restaurant.findById(req.params.id);
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
         if (!restaurant) {
             return res.status(404).json({ msg: 'Restaurant not found' });
         }
@@ -100,7 +101,7 @@ export const updateRestaurantImage = async (req: Request, res: Response) =>{
 
 export const updateRestaurantLogo = async (req: Request, res: Response) =>{
     try {
-        const restaurant = await Restaurant.findById(req.params.id);
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
         if (!restaurant) {
             return res.status(404).json({ msg: 'Restaurant not found' });
         }
