@@ -2,21 +2,25 @@ import { Schema, model, Types } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
 interface Restaurant {
-    address: String;
-    createdAt: Date;
-    description: String;
-    email: String;
-    image?: String;
-    logo?: String;
-    menu: Types.ObjectId[],
-    name: String;
-    owner: Types.ObjectId,
-    phone: Number;
-    primaryColor?: String;
-    secondaryColor?: String;
-    tables: Types.ObjectId[];
-    updatedAt: Date;
-    waiters: Types.ObjectId[];
+    address:           String;
+    createdAt:         Date;
+    description:       String;
+    email:             String;
+    image?:            String;
+    logo?:             String;
+    menu:              Types.ObjectId[];
+    name:              String;
+    owner:             Types.ObjectId;
+    phone:             Number;
+    weekDays:          Object[];
+    paymentMethods:    String[];
+    primaryColor?:     String;
+    secondaryColor?:   String;
+    facebook?:         String;
+    instagram?:        String
+    tables:            Types.ObjectId[];
+    updatedAt:         Date;
+    waiters:           Types.ObjectId[];
 }
 
 const schema = new Schema<Restaurant>({
@@ -46,6 +50,22 @@ const schema = new Schema<Restaurant>({
     secondaryColor: {
         type: String,
     },
+    facebook:{
+        type: String,
+        required: false
+    },
+    instagram:{
+        type: String,
+        required: false
+    },
+    weekDays:[{
+        type: Object,
+        required:true
+    }],
+    paymentMethods:[{
+        type: String,
+        required: true
+    }],
     image: {
         type: String,
         required: false

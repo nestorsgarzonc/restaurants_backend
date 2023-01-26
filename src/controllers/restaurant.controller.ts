@@ -5,6 +5,7 @@ import Table from '../models/restaurant/table';
 import Waiter from '../models/restaurant/waiter';
 import MenuItem from '../models/menu/menuItem';
 import { uploadImageS3 } from '../core/util/s3.utils';
+import Admin from '../models/restaurant/admin';
 
 export const getRestaurant = async (req: Request, res: Response) => {
     try {
@@ -59,8 +60,12 @@ export const getCloserRestaurants = async (_: Request, res: Response) => {
 export const createRestaurant = async (req: Request, res: Response) => {
     try {
         const restaurant = new Restaurant(req.body);
-        if(req.body.image)restaurant.image = await uploadImageS3(req.body.image,restaurant._id.toString(),process.env.AWS_S3_BUCKET_NAME_RESTAURANT);
-        if(req.body.logo)restaurant.logo = await uploadImageS3(req.body.logo,`logo${restaurant._id}`,process.env.AWS_S3_BUCKET_NAME_RESTAURANT);
+        restaurant.owner = res.locals.token.userId;
+        const admin = await Admin.findOne({user:restaurant.owner});
+        admin.restaurants.push(restaurant._id);
+        admin.save();
+        if(req.body.image)restaurant.image = await uploadImageS3(req.body.image,restaurant._id.toString(),process.env.AWS_S3_RESTAURANT);
+        if(req.body.logo)restaurant.logo = await uploadImageS3(req.body.logo,`logo${restaurant._id.toString()}`,process.env.AWS_S3_RESTAURANT);
         console.log(restaurant);
         await restaurant.save();
         return res.json({ msg: 'Restaurant created successfully', restaurant });
@@ -71,16 +76,48 @@ export const createRestaurant = async (req: Request, res: Response) => {
 
 export const updateRestaurant = async (req: Request, res: Response) => {
     try {
-        const restaurant = await Restaurant.findById(req.params.id);
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
         if (!restaurant) {
             return res.status(404).json({ msg: 'Restaurant not found' });
         }
+        if(req.body.image)req.body.image = await uploadImageS3(req.body.image,restaurant._id.toString(),process.env.AWS_S3_RESTAURANT);
+        if(req.body.logo)req.body.logo = await uploadImageS3(req.body.logo,`logo${restaurant._id.toString()}`,process.env.AWS_S3_RESTAURANT);
         await restaurant.updateOne(req.body);
         return res.json({ msg: 'Restaurant updated successfully', restaurant });
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
 }
+
+export const updateRestaurantImage = async (req: Request, res: Response) =>{
+    try {
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        if (!restaurant) {
+            return res.status(404).json({ msg: 'Restaurant not found' });
+        }
+        if(req.body.image)req.body.image = await uploadImageS3(req.body.image,restaurant._id.toString(),process.env.AWS_S3_RESTAURANT);
+        await restaurant.updateOne(req.body);
+        return res.json({ msg: 'Restaurant image updated successfully', restaurant });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+export const updateRestaurantLogo = async (req: Request, res: Response) =>{
+    try {
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        if (!restaurant) {
+            return res.status(404).json({ msg: 'Restaurant not found' });
+        }
+        if(req.body.logo)req.body.logo = await uploadImageS3(req.body.logo,`logo${restaurant._id.toString()}`,process.env.AWS_S3_RESTAURANT);
+        await restaurant.updateOne(req.body);
+        return res.json({ msg: 'Restaurant logo updated successfully', restaurant });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+
 
 //TODO: Table's methods into restaurant controller
 

@@ -15,21 +15,22 @@ router.get(
 )
 
 router.get(
+    '/get-menu/',
+    menuController.getRestaurantMenuWithRestaurantId
+)
+
+router.get(
     //TODO: get all menu
     '/:tableId',
     menuController.getRestaurantMenu,
 )
 
-router.get(
-    '/get-menu/:restaurantId',
-    menuController.getRestaurantMenuWithRestaurantId
-)
+
 
 router.post(
     //This is where I create a category
     '/category/:restaurantId',
     [
-        param('restaurantId').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('description').trim().optional({nullable:true}),
@@ -74,7 +75,7 @@ router.post(
         param('categoryId').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long').optional({ nullable: true }),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
-        //body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
+        body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('toppings').isArray().withMessage('Invalid menu').optional({ nullable: true }),
         body('isAvaliable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
         body('discount').isNumeric().withMessage('Discount must be a number').optional({ nullable: true }),
@@ -176,7 +177,7 @@ router.post(
         param('toppingId').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
-        //body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
+        body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
     ],
@@ -189,7 +190,7 @@ router.put(
         param('id').isMongoId().withMessage('Path param is not a mongo Id'),
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
-        //body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
+        body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
     ],
