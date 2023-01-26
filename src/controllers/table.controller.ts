@@ -6,75 +6,79 @@ import { redisClient } from '../core/sockets';
 export const createTable = async (req: Request, res: Response) => {
     try {
         //Look that table's not created at the same restaurant
-        const tableExists = await Table.findOne({ 'name': req.body.name, 'restaurantId': req.headers.restaurantId });
+        const restaurantId = req.header('restaurantId');
+        const tableExists = await Table.findOne({ 'name': req.body.name, 'restaurantId': restaurantId });
         if (tableExists) return res.status(403).json({ msg: 'The table already exists' })
-        const table = new Table(req.body);
-        const restaurant = await Restaurant.findById(req.headers.restaurantId);
+        const table = new Table({
+            restaurantId: restaurantId,
+            name: req.body.name
+        });
+        const restaurant = await Restaurant.findById(restaurantId);
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
         await table.save();
         restaurant.tables.push(table._id);
         await restaurant.save();
-        return res.status(201).json({ msg: 'Table created succesfully!!',table})
+        return res.status(201).json({ msg: 'Table created succesfully!!', table })
     } catch (error) {
         return res.status(404).json({ msg: error.message })
     }
 }
 
-export const editTable = async(req:Request,res:Response) => {
-    try{
+export const editTable = async (req: Request, res: Response) => {
+    try {
         const table = await Table.findById(req.body.tableId);
-        if(!table)return res.status(404).json({ msg: 'The table does not exist' });
+        if (!table) return res.status(404).json({ msg: 'The table does not exist' });
         table.name = req.body.name;
         await table.save();
-        return res.status(201).json({msg:'Table updated succesfully'});
-    }catch(error){
-        return res.status(404).json({msg: error.message});
+        return res.status(201).json({ msg: 'Table updated succesfully' });
+    } catch (error) {
+        return res.status(404).json({ msg: error.message });
     }
 }
 
-export const deleteTable = async(req:Request,res:Response)=>{
-    try{
+export const deleteTable = async (req: Request, res: Response) => {
+    try {
         const table = await Table.findById(req.body.tableId);
-        if(!table)return res.status(404).json({ msg: 'The table does not exist' });
+        if (!table) return res.status(404).json({ msg: 'The table does not exist' });
         const restaurant = await Restaurant.findById(table.restaurantId);
-        if(!restaurant)return res.status(404).json({ msg: 'The restaurant does not exist' });
+        if (!restaurant) return res.status(404).json({ msg: 'The restaurant does not exist' });
         const tableIndex = restaurant.tables.indexOf(req.body.tableId);
-        if (tableIndex > -1) { 
-            restaurant.tables.splice(tableIndex, 1); 
-        } 
+        if (tableIndex > -1) {
+            restaurant.tables.splice(tableIndex, 1);
+        }
         await restaurant.save();
-        await Table.deleteOne({_id:table._id});
-        return res.status(201).json({msg:'Table deleted succesfully'});
-    }catch(error){
-        return res.status(404).json({msg: error.message});
+        await Table.deleteOne({ _id: table._id });
+        return res.status(201).json({ msg: 'Table deleted succesfully' });
+    } catch (error) {
+        return res.status(404).json({ msg: error.message });
     }
 }
 
-export const getTable = async(req:Request,res:Response)=>{
-    try{
+export const getTable = async (req: Request, res: Response) => {
+    try {
         const table = await Table.findById(req.body.tableId);
-        if(!table)return res.status(404).json({ msg: 'The table does not exist' });
-        return res.status(200).json({table});
-    }catch(error){
-        return res.status(404).json({msg: error.message});
+        if (!table) return res.status(404).json({ msg: 'The table does not exist' });
+        return res.status(200).json({ table });
+    } catch (error) {
+        return res.status(404).json({ msg: error.message });
     }
 }
 
-export const getUsersByTable = async(req: Request, res: Response) => {
-    
+export const getUsersByTable = async (req: Request, res: Response) => {
+
     let currentTable = await redisClient.get(`table${req.body.tableId}`);
-    if(!currentTable) res.json({msg: "No user conected to this table"})
+    if (!currentTable) res.json({ msg: "No user conected to this table" })
     let currentTableParsed = JSON.parse(currentTable);
 
     let usersList = []
 
     currentTableParsed.usersConnected.forEach(user => {
         console.log(user.userId);
-        if(user.userId != req.body.tableId){
-            usersList.push({userid: user.userId, firstName: user.firstName, lastName: user.lastName});            
+        if (user.userId != req.body.tableId) {
+            usersList.push({ userid: user.userId, firstName: user.firstName, lastName: user.lastName });
         }
     });
 
-    res.json({users: usersList})
+    res.json({ users: usersList })
 
 }

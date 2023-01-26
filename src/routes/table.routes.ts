@@ -57,8 +57,8 @@ router.post(
     '/get-users-by-table',
     [
         body('tableId').isMongoId(),
-        tokenIsValid, 
-        errorHandler],    
+        tokenIsValid,
+        errorHandler],
     tableController.getUsersByTable
 )
 
@@ -67,7 +67,7 @@ router.put(
     '/get-user-orders',
     [
         body('tableId').isMongoId(),
-        tokenIsValid, 
+        tokenIsValid,
         errorHandler],
     userController.updateUser
 )
