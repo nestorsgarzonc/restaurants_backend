@@ -12,10 +12,8 @@ router.post(
     '/',
     [
         body('name').trim().isLength({ min: 1 }).withMessage('Name must be at least 1 characters long'),
-        body('capacity').isNumeric().withMessage('Capacity must be a number'),
-        body('restaurantId').isMongoId().withMessage('Invalid restaurant id'),
         tokenIsValid,
-        //checkAdmin,
+        checkAdmin,
         errorHandler,
     ],
     tableController.createTable
@@ -25,8 +23,6 @@ router.put(
     '/',
     [
         body('tableId').trim().isMongoId().withMessage('Invalid tableId'),
-        body('name').trim().isLength({ min: 1 }).withMessage('Name must be at least 1 characters long'),
-        body('capacity').isNumeric().withMessage('Capacity must be a number'),
         tokenIsValid,
         checkAdmin,
         errorHandler,

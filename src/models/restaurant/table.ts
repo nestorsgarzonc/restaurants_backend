@@ -2,7 +2,6 @@ import { Schema, model, Types } from 'mongoose';
 
 class Table {
     name: String;
-    capacity: Number;
     restaurantId: Types.ObjectId;
     status: String;
     createdAt: Date;
@@ -22,10 +21,6 @@ const schema = new Schema<Table>({
     name: {
         type: String,
         required: true
-    },
-    capacity: {
-        type: Number,
-        default: 4
     },
     restaurantId: {
         type: Schema.Types.ObjectId,

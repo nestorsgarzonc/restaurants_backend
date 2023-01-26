@@ -6,12 +6,11 @@ import { redisClient } from '../core/sockets';
 export const createTable = async (req: Request, res: Response) => {
     try {
         //Look that table's not created at the same restaurant
-        const tableExists = await Table.findOne({ 'name': req.body.name, 'restaurantId': req.body.restaurantId });
+        const tableExists = await Table.findOne({ 'name': req.body.name, 'restaurantId': req.headers.restaurantId });
         if (tableExists) return res.status(403).json({ msg: 'The table already exists' })
         const table = new Table(req.body);
-        const restaurant = await Restaurant.findById(req.body.restaurantId);
+        const restaurant = await Restaurant.findById(req.headers.restaurantId);
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
-        
         await table.save();
         restaurant.tables.push(table._id);
         await restaurant.save();
@@ -26,7 +25,6 @@ export const editTable = async(req:Request,res:Response) => {
         const table = await Table.findById(req.body.tableId);
         if(!table)return res.status(404).json({ msg: 'The table does not exist' });
         table.name = req.body.name;
-        table.capacity = req.body.capacity;
         await table.save();
         return res.status(201).json({msg:'Table updated succesfully'});
     }catch(error){
