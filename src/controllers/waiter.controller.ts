@@ -8,8 +8,11 @@ export const getWaiter = async (req: Request, res: Response) => {
 }
 
 export const getAllWaiters = async (req: Request, res: Response) => {
+    console.log("Endpoint Reached")
     try {
+        console.log("Entered - Data sent:", req);
         const waiters = await Waiter.find({restaurant : req.header('restaurantId')});
+        console.log("waiters found:", waiters);
         return res.json(waiters);
     } catch (error) {
         return res.status(400).json({ msg: error });

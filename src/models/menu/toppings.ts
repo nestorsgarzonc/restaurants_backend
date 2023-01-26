@@ -7,6 +7,7 @@ interface Toppings {
     menuId: Types.ObjectId;
     minOptions?: Number;
     maxOptions?: Number;
+    isAvaliable: Boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -40,6 +41,10 @@ const scheme = new Schema<Toppings>({
         type: Number,
         required: false,
         default: 1
+    },
+    isAvaliable: {
+        type: Boolean,
+        default: true,
     }
 }, { timestamps: true });
 

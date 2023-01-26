@@ -3,6 +3,7 @@ import { tokenIsValid } from "../middlewares/auth.middleware";
 import * as menuController from '../controllers/menu.controller';
 import { errorHandler } from "../middlewares/errors.middleware";
 import { body,param } from "express-validator";
+import { checkAdmin } from "../middlewares/checkAdmin.middleware";
 
 const router = Router()
 
@@ -135,6 +136,7 @@ router.post(
         body('options').isArray().withMessage('Invalid options').optional({ nullable: true }),
         body('minOptions').isNumeric().withMessage('Min toppings must be a number').optional({ nullable: true }),
         body('maxOptions').isNumeric().withMessage('Max toppings must be a number').optional({ nullable: true }),
+        body('isAvailable').isBoolean().withMessage('Availability must be a boolean').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
     ],
@@ -151,6 +153,7 @@ router.put(
         body('menuId').isMongoId().withMessage('Invalid menu Id'),
         body('minOptions').isNumeric().withMessage('Min toppings must be a number').optional({ nullable: true }),
         body('maxOptions').isNumeric().withMessage('Max toppings must be a number').optional({ nullable: true }),
+        body('isAvailable').isBoolean().withMessage('Availability must be a boolean').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
     ],
@@ -201,6 +204,39 @@ router.delete(
         tokenIsValid
     ],
     menuController.deleteOption,
+)
+
+router.put(
+    '/setDiscount/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        body('discount').isNumeric().withMessage('discount must be a number').optional({ nullable: true }),
+        tokenIsValid,
+        // checkAdmin
+    ],
+    menuController.setDiscount
+)
+
+router.put(
+    '/menuItemAvailability/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        body('isAvailable').isBoolean().withMessage('Availability must be a boolean').optional({ nullable: true }),
+        tokenIsValid,
+        checkAdmin
+    ],
+    //menuController.setMenuItemAvailability
+)
+
+router.put(
+    '/toppingAvailability/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        body('isAvailable').isBoolean().withMessage('Availability must be a boolean').optional({ nullable: true }),
+        tokenIsValid,
+        checkAdmin
+    ],
+    //menuController.setToppingAvailability
 )
 
 export default router

@@ -25,7 +25,7 @@ router.post(
 )
 
 router.get(
-    '/get-waiters',
+    '/getWaiters',
     [tokenIsValid],
     waiterController.getAllWaiters
 )

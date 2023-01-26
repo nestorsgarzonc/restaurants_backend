@@ -303,3 +303,24 @@ export const deleteOption = async (req: Request, res: Response) => {
         return res.status(400).json({ msg: error });
     }
 }
+
+export const setDiscount = async (req: Request, res: Response) => {
+    console.log("Entered - req sent:", req);
+    if (req.body.discount > 1 || req.body.discount < 0) {
+        return res.status(404).json({ msg: 'Discount must be a number between 0 and 1' });
+    }
+    try {
+        console.log("looking for menuItem");
+        const menuItem = await Menu.findById(req.params.id);
+        if (!menuItem) {
+            return res.status(404).json({ msg: 'Menu item not found' });
+        }
+        console.log("menuItem found:", menuItem);
+        menuItem.discount = req.body.discount;
+        console.log("new menuItem:", menuItem);
+        await menuItem.save();
+        return res.json({ msg: 'Menu item updated successfully', menuItem });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
