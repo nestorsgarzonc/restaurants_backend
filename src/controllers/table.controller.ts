@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Restaurant from '../models/restaurant/restaurant';
 import Table from '../models/restaurant/table'
 import { redisClient } from '../core/sockets';
+import { SageMakerFeatureStoreRuntime } from 'aws-sdk';
 
 export const createTable = async (req: Request, res: Response) => {
     try {
@@ -40,14 +41,13 @@ export const deleteTable = async (req: Request, res: Response) => {
     try {
         const table = await Table.findById(req.body.tableId);
         if (!table) return res.status(404).json({ msg: 'The table does not exist' });
+        if (table.restaurantId.toString() != req.header('restaurantId')) {
+            return res.status(403).json({ msg: 'You are not allowed to delete this table' });
+        }
         const restaurant = await Restaurant.findById(table.restaurantId);
         if (!restaurant) return res.status(404).json({ msg: 'The restaurant does not exist' });
-        const tableIndex = restaurant.tables.indexOf(req.body.tableId);
-        if (tableIndex > -1) {
-            restaurant.tables.splice(tableIndex, 1);
-        }
-        await restaurant.save();
-        await Table.deleteOne({ _id: table._id });
+        restaurant.tables = restaurant.tables.filter((table) => table != req.body.tableId);
+        await Promise.all([restaurant.save(), table.remove()]);
         return res.status(201).json({ msg: 'Table deleted succesfully' });
     } catch (error) {
         return res.status(404).json({ msg: error.message });
