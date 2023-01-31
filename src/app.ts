@@ -12,6 +12,8 @@ import { configEnv } from "./core/config_env";
 import { socketServer } from "./core/sockets";
 import { logger } from "./core/logger/custom_logger";
 
+
+
 configEnv();
 db();
 

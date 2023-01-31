@@ -29,7 +29,7 @@ router.get(
 
 router.post(
     //This is where I create a category
-    '/category/:restaurantId',
+    '/category',
     [
         body('name').trim().isLength({ min: 3 }).withMessage('Name must be at least 3 characters long'),
         body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
@@ -41,7 +41,6 @@ router.post(
 )
 
 router.put(
-    //This is where I create a category
     '/category/:id',
     [
         param('id').isMongoId().withMessage('Path param is not a mongo Id'),

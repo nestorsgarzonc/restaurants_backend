@@ -5,7 +5,7 @@ import Topping from '../models/menu/toppings';
 import Category from '../models/menu/category';
 import ToppingOption from '../models/menu/toppingOption';
 import Table from '../models/restaurant/table';
-import { uploadImageS3 } from '../core/util/s3.utils';
+import { uploadImageS3,updateImageS3 } from '../core/util/s3.utils';
 
 export const getAllMenus = async (req: Request, res: Response) => {
     //TODO: where do we use this method
@@ -61,10 +61,10 @@ export const getRestaurantMenu = async (req: Request, res: Response) => {
 export const createCategory = async (req: Request, res: Response) => {
     try {
         
-        const restaurant = await Restaurant.findById(req.params.restaurantId);
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
         const category = new Category(req.body);
-        if(req.body.img)category.img = await uploadImageS3(req.body.img,category._id.toString(),process.env.AWS_S3_MENU_PRODUCTS);
+        if(req.body.img)category.img = await uploadImageS3(req.body.img,process.env.AWS_S3_MENU_PRODUCTS);
         restaurant.menu.push(category._id);
         category.restaurantId = restaurant._id;
         await restaurant.save();
@@ -77,8 +77,8 @@ export const createCategory = async (req: Request, res: Response) => {
 
 export const updateCategory = async (req: Request, res: Response) => {
     try {
-        const category = Category.findById(req.params.id);
-        if(req.body.img)req.body.img = await uploadImageS3(req.body.img,req.params.id,process.env.AWS_S3_MENU_PRODUCTS);
+        const category = await Category.findById(req.params.id);
+        if(req.body.img)req.body.img = await updateImageS3(req.body.img,category.img,process.env.AWS_S3_MENU_PRODUCTS);
         if(!category)throw new Error('Category not found');
         await category.updateOne(req.body);
         return res.json({ msg: 'Category updated successfully', category });
@@ -126,7 +126,7 @@ export const createMenu = async (req: Request, res: Response) => {
             return res.status(404).json({ msg: 'Category not found' });
         }
         const menuItem = new Menu(req.body);
-        if(req.body.img)menuItem.img = await uploadImageS3(req.body.img,menuItem._id.toString(),process.env.AWS_S3_MENU_PRODUCTS);
+        if(req.body.img)menuItem.img = await uploadImageS3(req.body.img,process.env.AWS_S3_MENU_PRODUCTS);
         category.menuItems.push(menuItem._id);
         menuItem.categoryId = category._id;
         await category.save();
@@ -143,7 +143,7 @@ export const updateMenu = async (req: Request, res: Response) => {
         if (!menuItem) {
             return res.status(404).json({ msg: 'Menu item not found' });
         }
-        if(req.body.img)req.body.img = await uploadImageS3(req.body.img,req.params.id,process.env.AWS_S3_MENU_PRODUCTS);
+        if(req.body.img)req.body.img = await updateImageS3(req.body.img,menuItem.img,process.env.AWS_S3_MENU_PRODUCTS);
         await menuItem.updateOne(req.body);
         return res.json({ msg: 'Menu item updated successfully', menuItem });
     } catch (error) {
@@ -266,7 +266,7 @@ export const addToppingOptionToTopping = async (req: Request, res: Response) => 
         const topping = await Topping.findById(req.params.toppingId);
         if (!topping) return res.status(404).json({ msg: 'Topping not found' });
         const toppingOption = new ToppingOption(req.body);
-        if(req.body.img)toppingOption.img = await uploadImageS3(req.body.img,toppingOption._id.toString(),process.env.AWS_S3_MENU_PRODUCTS);
+        if(req.body.img)toppingOption.img = await uploadImageS3(req.body.img,process.env.AWS_S3_MENU_PRODUCTS);
         toppingOption.toppingId = topping._id;
         await toppingOption.save();
         topping.options.push(toppingOption._id);
@@ -283,7 +283,7 @@ export const updateOption = async (req: Request, res: Response) => {
         if (!option) {
             return res.status(404).json({ msg: 'Topping item not found' });
         }
-        if(req.body.img)req.body.img = await uploadImageS3(req.body.img,req.params.id,process.env.AWS_S3_MENU_PRODUCTS);
+        if(req.body.img)req.body.img = await updateImageS3(req.body.img,option.img,process.env.AWS_S3_MENU_PRODUCTS);
         await option.updateOne(req.body);
         return res.json({ msg: 'Menu item updated successfully', option});
     } catch (error) {
