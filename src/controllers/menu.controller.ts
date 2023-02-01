@@ -107,7 +107,19 @@ export const deleteCategory = async (req: Request, res: Response) => {
 }
 
 
-
+export const changeCategoryOrder = async(req:Request,res:Response)=>{
+    try{
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        const categoryIndex = restaurant.menu.indexOf(req.body.categoryId);
+        const tmpCategory = restaurant.menu[req.body.newIndex];
+        restaurant.menu[req.body.newIndex] = req.body.categoryId;
+        restaurant.menu[categoryIndex] = tmpCategory;
+        await restaurant.save();
+        return res.status(200).json(restaurant); 
+    }catch(error){
+        return res.status(400).json({msg:error});
+    }
+}
 
 export const getAllCategories = async (req: Request, res: Response) => {
 

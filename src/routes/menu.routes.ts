@@ -52,6 +52,19 @@ router.put(
     ],
     menuController.updateCategory,
 )
+
+router.post(
+    '/category/reorder/',
+    [
+        body('categoryId').isMongoId().withMessage('Category Id is not a mongo Id'),
+        body('newIndex').isNumeric().withMessage('Invalid array position'),
+        tokenIsValid,
+        errorHandler
+    ],
+    menuController.changeCategoryOrder
+)
+
+
 //TODO: Arreglar el tema de las imágenes
 router.delete(
     //This is where I create a category
