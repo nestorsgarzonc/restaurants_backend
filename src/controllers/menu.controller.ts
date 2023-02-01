@@ -182,6 +182,21 @@ export const deleteMenu = async (req: Request, res: Response) => {
     }
 }
 
+export const changeMenuOrder = async(req:Request,res:Response)=>{
+    try{
+        const category = await Category.findById(req.body.categoryId);
+        const itemIndex = category.menuItems.indexOf(req.body.menuItemId);
+        const tmpItem = category.menuItems[req.body.newIndex];
+        category.menuItems[req.body.newIndex] = req.body.categoryId;
+        category.menuItems[itemIndex] = tmpItem;
+        await category.save();
+        return res.status(200).json(category); 
+    }catch(error){
+        return res.status(400).json({msg:error});
+    }
+}
+
+
 export const getMenuToppings = async (req: Request, res: Response) => {
     try {
         const menu = await Menu.findById(req.params.id)

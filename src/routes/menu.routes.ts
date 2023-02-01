@@ -117,13 +117,24 @@ router.delete(
     '/item/:id',
     [
         param('id').isMongoId().withMessage('Path param is not a mongo Id'),
-        tokenIsValid
+        tokenIsValid,
+        errorHandler
     ],
-    menuController.deleteMenu,
+    menuController.deleteMenu
 )
 
 
-
+router.post(
+    '/item/reorder',
+    [
+        body('categoryId').isMongoId().withMessage('Category id is not a mongo Id'),
+        body('newIndex').isNumeric().withMessage('Invalid array position'),
+        body('menuItemId').isMongoId().withMessage('Item id is not a mongo Id'),
+        tokenIsValid,
+        errorHandler
+    ],
+    menuController.changeMenuOrder
+)
 
 
 router.get(
