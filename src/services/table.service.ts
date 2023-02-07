@@ -10,8 +10,9 @@ export const join = async (data) => {
     console.log(data);
     let userId = await checkUser(data.token);
     if (!userId) return;
-    let { user, currentTableParsed } = await TableController.joinController(userId, data.tableId);
+    let { user, currentTableParsed,restaurantId } = await TableController.joinController(userId, data.tableId);
     socket.join(data.tableId);
+    socket.join(`bus_${restaurantId}`);
     io.to(data.tableId).emit(socketEvents.newUserJoined, { table: currentTableParsed, 'connected': true, userName: `${user.firstName} ${user.lastName}` });
 };
 

@@ -8,6 +8,7 @@ import * as OrderService from '../services/order.service';
 import * as WaiterService from '../services/waiter.service';
 import * as SocketService from '../services/socket.service';
 import * as RestaurantService from '../services/restaurant.service';
+import * as MenuService from '../services/menu.service';
 import RedisClient, { RedisClientType } from '@redis/client/dist/lib/client';
 import { logger } from './logger/custom_logger';
 
@@ -48,6 +49,7 @@ const onConection = (socket) => {
     socket.on('waiter:add-item-to-table', errorHandlerSocket(WaiterService.addItemToTable))
     socket.on('waiter:leave-table', errorHandlerSocket(WaiterService.leaveTable))
 
+    socket.on('menu:update',errorHandlerSocket(MenuService.updateMenu))
 }
 
 export const socketServer = async (app) => {

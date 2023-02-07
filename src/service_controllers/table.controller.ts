@@ -8,7 +8,7 @@ import { PaymentStatus } from "../models_sockets/userConnected";
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
-    
+    const table = await Table.findById(tableId);
     let [_, currentTable] = await Promise.all([
         Table.findOneAndUpdate({ _id: tableId }, { status: TableStatus.Ordering }),
         redisClient.get(`table${tableId}`)
@@ -25,7 +25,7 @@ export const joinController = async (userId, tableId) => {
         }
     }
     console.log(currentTableParsed);
-    return { user, currentTableParsed };
+    return { user, currentTableParsed,restaurantId:table.restaurantId };
 }
 //TODO: Si se vacía la mesa, se borra del redis y se retorna null.
 //Si la mesa no existe y se cambia el estado, se añade al redis estando vacía y se retorna.

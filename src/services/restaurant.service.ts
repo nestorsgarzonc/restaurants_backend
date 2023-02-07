@@ -10,6 +10,7 @@ export const join = async (data) => {
     if (!userId) return;
     const { tables, callingTables, ordersParsed } = await RestaurantController.getTableListController(data);
     socket.join(data.restaurantId);
+    socket.join(`bus_${data.restaurantId}`);
     console.log("data emited to restaurant:tables ->", tables);
     io.to(data.restaurantId).emit(socketEvents.restaurantTables, { tables: tables });
     console.log("data emited to customer_requests ->", callingTables);

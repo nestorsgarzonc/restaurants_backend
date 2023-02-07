@@ -7,3 +7,4 @@ export const orderQueue = 'order_queue';
 export const error = 'error';
 export const singlePayment = 'single_payment';
 export const EqualPayment = 'equal_payment';
+export const updateMenu = 'menu:update';
