@@ -9,6 +9,7 @@ import Table from '../models/restaurant/table';
 import { uploadImageS3,updateImageS3 } from '../core/util/s3.utils';
 import { io, socket } from '../core/sockets';
 import * as eventNames from '../core/constants/sockets.events';
+import { menuUpdated } from '../core/constants/bus.events';
 
 export const getAllMenus = async (req: Request, res: Response) => {
     //TODO: where do we use this method
@@ -59,7 +60,7 @@ export const createCategory = async (req: Request, res: Response) => {
         await restaurant.save();
         await category.save();
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${restaurant._id}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${restaurant._id}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Category created successfully', category });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -73,7 +74,7 @@ export const updateCategory = async (req: Request, res: Response) => {
         if(!category)throw new Error('Category not found');
         await category.updateOne(req.body);
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Category updated successfully', category });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -94,7 +95,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
         await restaurant.save();
         await Category.deleteOne({_id:category._id});
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Category deleted successfully' });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -111,7 +112,7 @@ export const changeCategoryOrder = async(req:Request,res:Response)=>{
         restaurant.menu[categoryIndex] = tmpCategory;
         await restaurant.save();
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.status(200).json(restaurant); 
     }catch(error){
         return res.status(400).json({msg:error});
@@ -141,7 +142,7 @@ export const createMenu = async (req: Request, res: Response) => {
         await category.save();
         await menuItem.save();
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Menu item created successfully', menuItem });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -157,7 +158,7 @@ export const updateMenu = async (req: Request, res: Response) => {
         if(req.body.img)req.body.img = await updateImageS3(req.body.img,menuItem.img,process.env.AWS_S3_MENU_PRODUCTS);
         await menuItem.updateOne(req.body);
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Menu item updated successfully', menuItem });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -192,7 +193,7 @@ export const changeMenuOrder = async(req:Request,res:Response)=>{
         category.menuItems[itemIndex] = tmpItem;
         await category.save();
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.status(200).json(category); 
     }catch(error){
         return res.status(400).json({msg:error});
@@ -251,7 +252,7 @@ export const addToppingToMenu = async (req: Request, res: Response) => {
         menu.toppings.push(topping._id);
         await menu.save();
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Topping added to menu successfully', topping });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -266,7 +267,7 @@ export const updateTopping = async (req: Request, res: Response) => {
         }
         await topping.updateOne(req.body);
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Menu item updated successfully', topping});
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -291,7 +292,7 @@ export const deleteToppingFromMenu = async (req: Request, res: Response) => {
         await menu.save();
         await Topping.deleteOne({_id:topping._id});
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
@@ -308,7 +309,7 @@ export const addToppingOptionToTopping = async (req: Request, res: Response) => 
         topping.options.push(toppingOption._id);
         await topping.save();
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Topping Option added to menu successfully', toppingOption });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -324,7 +325,7 @@ export const updateOption = async (req: Request, res: Response) => {
         if(req.body.img)req.body.img = await updateImageS3(req.body.img,option.img,process.env.AWS_S3_MENU_PRODUCTS);
         await option.updateOne(req.body);
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
         return res.json({ msg: 'Menu item updated successfully', option});
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -348,7 +349,7 @@ export const deleteOption = async (req: Request, res: Response) => {
         await topping.save();
         await option.deleteOne({_id:topping._id});
         const restaurantMenu = await getRestaurantWithMenu(req.header('restaurantId'));
-        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.updateMenu,{menu:restaurantMenu});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated,menu:restaurantMenu});
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
