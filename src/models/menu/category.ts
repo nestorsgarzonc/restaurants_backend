@@ -6,7 +6,7 @@ interface Category {
     description: String;
     menuItems: Types.ObjectId[];
     restaurantId: Types.ObjectId;
-    isAvaliable: Boolean;
+    isAvailable: Boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -34,7 +34,7 @@ const scheme = new Schema<Category>({
         ref: 'MenuItem',
         default: []
     }],
-    isAvaliable: {
+    isAvailable: {
         type: Boolean,
         default: true,
     },

@@ -7,7 +7,7 @@ interface Toppings {
     menuId: Types.ObjectId;
     minOptions?: Number;
     maxOptions?: Number;
-    isAvaliable: Boolean;
+    isAvailable: Boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -42,7 +42,7 @@ const scheme = new Schema<Toppings>({
         required: false,
         default: 1
     },
-    isAvaliable: {
+    isAvailable: {
         type: Boolean,
         default: true,
     }

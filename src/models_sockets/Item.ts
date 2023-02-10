@@ -11,7 +11,7 @@ export class ItemDto {
     note:              string;
     totalWithToppings: number;
     uuid:              string;
-    isAvaliable:       boolean;
+    isAvailable:       boolean;
     constructor(data: any){
         this._id = data._id;
         this.name = data.name;
@@ -29,7 +29,7 @@ export class ItemDto {
         this.note = data.note;
         this.totalWithToppings = data.totalWithToppings;
         this.uuid = data.uuid;
-        this.isAvaliable = data.isAvaliable;
+        this.isAvailable = data.isAvailable;
         if(!this.uuid)throw new Error('No se envío el uuid correspondiente');
         if(!this.totalWithToppings)throw new Error('No llegó el costo del plato');
         if(!data.toppings)throw new Error('No se enviaron los toppings');

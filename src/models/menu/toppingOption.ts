@@ -5,6 +5,7 @@ interface ToppingOption {
     price: Number;
     img?: String;
     toppingId: Types.ObjectId;
+    isAvailable: Boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -21,6 +22,10 @@ const scheme = new Schema<ToppingOption>({
     img: {
         type: String,
         required: false
+    },
+    isAvailable: {
+        type: Boolean,
+        default: true,
     },
     toppingId:{
         type: Schema.Types.ObjectId,
