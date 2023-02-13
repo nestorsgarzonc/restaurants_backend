@@ -124,6 +124,7 @@ export const payAccount = async (req: Request, res: Response) => {
     
 
     io.to(req.body.tableId).emit(socketEvents.onPayedAccount, { orderId: orderId });
+    console.log(`Order completed: ${orderId}`);
     return res.json({ msg: 'User order created successfully', orderId:orderId });
 
 }

@@ -53,6 +53,16 @@ router.put(
     menuController.updateCategory,
 )
 
+router.put(
+    '/category/available/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.availableCategory
+)
+
 router.post(
     '/category/reorder/',
     [
@@ -89,7 +99,7 @@ router.post(
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('toppings').isArray().withMessage('Invalid menu').optional({ nullable: true }),
-        body('isAvaliable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
+        body('isAvailable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
         body('discount').isNumeric().withMessage('Discount must be a number').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
@@ -105,12 +115,22 @@ router.put(
         body('price').isNumeric().withMessage('Price must be a number').optional({ nullable: true }),
         body('img').isBase64().withMessage('Invalid image format').optional({ nullable: true }),
         body('toppings').isArray().withMessage('Invalid menu').optional({ nullable: true }),
-        body('isAvaliable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
+        body('isAvailable').isBoolean().withMessage('Invalid option').optional({ nullable: true }),
         body('discount').isNumeric().withMessage('Discount must be a number').optional({ nullable: true }),
         tokenIsValid,
         errorHandler,
     ],
     menuController.updateMenu,
+)
+
+router.put(
+    '/item/available/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.availableMenu
 )
 
 router.delete(
@@ -184,6 +204,16 @@ router.put(
     menuController.updateTopping,
 )
 
+router.put(
+    '/toppings/available/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.availableTopping
+)
+
 router.delete(
     //TODO: update this and the other deletes methods haha
     '/toppings/:id',
@@ -218,6 +248,16 @@ router.put(
         errorHandler,
     ],
     menuController.updateOption,
+)
+
+router.put(
+    '/option/available/:id',
+    [
+        param('id').isMongoId().withMessage('Path param is not a mongo Id'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    menuController.availableOption
 )
 
 router.delete(

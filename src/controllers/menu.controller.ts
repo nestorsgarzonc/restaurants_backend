@@ -66,6 +66,19 @@ export const createCategory = async (req: Request, res: Response) => {
     }
 }
 
+export const availableCategory = async (req: Request, res: Response) => {
+    try {
+        const category = await Category.findById(req.params.id);
+        if(!category)throw new Error('Category not found');
+        category.isAvailable = !category.isAvailable;
+        await category.save();
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated});
+        return res.json({ msg: 'Category status updated successfully', category });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
 export const updateCategory = async (req: Request, res: Response) => {
     try {
         const category = await Category.findById(req.params.id);
@@ -159,6 +172,21 @@ export const updateMenu = async (req: Request, res: Response) => {
     }
 }
 
+export const availableMenu = async (req: Request, res: Response) => {
+    try {
+        const menuItem = await Menu.findById(req.params.id);
+        if (!menuItem) {
+            return res.status(404).json({ msg: 'Menu item not found' });
+        }
+        menuItem.isAvailable = !menuItem.isAvailable;
+        await menuItem.save();
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated});
+        return res.json({ msg: 'Menu item updated successfully', menuItem });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
 export const deleteMenu = async (req: Request, res: Response) => {
     try {
         const menuItem = await Menu.findById(req.params.id);
@@ -172,6 +200,7 @@ export const deleteMenu = async (req: Request, res: Response) => {
         } 
         await category.save();
         await Menu.deleteOne({_id:menuItem._id});
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated});
         return res.json({ msg: 'Menu item deleted successfully' });
     } catch (error) {
         return res.status(400).json({ msg: error });
@@ -251,6 +280,21 @@ export const addToppingToMenu = async (req: Request, res: Response) => {
     }
 }
 
+export const availableTopping = async (req: Request, res: Response) => {
+    try {
+        const topping = await Topping.findById(req.params.id);
+        if (!topping) {
+            return res.status(404).json({ msg: 'Topping item not found' });
+        }
+        topping.isAvailable = !topping.isAvailable;
+        await topping.save();
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated});
+        return res.json({ msg: 'Menu item updated successfully', topping});
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
 export const updateTopping = async (req: Request, res: Response) => {
     try {
         const topping = await Topping.findById(req.params.id);
@@ -300,6 +344,21 @@ export const addToppingOptionToTopping = async (req: Request, res: Response) => 
         await topping.save();
         io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated});
         return res.json({ msg: 'Topping Option added to menu successfully', toppingOption });
+    } catch (error) {
+        return res.status(400).json({ msg: error });
+    }
+}
+
+export const availableOption = async (req: Request, res: Response) => {
+    try {
+        const option = await ToppingOption.findById(req.params.id);
+        if (!option) {
+            return res.status(404).json({ msg: 'Topping item not found' });
+        }
+        option.isAvailable = !option.isAvailable;
+        await option.updateOne(req.body);
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated});
+        return res.json({ msg: 'Menu item updated successfully', option});
     } catch (error) {
         return res.status(400).json({ msg: error });
     }
@@ -357,6 +416,7 @@ export const setDiscount = async (req: Request, res: Response) => {
         menuItem.discount = req.body.discount;
         console.log("new menuItem:", menuItem);
         await menuItem.save();
+        io.to(`bus_${req.header('restaurantId')}`).emit(eventNames.EventBus,{eventName:menuUpdated});
         return res.json({ msg: 'Menu item updated successfully', menuItem });
     } catch (error) {
         return res.status(400).json({ msg: error });

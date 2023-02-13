@@ -8,7 +8,7 @@ interface MenuItem {
     toppings: Types.ObjectId[];
     taxes?: Number;
     categoryId: Types.ObjectId;
-    isAvaliable: Boolean;
+    isAvailable: Boolean;
     discount?: Number;
     createdAt: Date;
     updatedAt: Date;
@@ -44,7 +44,7 @@ const scheme = new Schema<MenuItem>({
         type: Schema.Types.ObjectId,
         ref: 'Category'
     },
-    isAvaliable: {
+    isAvailable: {
         type: Boolean,
         default: true,
     },
