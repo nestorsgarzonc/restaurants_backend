@@ -11,6 +11,7 @@ import Table from '../models/restaurant/table';
 import { TableStatus } from '../models/restaurant/table';
 import { PaymentWays } from '../models_sockets/askAccount';
 import { saveOrderFromRedis } from '../core/util/sockets.utils';
+import order from '../models/restaurant/order';
 
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
@@ -173,4 +174,35 @@ export const getOrder = async (req: Request, res: Response) => {
     }
 }
 
+export const getOrderHistory = async (req: Request, res: Response) => {
+    try {
+        if (req.header("restaurantId") == null) {
+            throw new Error("getOrderHistory - No RestaurantId provided")
+        }
+        var queryFilter = {
+            restaurantId: req.header("restaurantId")
+        }
+        if (req.body.fechaInicio != null) {
+            queryFilter["createdAt"] = {$gte: req.body.fechaInicio};
+        }
+        if (req.body.fechaFin != null) {
+            queryFilter["createdAt"] = {$lte: req.body.fechaFin};
+        }
+        if (req.body.valorOrden != null) {
+            queryFilter["totalPrice"] = req.body.valorOrden;
+        }
+        if (req.body.paymentMethod != null) {
+            queryFilter["paymentMethod"] = req.body.paymentMethod;
+        }
+        console.log("QueryFilter:", queryFilter);
+        const order = await Order.find(queryFilter);
+        if (!order[0]) {
+            return res.status(404).json({ msg: 'No orders found' });
+        }
+        return res.json({ msg: 'Orders found:', order });
+    }
+    catch (error) {
+        return res.status(400).json({ msg: error.message });
+    }
+}
 

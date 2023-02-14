@@ -93,4 +93,16 @@ router.put(
     orderController.updateUserOrder
 )
 
+router.post(
+    '/order-history',
+    [
+        body('fechaInicio').isDate().optional({ nullable: true }),
+        body('fechaFin').isDate().optional({ nullable: true }),
+        body('valorOrden').isNumeric().optional({ nullable: true }),
+        body('paymentMethod').isIn(['cash','card','pse']).optional({ nullable: true }),
+        tokenIsValid,
+        orderController.getOrderHistory
+    ]
+)
+
 export default router
