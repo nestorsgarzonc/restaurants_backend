@@ -5,6 +5,7 @@ import MenuItem from "../models/menu/menuItem";
 import { redisClient } from "../core/sockets";
 import { updateOrderQueueInRedis, createOrderQueueInRedis, createTableInRedis } from "../core/util/sockets.utils"
 import { PaymentStatus } from "../models_sockets/userConnected";
+import { table } from "console";
 
 export const joinController = async (userId, tableId) => {
     let user = await User.findById(userId)
@@ -153,6 +154,28 @@ export const orderListQueueController = async (tableClient) => {
     return currentOrderParsed;
 }
 
+export const leaveTableController = async(tableId,userId)=>{
+    let currentTable = await redisClient.get(`table${tableId}`);
+    if (!currentTable) {
+        console.log("No se tiene un registro de la mesa")
+        throw new Error("No se tiene un registro de la mesa")
+    }
+    let currentTableParsed = JSON.parse(currentTable);
+    let userIndexInArray = currentTableParsed.usersConnected.findIndex(user => user.userId == userId);
+    if(currentTableParsed.usersConnected[userIndexInArray].orderProducts.length>0){
+        if(currentTableParsed.tableStatus !== TableStatus.Ordering)throw new Error('El usuario hizo un pedido.');
+        currentTableParsed.totalPrice -= currentTableParsed.usersConnected[userIndexInArray].price;
+    }
+    currentTableParsed.usersConnected.splice(userIndexInArray,1);
+    if(currentTableParsed.usersConnected.length==0){
+        await redisClient.del(`table${tableId}`);
+        const table = await Table.findById(tableId);
+        table.status = TableStatus.Empty;
+        await table.save();
+    }else await redisClient.set(`table${tableId}`, JSON.stringify(currentTableParsed));
+    return currentTableParsed;
+}
+
 const createNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, tableId, restaurantId, tableName) => {
     let currentOrderParsed: any = {}
     let usersConnected = currentTableParsed.usersConnected;
@@ -196,3 +219,4 @@ const updateNewOrderQueueRedisObject = async (currentTableParsed, currentOrder, 
     console.log("Set RedisOrderQueue", currentOrderParsed);
     return currentOrderParsed;
 }
+
