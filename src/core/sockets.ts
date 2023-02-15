@@ -32,7 +32,7 @@ const onConection = (socket) => {
     socket.on('table:call-waiter', errorHandlerSocket(TableService.callWaiter))
     socket.on('table:stop-calling-waiter', errorHandlerSocket(TableService.stopCallingWaiter))
     socket.on('table:order-now', errorHandlerSocket(TableService.orderNow))
-
+    socket.on('table:leave',errorHandlerSocket(TableService.leave))
 
     socket.on('order:add-item', errorHandlerSocket(OrderService.addItem))
     socket.on('order:edit-item', errorHandlerSocket(OrderService.editItem))

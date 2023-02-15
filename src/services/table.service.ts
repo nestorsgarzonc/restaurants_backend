@@ -89,3 +89,13 @@ export const orderNow = async (data) => {
         return;
     }
 }
+
+export const leave = async(data) => {
+    data = new TableInfoDto(data);
+    let userId = await checkUser(data.token);
+    if (!userId) return;
+    const currentTableParsed = await TableController.leaveTableController(data.tableId,userId);
+    socket.leave(data.tableId);
+    io.to(data.tableId).emit(socketEvents.listOfOrders, { table: currentTableParsed });
+}
+
