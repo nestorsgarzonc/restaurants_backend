@@ -12,6 +12,7 @@ import { TableStatus } from '../models/restaurant/table';
 import { PaymentWays } from '../models_sockets/askAccount';
 import { saveOrderFromRedis } from '../core/util/sockets.utils';
 import order from '../models/restaurant/order';
+import { parse } from 'path';
 
 export const getOrderDetail = async (req: Request, res: Response) => {
     try {
@@ -176,6 +177,7 @@ export const getOrder = async (req: Request, res: Response) => {
 
 export const getOrderHistory = async (req: Request, res: Response) => {
     try {
+        const ordersPerPage = 50;
         if (req.header("restaurantId") == null) {
             throw new Error("getOrderHistory - No RestaurantId provided")
         }
@@ -196,10 +198,13 @@ export const getOrderHistory = async (req: Request, res: Response) => {
         }
         console.log("QueryFilter:", queryFilter);
         const order = await Order.find(queryFilter);
-        if (!order[0]) {
+        const firstLimit = ordersPerPage * (parseInt(req.params.pageNumber) - 1);
+        const lastLimit = ordersPerPage * (parseInt(req.params.pageNumber));
+        const orderPaged = order.slice(firstLimit, lastLimit);
+        if (!orderPaged[0]) {
             return res.status(404).json({ msg: 'No orders found' });
         }
-        return res.json({ msg: 'Orders found:', order });
+        return res.json({ msg: 'Orders found:', orderPaged });
     }
     catch (error) {
         return res.status(400).json({ msg: error.message });

@@ -94,7 +94,7 @@ router.put(
 )
 
 router.post(
-    '/order-history',
+    '/order-history/:pageNumber',
     [
         body('fechaInicio').isDate().optional({ nullable: true }),
         body('fechaFin').isDate().optional({ nullable: true }),
