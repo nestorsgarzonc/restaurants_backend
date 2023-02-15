@@ -1,6 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 
-interface Waiter {
+interface Cashier {
     user: Types.ObjectId;
     restaurant: Types.ObjectId;
     isAvailable: Boolean;
@@ -8,7 +8,7 @@ interface Waiter {
     updatedAt: Date;
 }
 
-const schema = new Schema<Waiter>({
+const schema = new Schema<Cashier>({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -25,4 +25,4 @@ const schema = new Schema<Waiter>({
     }
 }, { timestamps: true });
 
-export default model<Waiter>('Waiter', schema);
+export default model<Cashier>('Cashier', schema);

@@ -1,6 +1,6 @@
 import User from '../models/user/user';
 import Waiter from '../models/restaurant/waiter';
-import { Request, Response, NextFunction } from 'express';
+import e, { Request, Response, NextFunction } from 'express';
 import Restaurant from '../models/restaurant/restaurant';
 
 export const getWaiter = async (req: Request, res: Response) => {
@@ -22,13 +22,13 @@ export const getAllWaiters = async (req: Request, res: Response) => {
 export const createWaiter = async (req: Request, res: Response) => {
     const user = await User.findOne({ 'email': req.body.waiterEmail });
     if (!user) return res.status(404).json({ msg: 'waiters email is not found' });
-    const restaurant = await Restaurant.findById(req.body.restaurantId);
+    const restaurant = await Restaurant.findById(req.header('restaurantId'));
     const waiterExists = await Waiter.findOne({ 'user': user._id, 'restaurant': req.body.restaurantId });
     if (waiterExists) return res.status(403).json({ msg: 'The waiter is already registered' })
     if (!restaurant) return res.status(404).json({ msg: ' restaurant is not found' });
     if (req.body.adminId != restaurant.owner) return res.status(404).json({ msg: ' you are not the owner of this restaurant' })
     try {
-        user.rol = 'waiter';
+        if(!user.rols.includes('waiter'))user.rols.push('waiter');
         await user.save();
         const waiter = new Waiter({ 'user': user._id, 'restaurant': req.body.restaurantId });
         await waiter.save();
@@ -38,4 +38,16 @@ export const createWaiter = async (req: Request, res: Response) => {
     } catch (error) {
         return res.status(400).json({ msg: error })
     }
+}
+
+
+export const updateWaiter = async(req:Request,res:Response)=>{
+    try{
+        const waiter = await Waiter.findById(req.body.waiterId);
+        await waiter.updateOne(req.body);
+        return res.json({msg:'Waiter updated succesfully',waiter});
+    }catch(error){
+        return res.status(400).json({msg:error});
+    }
+    
 }

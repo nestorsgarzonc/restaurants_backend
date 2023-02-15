@@ -7,7 +7,7 @@ interface User {
     password: String;
     phone: Number;
     isActive: Boolean;
-    rol: String;
+    rols: String[];
     ordersStory: Types.ObjectId[];
     address?: String;
     deviceToken?: String;
@@ -44,11 +44,11 @@ const scheme = new Schema<User>({
         type: Boolean,
         default: true
     },
-    rol: {
+    rols: [{
         type: String,
         default: 'customer',
-        enum: ['customer', 'waiter', 'owner', 'admin']
-    },
+        enum: ['customer', 'waiter', 'owner', 'admin','cashier']
+    }],
     ordersStory: [{
         type: Schema.Types.ObjectId,
         ref: 'Order',

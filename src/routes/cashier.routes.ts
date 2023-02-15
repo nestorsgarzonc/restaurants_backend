@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import * as waiterController from '../controllers/waiter.controller';
+import * as cashierController from '../controllers/cashier.controller';
 import { tokenIsValid } from '../middlewares/auth.middleware';
 import { errorHandler } from '../middlewares/errors.middleware';
 
@@ -9,35 +9,35 @@ const router = Router();
 router.get(
     '/:id',
     [tokenIsValid],
-    waiterController.getWaiter
+    cashierController.getCashier
 )
 
 router.post(
     '/',
     [
-        body('waiterEmail').isEmail().normalizeEmail().withMessage('The waiters email is invalid'),
+        body('cashierEmail').isEmail().normalizeEmail().withMessage('The cashiers email is invalid'),
         body('adminId').trim(),
         tokenIsValid,
         errorHandler,
     ],
-    waiterController.createWaiter
+    cashierController.createCashier
 )
 
 router.put(
     '/',
     [
-        body('waiterId').isMongoId().withMessage('WaiterId is not mongo Id'),
+        body('waiterId').isMongoId().withMessage('cashieerId is not mongo Id'),
         body('isAvailable').isBoolean().withMessage('isAvailable value is not boolean'),
         tokenIsValid,
         errorHandler
     ],
-    waiterController.updateWaiter
+    cashierController.updateCashier
 )
 
 router.get(
-    '/getWaiters',
+    '/getCashiers',
     [tokenIsValid],
-    waiterController.getAllWaiters
+    cashierController.getAllCashiers
 )
 
 

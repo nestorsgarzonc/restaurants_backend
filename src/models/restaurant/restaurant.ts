@@ -21,6 +21,7 @@ interface Restaurant {
     tables:            Types.ObjectId[];
     updatedAt:         Date;
     waiters:           Types.ObjectId[];
+    cashiers:          Types.ObjectId[];
 }
 
 const schema = new Schema<Restaurant>({
@@ -94,6 +95,12 @@ const schema = new Schema<Restaurant>({
     waiters: [{
         type: Schema.Types.ObjectId,
         ref: 'Waiter',
+        required: false,
+        default: []
+    }],
+    cashiers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Cashier',
         required: false,
         default: []
     }]

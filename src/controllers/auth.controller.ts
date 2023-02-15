@@ -8,6 +8,10 @@ import nodemailer = require('nodemailer')
 import * as jwt from 'jsonwebtoken';
 import { redisClient } from '../core/sockets';
 import { sessionTime, sessionValid } from '../core/constants/redis.constants';
+import userOrder from '../models/restaurant/userOrder';
+import Cashier from '../models/restaurant/cashier';
+import { ConfigurationServicePlaceholders } from 'aws-sdk/lib/config_service_placeholders';
+import { rmSync } from 'fs';
 
 export const login = async (req: Request, res: Response) => {
     try {
@@ -146,7 +150,7 @@ export const isWaiter = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
-        if (user.rol == 'waiter') {
+        if (user.rols.includes('waiter')) {
             const waiter = await Waiter.findOne({ user: user._id });
             return res.json({ restaurantId: waiter.restaurant });
         } else {
@@ -163,7 +167,7 @@ export const isAdmin = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
-        if (user.rol == 'admin') {
+        if (user.rols.includes('admin')) {
             const admin = await Admin.findOne({user: user._id});
             if(!admin)throw new Error('Admin not found');
             console.log(admin);
@@ -172,6 +176,25 @@ export const isAdmin = async (req: Request, res: Response) => {
         return res.status(401).json({ msg: 'User is not Admin' });
         
     } catch (error) {
-        return res.json({ msg: error.message })
+        return res.json({ msg: error.message });
+    }
+}
+
+export const isCashier = async(req:Request,res:Response)=>{
+    try{
+        const user = await User.findById(res.locals.token.userId);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+        if(user.rols.includes('cashier')){
+            const cashier = await Cashier.findOne({user:user._id});
+            if(!cashier)return res.status(404).json({msg:'Cajero no encontrado'});
+            console.log(cashier);
+            return res.json({restaurant:cashier.restaurant});
+        }else{
+            return res.status(401).json({ msg: 'El usuario no es cajero' });
+        }
+    }catch(error){
+        return res.json({ msg: error.message });
     }
 }
