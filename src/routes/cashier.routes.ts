@@ -16,7 +16,6 @@ router.post(
     '/',
     [
         body('cashierEmail').isEmail().normalizeEmail().withMessage('The cashiers email is invalid'),
-        body('adminId').trim(),
         tokenIsValid,
         errorHandler,
     ],
@@ -26,7 +25,7 @@ router.post(
 router.put(
     '/',
     [
-        body('waiterId').isMongoId().withMessage('cashieerId is not mongo Id'),
+        body('cashierId').isMongoId().withMessage('cashieerId is not mongo Id'),
         body('isAvailable').isBoolean().withMessage('isAvailable value is not boolean'),
         tokenIsValid,
         errorHandler

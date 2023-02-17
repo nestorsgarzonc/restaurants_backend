@@ -26,7 +26,6 @@ export const createWaiter = async (req: Request, res: Response) => {
     const waiterExists = await Waiter.findOne({ 'user': user._id, 'restaurant': req.body.restaurantId });
     if (waiterExists) return res.status(403).json({ msg: 'The waiter is already registered' })
     if (!restaurant) return res.status(404).json({ msg: ' restaurant is not found' });
-    if (req.body.adminId != restaurant.owner) return res.status(404).json({ msg: ' you are not the owner of this restaurant' })
     try {
         if(!user.rols.includes('waiter'))user.rols.push('waiter');
         await user.save();
@@ -34,7 +33,7 @@ export const createWaiter = async (req: Request, res: Response) => {
         await waiter.save();
         restaurant.waiters.push(user._id);
         await restaurant.save();
-        return res.json({ msg: 'The waiter was registered succesfully!!' })
+        return res.json({ msg: 'The waiter was registered succesfully!!' ,waiter})
     } catch (error) {
         return res.status(400).json({ msg: error })
     }

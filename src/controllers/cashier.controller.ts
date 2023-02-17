@@ -34,7 +34,7 @@ export const createCashier = async (req: Request, res: Response) => {
         await cashier.save();
         restaurant.cashiers.push(user._id);
         await restaurant.save();
-        return res.json({ msg: 'The cashier was registered succesfully!!' })
+        return res.json({ msg: 'The cashier was registered succesfully!!' ,cashier})
     } catch (error) {
         return res.status(400).json({ msg: error })
     }

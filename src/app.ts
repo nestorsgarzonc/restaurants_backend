@@ -1,6 +1,7 @@
 import express from "express";
 import cors from 'cors';
 import waiterRoutes from "./routes/waiter.routes";
+import cashierRoutes from "./routes/cashier.routes";
 import tableRoutes from "./routes/table.routes";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
@@ -45,6 +46,7 @@ app.get('/', (_, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/waiter', waiterRoutes);
+app.use('/api/cashier',cashierRoutes);
 app.use('/api/table', tableRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/order', orderRoutes);

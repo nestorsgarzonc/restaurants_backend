@@ -16,7 +16,6 @@ router.post(
     '/',
     [
         body('waiterEmail').isEmail().normalizeEmail().withMessage('The waiters email is invalid'),
-        body('adminId').trim(),
         tokenIsValid,
         errorHandler,
     ],
