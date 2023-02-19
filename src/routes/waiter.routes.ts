@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body,param } from 'express-validator';
 import * as waiterController from '../controllers/waiter.controller';
 import { tokenIsValid } from '../middlewares/auth.middleware';
 import { errorHandler } from '../middlewares/errors.middleware';
@@ -8,6 +8,7 @@ const router = Router();
 
 router.get(
     '/:id',
+    param('id').isMongoId().withMessage('WaiterId is not mongo Id'),
     [tokenIsValid],
     waiterController.getWaiter
 )
@@ -23,9 +24,9 @@ router.post(
 )
 
 router.put(
-    '/',
+    '/:id',
     [
-        body('waiterId').isMongoId().withMessage('WaiterId is not mongo Id'),
+        param('id').isMongoId().withMessage('WaiterId is not mongo Id'),
         body('isAvailable').isBoolean().withMessage('isAvailable value is not boolean'),
         tokenIsValid,
         errorHandler
@@ -34,7 +35,7 @@ router.put(
 )
 
 router.get(
-    '/getWaiters',
+    '/',
     [tokenIsValid],
     waiterController.getAllWaiters
 )
