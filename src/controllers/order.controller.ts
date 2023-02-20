@@ -177,7 +177,7 @@ export const getOrder = async (req: Request, res: Response) => {
 
 export const getOrderHistory = async (req: Request, res: Response) => {
     try {
-        const ordersPerPage = 3;
+        const ordersPerPage = 50;
         if (req.header("restaurantId") == null) {
             throw new Error("getOrderHistory - No RestaurantId provided")
         }
