@@ -18,7 +18,9 @@ export const getAllCashiers = async (req: Request, res: Response) => {
     console.log("Endpoint Reached")
     try {
         console.log("Entered - Data sent:", req);
-        const cashier = await Cashier.find({restaurant : req.header('restaurantId')});
+        const cashier = await Cashier.find({restaurant : req.header('restaurantId')}).populate({
+            path:'user',select:['firstName','lastName','email']
+        });
         console.log("waiters found:", cashier);
         return res.json(cashier);
     } catch (error) {
