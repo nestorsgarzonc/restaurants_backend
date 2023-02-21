@@ -47,7 +47,7 @@ const scheme = new Schema<User>({
     rols: [{
         type: String,
         default: 'customer',
-        enum: ['customer', 'waiter', 'owner', 'admin','cashier']
+        enum: ['customer', 'waiter', 'owner', 'admin','cashier','chef']
     }],
     ordersStory: [{
         type: Schema.Types.ObjectId,
