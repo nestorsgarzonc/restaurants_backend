@@ -42,7 +42,7 @@ export const createCashier = async (req: Request, res: Response) => {
         await cashier.save();
         restaurant.cashiers.push(user._id);
         await restaurant.save();
-        cashier = await Cashier.findById(req.params.id).populate({
+        cashier = await Cashier.findOne({'user': user._id}).populate({
             path:'user',select:['firstName','lastName','email']
         });
         return res.json({ msg: 'The cashier was registered succesfully!!' ,cashier})
@@ -65,4 +65,25 @@ export const updateCashier = async(req:Request,res:Response)=>{
         return res.status(400).json({msg:error});
     }
     
+}
+
+export const deleteCashier = async(req:Request,res:Response)=>{
+    try{
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        if (!restaurant) return res.status(404).json({ msg: ' restaurant is not found' });
+        const cashier = await Cashier.findById(req.params.id);
+        if(!cashier)return res.json({msg:'Cashier not found'});
+        let cashierIndex = restaurant.cashiers.indexOf(cashier.user, 0);
+        if (cashierIndex > -1)restaurant.cashiers.splice(cashierIndex, 1);
+        const user = await User.findById(cashier.user);
+        cashierIndex = user.rols.indexOf('cashier', 0);
+        if (cashierIndex > -1)user.rols.splice(cashierIndex, 1);
+        await restaurant.save();
+        await user.save();
+        await cashier.deleteOne({_id:cashier._id});
+        return res.json({msg:'Cashier deleted succesfully'});
+
+    }catch(error){
+        return res.status(400).json({msg:error});
+    }
 }

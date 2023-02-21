@@ -2,6 +2,7 @@ import User from '../models/user/user';
 import Waiter from '../models/restaurant/waiter';
 import e, { Request, Response, NextFunction } from 'express';
 import Restaurant from '../models/restaurant/restaurant';
+import waiter from '../models/restaurant/waiter';
 
 export const getWaiter = async (req: Request, res: Response) => {
     try{
@@ -42,7 +43,7 @@ export const createWaiter = async (req: Request, res: Response) => {
         await waiter.save();
         restaurant.waiters.push(user._id);
         await restaurant.save();
-        waiter = await Waiter.findById(req.params.id).populate({
+        waiter = await Waiter.findOne({'user': user._id}).populate({
             path:'user',select:['firstName','lastName','email']
         })
         return res.json({ msg: 'The waiter was registered succesfully!!' ,waiter})
@@ -63,5 +64,25 @@ export const updateWaiter = async(req:Request,res:Response)=>{
     }catch(error){
         return res.status(400).json({msg:error});
     }
-    
+}
+
+export const deleteWaiter = async(req:Request,res:Response)=>{
+    try{
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        if (!restaurant) return res.status(404).json({ msg: ' restaurant is not found' });
+        const waiter = await Waiter.findById(req.params.id);
+        if(!waiter)return res.json({msg:'Waiter not found'});
+        let waiterIndex = restaurant.waiters.indexOf(waiter.user, 0);
+        if (waiterIndex > -1)restaurant.waiters.splice(waiterIndex, 1);
+        const user = await User.findById(waiter.user);
+        waiterIndex = user.rols.indexOf('waiter', 0);
+        if (waiterIndex > -1)user.rols.splice(waiterIndex, 1);
+        await restaurant.save();
+        await user.save();
+        await Waiter.deleteOne({_id:waiter._id});
+        return res.json({msg:'Waiter deleted succesfully'});
+
+    }catch(error){
+        return res.status(400).json({msg:error});
+    }
 }

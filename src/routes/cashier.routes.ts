@@ -34,6 +34,16 @@ router.put(
     cashierController.updateCashier
 )
 
+router.delete(
+    '/:id',
+    [
+        param('id').isMongoId().withMessage('WaiterId is not mongo Id'),
+        tokenIsValid,
+        errorHandler
+    ],
+    cashierController.deleteCashier
+)
+
 router.get(
     '/',
     [tokenIsValid],

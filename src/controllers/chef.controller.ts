@@ -42,7 +42,7 @@ export const createChef = async (req: Request, res: Response) => {
         await chef.save();
         restaurant.chefs.push(user._id);
         await restaurant.save();
-        chef = await Chef.findById(req.params.id).populate({
+        chef = await Chef.findOne({'user': user._id}).populate({
             path:'user',select:['firstName','lastName','email']
         });
         return res.json({ msg: 'The chef was registered succesfully!!' ,chef})
@@ -65,4 +65,25 @@ export const updateChef = async(req:Request,res:Response)=>{
         return res.status(400).json({msg:error});
     }
     
+}
+
+
+export const deleteChef = async(req:Request,res:Response)=>{
+    try{
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        if (!restaurant) return res.status(404).json({ msg: ' restaurant is not found' });
+        const chef = await Chef.findById(req.params.id);
+        if(!chef)return res.json({msg:'Chef not found'});
+        let chefIndex = restaurant.chefs.indexOf(chef.user, 0);
+        if (chefIndex > -1)restaurant.chefs.splice(chefIndex, 1);
+        const user = await User.findById(chef.user);
+        chefIndex = user.rols.indexOf('chef', 0);
+        if (chefIndex > -1)user.rols.splice(chefIndex, 1);
+        await restaurant.save();
+        await user.save();
+        await chef.deleteOne({_id:chef._id});
+        return res.json({msg:'Chef deleted succesfully'});
+    }catch(error){
+        return res.status(400).json({msg:error});
+    }
 }

@@ -34,6 +34,16 @@ router.put(
     waiterController.updateWaiter
 )
 
+router.delete(
+    '/:id',
+    [
+        param('id').isMongoId().withMessage('WaiterId is not mongo Id'),
+        tokenIsValid,
+        errorHandler
+    ],
+    waiterController.deleteWaiter
+)
+
 router.get(
     '/',
     [tokenIsValid],

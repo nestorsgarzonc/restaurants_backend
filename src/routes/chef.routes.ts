@@ -34,6 +34,16 @@ router.put(
     chefController.updateChef
 )
 
+router.delete(
+    '/:id',
+    [
+        param('id').isMongoId().withMessage('chefId is not mongo Id'),
+        tokenIsValid,
+        errorHandler
+    ],
+    chefController.deleteChef
+)
+
 router.get(
     '/',
     [tokenIsValid],
