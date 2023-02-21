@@ -7,21 +7,9 @@ import { errorHandler } from '../middlewares/errors.middleware';
 const router = Router()
 
 router.get(
-    '/:id',
-    [tokenIsValid],
-    restaurantController.getRestaurant
-)
-
-router.get(
     '/',
     [tokenIsValid],
     restaurantController.getRestaurants
-)
-
-router.get(
-    '/closer-restaurarts',
-    [tokenIsValid],
-    restaurantController.getCloserRestaurants
 )
 
 router.post(
@@ -80,6 +68,19 @@ router.put(
     ],
     restaurantController.updateRestaurantLogo
 )
+
+router.get(
+    '/payment-methods',
+    [tokenIsValid],
+    restaurantController.getPaymentMethods
+)
+
+
+// router.get(
+//     '/closer-restaurarts',
+//     [tokenIsValid],
+//     restaurantController.getCloserRestaurants
+// )
 
 /*router.get(
     '/:restaurantId/tables',

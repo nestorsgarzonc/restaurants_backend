@@ -177,7 +177,7 @@ export const getOrder = async (req: Request, res: Response) => {
 
 export const getOrderHistory = async (req: Request, res: Response) => {
     try {
-        const ordersPerPage = 50;
+        const ordersPerPage = 3;
         if (req.header("restaurantId") == null) {
             throw new Error("getOrderHistory - No RestaurantId provided")
         }
@@ -200,11 +200,16 @@ export const getOrderHistory = async (req: Request, res: Response) => {
         const order = await Order.find(queryFilter);
         const firstLimit = ordersPerPage * (parseInt(req.params.pageNumber) - 1);
         const lastLimit = ordersPerPage * (parseInt(req.params.pageNumber));
+        const nextLimit = ordersPerPage * (parseInt(req.params.pageNumber));
+        var nextPage = true;
         const orderPaged = order.slice(firstLimit, lastLimit);
         if (!orderPaged[0]) {
             return res.status(404).json({ msg: 'No orders found' });
         }
-        return res.json({ msg: 'Orders found:', orderPaged });
+        if (nextLimit > order.length) {
+            nextPage = false
+        }
+        return res.json({ msg: 'Orders found:', orderPaged, nextPage});
     }
     catch (error) {
         return res.status(400).json({ msg: error.message });

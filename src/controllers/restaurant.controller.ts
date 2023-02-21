@@ -129,6 +129,19 @@ export const updateRestaurantLogo = async (req: Request, res: Response) =>{
     }
 }
 
+export const getPaymentMethods = async (req: Request, res: Response) =>{
+    try{
+        console.log("entered");
+        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        if (!restaurant) {
+            return res.status(404).json({ msg: 'Restaurant not found' });
+        }
+        console.log("restaurant found: ", restaurant);
+        return res.json({paymentMethods: restaurant.paymentMethods});
+    }catch (error){
+        return res.status(400).json({msg: error })
+    }
+}
 
 
 //TODO: Table's methods into restaurant controller
