@@ -87,6 +87,15 @@ router.post(
     restaurantController.createPaymentMethod
 )
 
+router.get(
+    '/country-payment-methods',[
+        body('country').trim().isLength({min: 2, max:2}).withMessage('Country must have exactly 2 characters'),
+        tokenIsValid,
+        errorHandler,
+    ],
+    restaurantController.getCountryPaymentMethods
+)
+
 // router.get(
 //     '/closer-restaurarts',
 //     [tokenIsValid],

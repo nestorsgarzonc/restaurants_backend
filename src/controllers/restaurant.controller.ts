@@ -8,6 +8,7 @@ import Waiter from '../models/restaurant/waiter';
 import MenuItem from '../models/menu/menuItem';
 import { uploadImageS3,updateImageS3 } from '../core/util/s3.utils';
 import Admin from '../models/restaurant/admin';
+import { body } from 'express-validator';
 
 export const getRestaurant = async (req: Request, res: Response) => {
     try {
@@ -156,6 +157,22 @@ export const createPaymentMethod = async (req: Request, res: Response) =>{
         console.log(paymentMethod);
         await paymentMethod.save();
         return res.json({ msg: 'Payment method created successfully', paymentMethod });
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: error });
+    }
+}
+
+export const getCountryPaymentMethods = async (req: Request, res: Response) =>{
+    try {
+        console.log("Object.values(Countries):", Object.values(Countries));
+        console.log("req.body.country:", req.body.country);
+        if (!Object.values(Countries)?.includes(req.body.country)){
+            return res.status(404).json({ msg: 'Country sent is not valid or included. Please check the ISO 2 bytes country codes' });
+        }
+        const paymentMethods = await PaymentMethod.find({country : req.body.country});
+        console.log(paymentMethods);
+        return res.json({ paymentMethods });
     } catch (error) {
         console.log(error);
         return res.status(400).json({ msg: error });
