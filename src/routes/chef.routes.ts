@@ -16,7 +16,7 @@ router.get(
 router.post(
     '/',
     [
-        body('cashierEmail').isEmail().normalizeEmail().withMessage('The chefs email is invalid'),
+        body('chefEmail').isEmail().normalizeEmail().withMessage('The chefs email is invalid'),
         tokenIsValid,
         errorHandler,
     ],

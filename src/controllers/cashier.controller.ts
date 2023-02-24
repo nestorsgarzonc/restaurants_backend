@@ -55,9 +55,8 @@ export const createCashier = async (req: Request, res: Response) => {
 
 export const updateCashier = async(req:Request,res:Response)=>{
     try{
-        let cashier = await Cashier.findById(req.body.waiterId);
-        await cashier.updateOne(req.body);
-        cashier = await Cashier.findById(req.params.id).populate({
+        await Cashier.updateOne({_id:req.params.id},req.body);
+        const cashier = await Cashier.findById(req.params.id).populate({
             path:'user',select:['firstName','lastName','email']
         });
         return res.json({msg:'Cashier updated succesfully',cashier});

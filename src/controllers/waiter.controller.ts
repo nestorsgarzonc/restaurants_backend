@@ -55,13 +55,15 @@ export const createWaiter = async (req: Request, res: Response) => {
 
 export const updateWaiter = async(req:Request,res:Response)=>{
     try{
-        let waiter = await Waiter.findById(req.body.waiterId);
-        await waiter.updateOne(req.body);
-        waiter = await Waiter.findById(req.params.id).populate({
+        await Waiter.updateOne({_id:req.params.id},req.body);
+
+        const waiter = await Waiter.findById(req.params.id).populate({
             path:'user',select:['firstName','lastName','email']
         })
+        console.log(waiter);
         return res.json({msg:'Waiter updated succesfully',waiter});
     }catch(error){
+        console.log(error);
         return res.status(400).json({msg:error});
     }
 }

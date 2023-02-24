@@ -150,8 +150,11 @@ export const isWaiter = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
+        console.log(user);
         if (user.rols.includes('waiter')) {
             const waiter = await Waiter.findOne({ user: user._id });
+            console.log(waiter);
+            
             return res.json({ restaurantId: waiter.restaurant });
         } else {
             return res.status(401).json({ msg: 'User is not waiter' });
