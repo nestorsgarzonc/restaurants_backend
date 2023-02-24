@@ -55,9 +55,8 @@ export const createChef = async (req: Request, res: Response) => {
 
 export const updateChef = async(req:Request,res:Response)=>{
     try{
-        let chef = await Chef.findById(req.body.waiterId);
-        await chef.updateOne(req.body);
-        chef = await Chef.findById(req.params.id).populate({
+        await Chef.updateOne({_id:req.params.id},req.body);
+        const chef = await Chef.findById(req.params.id).populate({
             path:'user',select:['firstName','lastName','email']
         });
         return res.json({msg:'Chef updated succesfully',chef});
