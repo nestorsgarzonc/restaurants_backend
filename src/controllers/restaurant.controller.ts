@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import Restaurant from '../models/restaurant/restaurant';
 import User from '../models/user/user';
+import PaymentMethod from '../models/restaurant/paymentMethod';
+import {Countries} from '../models/restaurant/paymentMethod';
 import Table from '../models/restaurant/table';
 import Waiter from '../models/restaurant/waiter';
 import MenuItem from '../models/menu/menuItem';
@@ -143,6 +145,22 @@ export const getPaymentMethods = async (req: Request, res: Response) =>{
     }
 }
 
+export const createPaymentMethod = async (req: Request, res: Response) =>{
+    try {
+        console.log("Object.values(Countries):", Object.values(Countries));
+        console.log("req.body.country:", req.body.country);
+        if (!Object.values(Countries)?.includes(req.body.country)){
+            return res.status(404).json({ msg: 'Country sent is not valid or included. Please check the ISO 2 bytes country codes' });
+        }
+        const paymentMethod = new PaymentMethod(req.body);
+        console.log(paymentMethod);
+        await paymentMethod.save();
+        return res.json({ msg: 'Payment method created successfully', paymentMethod });
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: error });
+    }
+}
 
 //TODO: Table's methods into restaurant controller
 
