@@ -13,7 +13,7 @@ interface Restaurant {
     owner:             Types.ObjectId;
     phone:             Number;
     weekDays:          Object[];
-    paymentMethods:    String[];
+    paymentMethods:    Types.ObjectId[];
     primaryColor?:     String;
     secondaryColor?:   String;
     facebook?:         String;
@@ -65,7 +65,8 @@ const schema = new Schema<Restaurant>({
         required:true
     }],
     paymentMethods:[{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'PaymentMethod',
         required: true
     }],
     image: {
