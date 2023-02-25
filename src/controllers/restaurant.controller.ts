@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import Restaurant from '../models/restaurant/restaurant';
 import User from '../models/user/user';
-import PaymentMethod from '../models/restaurant/paymentMethod';
-import {Countries} from '../models/restaurant/paymentMethod';
+import PaymentMethod, {Countries} from '../models/restaurant/paymentMethod';
 import Table from '../models/restaurant/table';
 import Waiter from '../models/restaurant/waiter';
 import MenuItem from '../models/menu/menuItem';
@@ -69,6 +68,15 @@ export const createRestaurant = async (req: Request, res: Response) => {
         admin.save();
         if(req.body.image)restaurant.image = await uploadImageS3(req.body.image,process.env.AWS_S3_RESTAURANT);
         if(req.body.logo)restaurant.logo = await uploadImageS3(req.body.logo,process.env.AWS_S3_RESTAURANT);
+        if(req.body.paymentMethods){
+            await req.body.paymentMethods.forEach(async paymentMethodId => {
+                console.log("*************i*************", paymentMethodId);
+                const paymentMethod = await PaymentMethod.findById(paymentMethodId);
+                if (!paymentMethod){
+                    return res.status(404).json({ msg: 'PaymentMethod id (' + paymentMethodId + ') not found' });
+                }
+            });
+        }
         console.log(restaurant);
         await restaurant.save();
         return res.json({ msg: 'Restaurant created successfully', restaurant });
@@ -92,6 +100,15 @@ export const updateRestaurant = async (req: Request, res: Response) => {
         if(req.body.logo){
             req.body.logo = await updateImageS3(req.body.logo,restaurant.logo,process.env.AWS_S3_RESTAURANT);
             restaurant.logo = req.body.logo;
+        }
+        if(req.body.paymentMethods){
+            await req.body.paymentMethods.forEach(async paymentMethodId => {
+                console.log("*************i*************", paymentMethodId);
+                const paymentMethod = await PaymentMethod.findById(paymentMethodId);
+                if (!paymentMethod){
+                    return res.status(404).json({ msg: 'PaymentMethod id (' + paymentMethodId + ') not found' });
+                }
+            });
         }
         await restaurant.save();
         await restaurant.updateOne(req.body);
@@ -135,11 +152,11 @@ export const updateRestaurantLogo = async (req: Request, res: Response) =>{
 export const getPaymentMethods = async (req: Request, res: Response) =>{
     try{
         console.log("entered");
-        const restaurant = await Restaurant.findById(req.header('restaurantId'));
+        const restaurant = await Restaurant.findById(req.header('restaurantId')).populate({path : "paymentMethods"});
         if (!restaurant) {
             return res.status(404).json({ msg: 'Restaurant not found' });
         }
-        console.log("restaurant found: ", restaurant);
+        console.log("restaurant paymentMethods: ", restaurant.paymentMethods);
         return res.json({paymentMethods: restaurant.paymentMethods});
     }catch (error){
         return res.status(400).json({msg: error })
