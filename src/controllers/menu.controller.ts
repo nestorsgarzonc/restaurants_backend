@@ -24,7 +24,7 @@ export const getAllMenus = async (req: Request, res: Response) => {
 export const getRestaurantMenuWithRestaurantId = async (req: Request, res: Response) => {
     //TODO: this is what I need to complete ajaja
     try {
-        const restaurant = await getRestaurantWithMenu(req.header('restaurantId'));
+        const restaurant = await (await getRestaurantWithMenu(req.header('restaurantId'))).populate({path : "paymentMethods"});
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
 
         return res.json({ restaurant: restaurant });
@@ -37,7 +37,7 @@ export const getRestaurantMenu = async (req: Request, res: Response) => {
     try {
         const table = await Table.findById(req.params.tableId);
         if (!table) return res.status(404).json({ msg: 'Table not found' });
-        const restaurant = await getRestaurantWithMenu(table.restaurantId);
+        const restaurant = await (await getRestaurantWithMenu(table.restaurantId)).populate({path : "paymentMethods"});
 
 
         if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
