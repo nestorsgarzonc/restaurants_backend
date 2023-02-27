@@ -166,8 +166,8 @@ export const getOrder = async (req: Request, res: Response) => {
         if (order.paymentWay == 'all') {
             return res.json(order);
         } else if (order.paymentWay == 'split') {
-
-            return res.json({ order: order.usersOrder.find(userorder => (userorder as any).userId._id == userId), restaurantId: order.restaurantId, payment: { way: order.paymentWay, method: order.paymentMethod } });
+            return res.json({...order['_doc'], usersOrder: order.usersOrder.find(userorder => (userorder as any).userId._id == userId)})
+            // return res.json({ order: order.usersOrder.find(userorder => (userorder as any).userId._id == userId), restaurantId: order.restaurantId, payment: { way: order.paymentWay, method: order.paymentMethod } });
         }
 
     } catch (error) {
