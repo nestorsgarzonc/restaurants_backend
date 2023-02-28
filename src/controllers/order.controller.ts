@@ -49,7 +49,7 @@ export const getOrders = async (req: Request, res: Response) => {
             return res.status(400).json({ msg: 'Orders not found' });
         }
         user.ordersStory.forEach(order => {
-            order["totalPrice"] += order["totalPrice"]*order["tip"]/100
+            order["totalPrice"] += order["totalPrce"]*order["tip"]/100
         });
         return res.json(user.ordersStory);
     } catch (error) {
