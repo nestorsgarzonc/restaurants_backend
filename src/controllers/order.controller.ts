@@ -29,12 +29,13 @@ export const getOrderDetail = async (req: Request, res: Response) => {
 }
 
 export const getOrders = async (req: Request, res: Response) => {
+    //TODO: sumarle el tip a totalPrice
     try {
         const userId = res.locals.token.userId;
         const user = await User.findById(userId)
             .populate({
                 path: 'ordersStory',
-                select: ['totalPrice', 'createdAt', 'paymentWay', 'paymentMethod'],
+                select: ['totalPrice', 'tip', 'createdAt', 'paymentWay', 'paymentMethod'],
                 populate: [{
                     path: 'restaurantId' as 'restaurant',
                     select: ['address', 'name', 'logo']
@@ -47,6 +48,9 @@ export const getOrders = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(400).json({ msg: 'Orders not found' });
         }
+        user.ordersStory.forEach(order => {
+            order["totalPrice"] += order["totalPrice"]*order["tip"]/100
+        });
         return res.json(user.ordersStory);
     } catch (error) {
         return res.status(400).json({ msg: error.message });
