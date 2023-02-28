@@ -124,7 +124,7 @@ export const updateUserOrder = async (req: Request, res: Response) => {
 }
 
 export const payAccount = async (req: Request, res: Response) => {
-
+    //TODO: paymentMethods
     const orderId = await saveOrderFromRedis(req.body.tableId,res.locals.token.userId,req.body.tip,req.body.paymentWay,req.body.individualPaymentWay,req.body.paymentMethod);
     
 

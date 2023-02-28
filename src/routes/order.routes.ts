@@ -37,7 +37,7 @@ router.get(
 router.post(
     '/table-order',
     [
-        body('paymentMethod').isIn(['cash','card','pse']),
+        body('paymentMethod'),
         body('tableId').isMongoId(),
         body('tip').isNumeric(),
         tokenIsValid,
