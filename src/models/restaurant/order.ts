@@ -8,7 +8,7 @@ interface Order {
     waiterId: Types.ObjectId;
     tip: Number;
     paymentWay: String;
-    paymentMethod: String;
+    paymentMethod: Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -50,10 +50,10 @@ const scheme = new Schema<Order>(
             default: 'all',
             enum: ['all','split']
         },
-        paymentMethod:{
-            type:String,
-            default:"cash",
-            enum:['cash','card','pse']
+        paymentMethod: {
+            type: Schema.Types.ObjectId,
+            ref: 'PaymentMethod',
+            required: true
         }
     }, { timestamps: true }
 );

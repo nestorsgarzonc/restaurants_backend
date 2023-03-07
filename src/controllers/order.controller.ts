@@ -29,7 +29,6 @@ export const getOrderDetail = async (req: Request, res: Response) => {
 }
 
 export const getOrders = async (req: Request, res: Response) => {
-    //TODO: sumarle el tip a totalPrice
     try {
         const userId = res.locals.token.userId;
         const user = await User.findById(userId)
@@ -42,6 +41,9 @@ export const getOrders = async (req: Request, res: Response) => {
                 },
                 {
                     path: 'usersOrder', match: { userId: userId }, select: ['price']
+                },
+                {
+                    path: 'paymentMethod'
                 }
                 ]
             })
@@ -49,7 +51,7 @@ export const getOrders = async (req: Request, res: Response) => {
             return res.status(400).json({ msg: 'Orders not found' });
         }
         user.ordersStory.forEach(order => {
-            order["totalPrice"] += order["totalPrce"]*order["tip"]/100
+            order["totalPrice"] += order["totalPrice"]*order["tip"]/100
         });
         return res.json(user.ordersStory);
     } catch (error) {
@@ -124,7 +126,6 @@ export const updateUserOrder = async (req: Request, res: Response) => {
 }
 
 export const payAccount = async (req: Request, res: Response) => {
-    //TODO: paymentMethods
     const orderId = await saveOrderFromRedis(req.body.tableId,res.locals.token.userId,req.body.tip,req.body.paymentWay,req.body.individualPaymentWay,req.body.paymentMethod);
     
 
