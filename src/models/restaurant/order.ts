@@ -9,6 +9,8 @@ interface Order {
     tip: Number;
     paymentWay: String;
     paymentMethod: Types.ObjectId;
+    //TODO:Pasar paymentMethods a userOrder
+
     createdAt: Date;
     updatedAt: Date;
 }
