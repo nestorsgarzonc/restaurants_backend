@@ -14,6 +14,7 @@ import UserOrder from '../../models/restaurant/userOrder';
 import Order from '../../models/restaurant/order';
 import { PaymentWays } from "../../models_sockets/askAccount";
 import { sendPush } from "./push.utils";
+import { table } from "console";
 
 export const checkUser = async (token) => {
     let userId = await tokenIsValidSocket(token);
@@ -150,5 +151,8 @@ export const saveOrderFromRedis = async(tableId,userId,tip,paymentWay,individual
         })
     }
     await redisClient.del(`table${tableId}`);
+    const mongoTable = await Table.findById(tableId);
+    mongoTable.status = TableStatus.Empty;
+    await mongoTable.save();
     return order._id;
 }
