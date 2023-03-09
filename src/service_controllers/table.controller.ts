@@ -124,10 +124,15 @@ export const orderNowController = async (data) => {
     }
     table.status = TableStatus.ConfirmOrder;
     await table.save();
-    console.log("#############")
-    console.log(table);
-    console.log("#############")
-    return currentTableParsed;
+    const restaurant = await Restaurant.findById(table.restaurantId)
+            .populate({
+                path: 'tables', select: ['status', 'name']
+            })
+        if (!restaurant) {
+            throw new Error("No se encontró el restaurante");
+        }
+
+    return {currentTableParsed,restaurant};
 }
 
 export const orderListQueueController = async (tableClient) => {
