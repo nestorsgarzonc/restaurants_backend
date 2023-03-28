@@ -8,6 +8,7 @@ import authRoutes from "./routes/auth.routes";
 import orderRoutes from "./routes/order.routes";
 import chefRoutes from "./routes/chef.routes";
 import restaurantRoutes from "./routes/restaurant.routes";
+import clientRoutes from "./routes/client.routes"
 import menuRoutes from "./routes/menu.routes";
 import db from './core/db';
 import { configEnv } from "./core/config_env";
@@ -54,3 +55,4 @@ app.use('/api/order', orderRoutes);
 app.use('/api/restaurant', restaurantRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/chef',chefRoutes);
+app.use('/api/client',clientRoutes);
