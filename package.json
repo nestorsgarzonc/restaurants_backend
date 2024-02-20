@@ -24,7 +24,7 @@
     "@types/cors": "^2.8.13",
     "@types/jsonwebtoken": "^8.5.9",
     "aws-sdk": "^2.1293.0",
-    "axios": "^1.2.1",
+    "axios": "^1.6.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
